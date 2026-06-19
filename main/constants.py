@@ -1,2 +1,2 @@
 # main/constants.py
-API_KEY=aldsjfalksjdflaksjflkajsdlfska
+API_KEY='aldsjfalksjdflaksjflkajsdlfska'

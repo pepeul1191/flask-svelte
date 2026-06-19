@@ -1,6 +1,6 @@
 # main/middlewares.py
 from functools import wraps
-from flask import session, redirect, request
+from flask import session, redirect, request, Response, jsonify
 
 def only_logged(fn):
   @wraps(fn)
@@ -29,15 +29,25 @@ def logged_go_admin(fn):
   return _logged_go_admin
 
 def not_found(e):
-  # print(request.url)
-  if request.method == 'GET':
-    extensions_to_check = ['.css', '.js', '.woff', 'png', ]
-    if any(ext in request.url for ext in extensions_to_check):
-      return 'Recurso no encontrado', 404
-    else:
-      return redirect('/error/404')
-  else:
-    return 'Recurso no encontrado', 404
+  path = request.path
+
+  static_extensions = ('.css', '.js', '.woff', '.png', '.jpg', '.jpeg', '.svg', '.ico')
+
+  # 1. ARCHIVOS ESTÁTICOS → cortar respuesta silenciosa
+  if path.endswith(static_extensions):
+    return Response(status=404)  # no body, request "muere" aquí
+
+  # 2. API → JSON genérico
+  if path.startswith('/apis/'):
+    return jsonify({
+      "data": None,
+      "message": "Recurso no encontrado",
+      "error": True,
+      "success": False
+    }), 404
+
+  # 3. FRONTEND → redirect
+  return redirect('/error/404')
 
 def set_global_headers(response):
   response.headers["Server"] = "Werkzeug/3.1.8 Python/3.12.3/Ubuntu"

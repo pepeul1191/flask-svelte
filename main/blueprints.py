@@ -2,11 +2,13 @@
 from main.views import view as main_views
 from main.apis import api as main_apis
 # from admin.blueprints import blueprints as admin_blueprints
+from web.blueprints import blueprints as web_blueprints
 
 def register(app):
   # append sub blueprints
   modules_blueprints = [
     # admin_blueprints,
+    web_blueprints
   ]
   # load main blueprint to app
   app.register_blueprint(main_views)

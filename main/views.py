@@ -6,7 +6,7 @@ from main.middlewares import logged_go_admin
 
 view = Blueprint('main_views', __name__, template_folder='./templates')
 
-@view.route('/')
+# @view.route('/')
 @view.route('/nosotros')
 @view.route('/contacto')
 @logged_go_admin
@@ -30,13 +30,6 @@ def contacto():
   }
   return render_template('contacto.html', locals=locals)
 """
-@view.route('/error/403')
-def error_403():
-  return render_template('403.html')
-
-@view.route('/error/404')
-def error_404():
-  return render_template('404.html'), 404
 
 @view.route('/demo')
 def demo():
