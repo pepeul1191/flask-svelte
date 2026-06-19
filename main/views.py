@@ -1,3 +1,4 @@
+# main/views.py
 from flask import Blueprint, render_template, request, session, redirect
 from main.database import Session
 from main.models import User

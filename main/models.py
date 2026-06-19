@@ -1,3 +1,4 @@
+# main/models.py
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship
 from main.database import ToString

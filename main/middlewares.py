@@ -1,3 +1,4 @@
+# main/middlewares.py
 from functools import wraps
 from flask import session, redirect, request
 
@@ -37,3 +38,7 @@ def not_found(e):
       return redirect('/error/404')
   else:
     return 'Recurso no encontrado', 404
+
+def set_global_headers(response):
+  response.headers["Server"] = "Werkzeug/3.1.8 Python/3.12.3/Ubuntu"
+  return response

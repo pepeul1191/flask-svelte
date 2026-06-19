@@ -1,8 +1,8 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
+# main/application.py
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_session import Session
+from main.middlewares import set_global_headers
 
 APP = Flask(
   __name__,
@@ -16,6 +16,9 @@ APP.config['SESSION_PERMANENT'] = False
 APP.config['SESSION_USE_SIGNER'] = True
 APP.config['SESSION_KEY_PREFIX'] = 'session:'
 APP.config['JWT_SECRET_KEY'] = 'tu_clave_secreta_aqui' 
+
+APP.after_request(set_global_headers)
+
 Session(APP)
 
 jwt = JWTManager(APP)
