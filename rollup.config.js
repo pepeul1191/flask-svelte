@@ -13,7 +13,7 @@ const production = !process.env.ROLLUP_WATCH;
 const App = {
   input: 'src/entries/app.js', // Tu archivo de entrada principal
   output: {
-    file: 'public/dist/app.min.js',
+    file: 'static/dist/app.min.js',
     format: 'iife',
     sourcemap: !production
   },
@@ -43,11 +43,11 @@ const App = {
       targets: [
         { 
 					src: 'src/assets/*', 
-					dest: 'public/dist/assets' 
+					dest: 'static/dist/assets' 
 				},
 				{
           src: 'node_modules/simplemde/dist/*',
-          dest: 'public/dist/'
+          dest: 'static/dist/'
         }
       ]
     })
@@ -60,7 +60,7 @@ const Login = {
 		sourcemap: true,
 		format: 'iife',
 		name: 'login',
-		file: production ? 'public/dist/login.min.js' : 'public/dist/login.js',
+		file: production ? 'static/dist/login.min.js' : 'static/dist/login.js',
 	},
 	plugins: [
 		svelte({
@@ -88,7 +88,7 @@ const Vendor = {
 			sourcemap: true,
 			format: 'iife',
 			name: 'vendor',
-			file: production ? 'public/dist/vendor.min.js' : 'public/dist/vendor.js',
+			file: production ? 'static/dist/vendor.min.js' : 'static/dist/vendor.js',
 	},
 	plugins: [
 		svelte({
@@ -116,7 +116,7 @@ const Vendor = {
 			targets: [
 				{
 					src: 'node_modules/font-awesome/fonts/*',
-					dest: 'public/fonts/'
+					dest: 'static/fonts/'
 				}
 			]
 		})
