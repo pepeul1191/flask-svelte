@@ -1,5 +1,4 @@
 # web/views.py
-
 from flask import Blueprint, render_template
 
 view = Blueprint('web-view', __name__)
