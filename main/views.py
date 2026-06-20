@@ -13,6 +13,15 @@ view = Blueprint('main_views', __name__, template_folder='./templates')
 def home():
   return render_template('home.html')
 
+@view.route('/sign-in', methods=["GET"])
+@logged_go_admin
+def sign_in():
+  locals = {
+    'message': '',
+    'title': 'Ingresar al Sitema'
+  }
+  return render_template('web/sign-in.html', locals=locals)
+
 """
 @view.route('/nosotros')
 def nosotros():
@@ -34,15 +43,6 @@ def contacto():
 @view.route('/demo')
 def demo():
   return '<h1>Bienvenido a la página de demo</h1>'
-
-@view.route('/sign-in', methods=["GET"])
-@logged_go_admin
-def sign_in():
-  locals = {
-    'message': '',
-    'title': 'Ingresar al Sitema'
-  }
-  return render_template('sign-in.html', locals=locals)
 
 @view.route('/sign-out', methods=["GET"])
 def sign_out():

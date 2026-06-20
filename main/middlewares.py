@@ -38,7 +38,7 @@ def not_found(e):
     return Response(status=404)  # no body, request "muere" aquí
 
   # 2. API → JSON genérico
-  if path.startswith('/apis/'):
+  if path.startswith('/api/'):
     return jsonify({
       "data": None,
       "message": "Recurso no encontrado",

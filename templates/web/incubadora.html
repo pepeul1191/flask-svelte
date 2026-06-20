@@ -1,0 +1,619 @@
+{# templates/web/incubadora.html #}
+{% extends 'layouts/website.html' %}
+
+{% block extra_css %}
+<style>
+  .incubator-hero {
+    background: linear-gradient(135deg, var(--bs-secondary) 0%, #2d2d2b 100%);
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .incubator-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background: rgba(255, 82, 22, 0.1);
+    border-radius: 50%;
+  }
+
+  .incubator-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 82, 22, 0.08);
+    border-radius: 50%;
+  }
+
+  .incubator-hero .container {
+    position: relative;
+    z-index: 1;
+  }
+
+  .benefit-card {
+    padding: 2rem;
+    border-radius: 15px;
+    background: white;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+    height: 100%;
+  }
+
+  .benefit-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    border-color: var(--bs-primary);
+  }
+
+  .benefit-card .icon-wrapper {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    background: #fff5f0;
+    color: var(--bs-primary);
+    font-size: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  .benefit-card:hover .icon-wrapper {
+    background: var(--bs-primary);
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .process-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: white;
+    border: 1px solid #e9ecef;
+  }
+
+  .process-step:hover {
+    transform: translateX(10px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    border-color: var(--bs-primary);
+  }
+
+  .process-step .step-number {
+    min-width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--bs-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+
+  .process-step .step-content {
+    flex: 1;
+  }
+
+  .startup-card {
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: none;
+    background: white;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+  }
+
+  .startup-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  }
+
+  .startup-card .card-img-top {
+    height: 200px;
+    object-fit: cover;
+  }
+
+  .startup-card .startup-tag {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--bs-primary);
+    color: white;
+    padding: 0.25rem 1rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .startup-card .card-body {
+    padding: 1.5rem;
+  }
+
+  .startup-card .card-body .category-badge {
+    background: #f8f9fa;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    color: #6c757d;
+  }
+
+  .faq-item {
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .faq-item:hover {
+    border-color: var(--bs-primary);
+  }
+
+  .faq-item .faq-question {
+    padding: 1.25rem 1.5rem;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .faq-item .faq-question:hover {
+    background: #fff5f0;
+  }
+
+  .faq-item .faq-question i {
+    color: var(--bs-primary);
+    transition: transform 0.3s ease;
+  }
+
+  .faq-item .faq-question.collapsed i {
+    transform: rotate(-90deg);
+  }
+
+  .faq-item .faq-answer {
+    padding: 0 1.5rem 1.25rem;
+    color: #6c757d;
+  }
+
+  .cta-box {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, #e64810 100%);
+    border-radius: 20px;
+    padding: 4rem 3rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-box::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+  }
+
+  .cta-box .container {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 768px) {
+    .incubator-hero {
+      padding: 50px 0;
+    }
+
+    .process-step {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .cta-box {
+      padding: 2rem 1.5rem;
+    }
+
+    .incubator-hero::before,
+    .incubator-hero::after {
+      display: none;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // FAQ toggle functionality
+    const faqQuestions = document.querySelectorAll('.faq-question');
+    faqQuestions.forEach(question => {
+      question.addEventListener('click', function() {
+        const answer = this.nextElementSibling;
+        const icon = this.querySelector('i');
+        
+        if (answer.style.display === 'none' || !answer.style.display) {
+          answer.style.display = 'block';
+          icon.style.transform = 'rotate(0deg)';
+        } else {
+          answer.style.display = 'none';
+          icon.style.transform = 'rotate(-90deg)';
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="incubator-hero text-white">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <span class="badge bg-primary mb-3 px-3 py-2" style="font-size: 0.9rem;">
+          <i class="fa fa-rocket me-2"></i>Programa de Incubación
+        </span>
+        <h1 class="display-4 fw-bold mb-4">
+          Acelera tu startup <br>con nosotros
+        </h1>
+        <p class="lead mb-4" style="opacity: 0.9;">
+          Convierte tu idea en un negocio escalable con nuestro programa
+          de incubación de 6 meses. Mentoría, financiamiento y networking
+          para hacer realidad tu emprendimiento.
+        </p>
+        <div>
+          <a href="/postula" class="btn btn-primary btn-lg me-3">
+            <i class="fa fa-pencil-square-o me-2"></i>Postula ahora
+          </a>
+          <a href="#beneficios" class="btn btn-outline-light btn-lg">
+            <i class="fa fa-arrow-down me-2"></i>Conoce más
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-5 d-none d-lg-block text-center">
+        <div class="bg-white bg-opacity-10 rounded-4 p-4">
+          <i class="fa fa-rocket fa-5x mb-3"></i>
+          <h3 class="h4">Próxima convocatoria</h3>
+          <p class="mb-0" style="opacity: 0.9;">Abril 2026</p>
+          <div class="mt-3 d-flex justify-content-center gap-3">
+            <div class="text-center">
+              <div class="display-6 fw-bold">45</div>
+              <small>Días</small>
+            </div>
+            <div class="text-center">
+              <div class="display-6 fw-bold">12</div>
+              <small>Horas</small>
+            </div>
+            <div class="text-center">
+              <div class="display-6 fw-bold">30</div>
+              <small>Min</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFICIOS -->
+<section id="beneficios" class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="text-primary fw-bold text-uppercase small">Beneficios</span>
+      <div class="accent-line"></div>
+      <h2 class="display-5 fw-bold text-secondary">¿Por qué incubarte con nosotros?</h2>
+      <p class="lead text-muted">
+        Todo lo que necesitas para llevar tu startup al siguiente nivel
+      </p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="benefit-card">
+          <div class="icon-wrapper">
+            <i class="fa fa-users"></i>
+          </div>
+          <h4 class="fw-bold text-secondary">Mentoría Especializada</h4>
+          <p class="text-muted">
+            Accede a mentores expertos en diferentes industrias que te guiarán
+            en cada etapa de tu emprendimiento.
+          </p>
+          <ul class="list-unstyled text-muted small">
+            <li><i class="fa fa-check-circle text-primary me-2"></i>Mentores internacionales</li>
+            <li><i class="fa fa-check-circle text-primary me-2"></i>Sesiones 1:1 semanales</li>
+            <li><i class="fa fa-check-circle text-primary me-2"></i>Feedback personalizado</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="benefit-card">
+          <div class="icon-wrapper">
+            <i class="fa fa-money"></i>
+          </div>
+          <h4 class="fw-bold text-secondary">Financiamiento</h4>
+          <p class="text-muted">
+            Conectamos tu startup con inversores ángeles, fondos de inversión
+            y programas de financiamiento público.
+          </p>
+          <ul class="list-unstyled text-muted small">
+            <li><i class="fa fa-check-circle text-primary me-2"></i>Inversión semilla</li>
+            <li><i class="fa fa-check-circle text-primary me-2"></i>Rondas de inversión</li>
+            <li><i class="fa fa-check-circle text-primary me-2"></i>Matching con inversores</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="benefit-card">
+          <div class="icon-wrapper">
+            <i class="fa fa-building"></i>
+          </div>
+          <h4 class="fw-bold text-secondary">Espacio de Trabajo</h4>
+          <p class="text-muted">
+            Disfruta de nuestro espacio de coworking totalmente equipado
+            para que tu equipo pueda trabajar y colaborar.
+          </p>
+          <ul class="list-unstyled text-muted small">
+            <li><i class="fa fa-check-circle text-primary me-2"></i>Oficinas privadas</li>
+            <li><i class="fa fa-check-circle text-primary me-2"></i>Salas de reuniones</li>
+            <li><i class="fa fa-check-circle text-primary me-2"></i>Laboratorios de innovación</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESO -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="text-primary fw-bold text-uppercase small">Proceso</span>
+      <div class="accent-line"></div>
+      <h2 class="display-5 fw-bold text-secondary">Cómo funciona</h2>
+      <p class="lead text-muted">
+        Un camino estructurado para transformar tu idea en una startup exitosa
+      </p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="process-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h5 class="fw-bold text-secondary mb-2">Postulación</h5>
+            <p class="text-muted small mb-0">
+              Completa el formulario de postulación con tu idea de negocio,
+              equipo y modelo de negocio.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="process-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h5 class="fw-bold text-secondary mb-2">Evaluación</h5>
+            <p class="text-muted small mb-0">
+              Nuestro comité evaluador analiza tu propuesta y selecciona
+              a los mejores proyectos para incubar.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="process-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h5 class="fw-bold text-secondary mb-2">Programa de Incubación</h5>
+            <p class="text-muted small mb-0">
+              Participa en un programa intensivo de 6 meses con mentoría,
+              talleres y acceso a recursos.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="process-step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h5 class="fw-bold text-secondary mb-2">Demo Day</h5>
+            <p class="text-muted small mb-0">
+              Presenta tu proyecto ante inversores, mentores y la comunidad
+              emprendedora en nuestro Demo Day.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STARTUPS INCUBADAS -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="text-primary fw-bold text-uppercase small">Historias de éxito</span>
+      <div class="accent-line"></div>
+      <h2 class="display-5 fw-bold text-secondary">Startups incubadas</h2>
+      <p class="lead text-muted">
+        Conoce algunos de los proyectos que han pasado por nuestra incubadora
+      </p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="startup-card position-relative">
+          <img src="{{ config.STATIC_URL }}/img/startup-1.jpg" class="card-img-top" alt="EcoTech">
+          <span class="startup-tag">Incubada 2025</span>
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h5 class="fw-bold text-secondary mb-0">EcoTech</h5>
+              <span class="category-badge">Sostenibilidad</span>
+            </div>
+            <p class="text-muted small">
+              Soluciones tecnológicas para la gestión eficiente de residuos
+              y promoción de economía circular.
+            </p>
+            <div class="d-flex gap-3 mt-3">
+              <span class="text-muted small"><i class="fa fa-users text-primary me-1"></i> 8 miembros</span>
+              <span class="text-muted small"><i class="fa fa-map-marker text-primary me-1"></i> Perú</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="startup-card position-relative">
+          <img src="{{ config.STATIC_URL }}/img/startup-2.jpg" class="card-img-top" alt="HealthAI">
+          <span class="startup-tag">Incubada 2025</span>
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h5 class="fw-bold text-secondary mb-0">HealthAI</h5>
+              <span class="category-badge">HealthTech</span>
+            </div>
+            <p class="text-muted small">
+              Plataforma de inteligencia artificial para diagnóstico temprano
+              y seguimiento de pacientes.
+            </p>
+            <div class="d-flex gap-3 mt-3">
+              <span class="text-muted small"><i class="fa fa-users text-primary me-1"></i> 12 miembros</span>
+              <span class="text-muted small"><i class="fa fa-map-marker text-primary me-1"></i> Colombia</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="startup-card position-relative">
+          <img src="{{ config.STATIC_URL }}/img/startup-3.jpg" class="card-img-top" alt="EduTech">
+          <span class="startup-tag">Incubada 2024</span>
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h5 class="fw-bold text-secondary mb-0">EduTech</h5>
+              <span class="category-badge">EdTech</span>
+            </div>
+            <p class="text-muted small">
+              Plataforma educativa interactiva que personaliza el aprendizaje
+              para estudiantes de todas las edades.
+            </p>
+            <div class="d-flex gap-3 mt-3">
+              <span class="text-muted small"><i class="fa fa-users text-primary me-1"></i> 10 miembros</span>
+              <span class="text-muted small"><i class="fa fa-map-marker text-primary me-1"></i> México</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="text-primary fw-bold text-uppercase small">Preguntas frecuentes</span>
+      <div class="accent-line"></div>
+      <h2 class="display-5 fw-bold text-secondary">Resuelve tus dudas</h2>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="faq-item">
+          <div class="faq-question" onclick="this.classList.toggle('collapsed')">
+            <span>¿Quiénes pueden postular a la incubadora?</span>
+            <i class="fa fa-chevron-down"></i>
+          </div>
+          <div class="faq-answer" style="display: block;">
+            Pueden postular emprendedores con una idea o proyecto en etapa temprana,
+            estudiantes, egresados y público en general que deseen desarrollar su
+            negocio con nuestro apoyo.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question collapsed" onclick="this.classList.toggle('collapsed')">
+            <span>¿Cuánto dura el programa de incubación?</span>
+            <i class="fa fa-chevron-down"></i>
+          </div>
+          <div class="faq-answer" style="display: none;">
+            El programa tiene una duración de 6 meses, con posibilidad de extensión
+            dependiendo de las necesidades y avance de cada startup.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question collapsed" onclick="this.classList.toggle('collapsed')">
+            <span>¿Qué porcentaje de la empresa se lleva la incubadora?</span>
+            <i class="fa fa-chevron-down"></i>
+          </div>
+          <div class="faq-answer" style="display: none;">
+            Nuestro modelo no requiere participación accionaria. En su lugar,
+            ofrecemos un modelo de éxito compartido donde solo pagas al
+            conseguir inversión o generar ingresos.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question collapsed" onclick="this.classList.toggle('collapsed')">
+            <span>¿Qué recursos ofrece la incubadora?</span>
+            <i class="fa fa-chevron-down"></i>
+          </div>
+          <div class="faq-answer" style="display: none;">
+            Ofrecemos espacio de coworking, mentoría especializada, acceso a
+            inversores, talleres formativos, networking, asesoría legal y
+            administrativa, y laboratorios de innovación.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-5">
+  <div class="container">
+    <div class="cta-box">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <h2 class="display-5 fw-bold mb-3">
+            ¿Listo para incubar tu startup?
+          </h2>
+          <p class="lead mb-0" style="opacity: 0.9;">
+            La próxima convocatoria abre en Abril 2026. No esperes más
+            para convertir tu idea en realidad.
+          </p>
+        </div>
+        <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+          <a href="/postula" class="btn btn-light btn-lg">
+            <i class="fa fa-pencil-square-o me-2"></i>Postula ahora
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

@@ -31,9 +31,9 @@ Este es un proyecto base que integra un backend en **Flask** con un frontend en 
     # .env
     #### DBMATE
     DB=sqlite:db/app.db
-    #### RAILS
-    BASE_URL=http://localhost:3000
-    STATIC_URL=http://localhost:3000
+    #### SERVER
+    BASE_URL=http://localhost:5000
+    STATIC_URL=http://localhost:5000
     USERNAME=admin
     PASSWORD=123
     #### ACCESS SERVICE

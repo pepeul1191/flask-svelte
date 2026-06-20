@@ -1,7 +1,9 @@
 {# templates/partials/web-navbar.html #}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="/">Sitio Web</a>
+    <a class="navbar-brand fw-bold" href="/">
+      <i class="fa fa-rocket me-2"></i>Innova ULima
+    </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
       <span class="navbar-toggler-icon"></span>
@@ -10,13 +12,45 @@
     <div class="collapse navbar-collapse" id="nav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link" href="/">Home</a>
+          <a class="nav-link" href="/">Inicio</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/login">Login</a>
+          <a class="nav-link" href="/nosotros">Nosotros</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="programsDropdown" role="button" data-bs-toggle="dropdown">
+            Programas
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/programas/ideacion">Ideación</a></li>
+            <li><a class="dropdown-item" href="/programas/aceleracion">Aceleración</a></li>
+            <li><a class="dropdown-item" href="/programas/internacionalizacion">Internacionalización</a></li>
+          </ul>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/register">Register</a>
+          <a class="nav-link" href="/innovacion">Innovación</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/incubadora">Incubadora</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/eventos">Eventos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/comunidad">Comunidad</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/contacto">Contacto</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link btn btn-primary text-white px-3 ms-2" href="/postula" style="border-radius: 20px;">
+            <i class="fa fa-pencil-square-o me-1"></i>Postula
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/sign-in">
+            <i class="fa fa-user-circle me-1"></i>Ingresar
+          </a>
         </li>
       </ul>
     </div>

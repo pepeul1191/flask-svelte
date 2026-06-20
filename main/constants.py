@@ -1,2 +1,7 @@
 # main/constants.py
-API_KEY='aldsjfalksjdflaksjflkajsdlfska'
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+ENV = dict(os.environ)

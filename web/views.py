@@ -12,6 +12,15 @@ def index():
   }
   return render_template('web/index.html', locals=locals)
 
+@view.route('/incubadora', methods=['GET'])
+def incubadora():
+  locals = {
+    'title': 'Inncuvadora',
+    'nav_active': 'home',
+    'message': '',
+  }
+  return render_template('web/incubadora.html', locals=locals)
+
 @view.route('/error/403')
 def error_403():
   return render_template('web/403.html')

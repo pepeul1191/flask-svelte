@@ -2,78 +2,658 @@
 {% extends 'layouts/website.html' %}
 
 {% block extra_css %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<style>
+  /* Slider Styles */
+  .hero-slider {
+    position: relative;
+    height: 600px;
+    overflow: hidden;
+  }
+
+  .hero-slider .carousel-item {
+    height: 600px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+
+  .hero-slider .carousel-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(29, 29, 27, 0.6);
+  }
+
+  .hero-slider .carousel-caption {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    bottom: auto;
+    text-align: left;
+    max-width: 600px;
+  }
+
+  .hero-slider .carousel-caption h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .hero-slider .carousel-caption .lead {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  }
+
+  .hero-slider .carousel-indicators {
+    bottom: 30px;
+  }
+
+  .hero-slider .carousel-indicators button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin: 0 6px;
+  }
+
+  .hero-slider .carousel-indicators .active {
+    background-color: var(--bs-primary);
+  }
+
+  /* Card Styles */
+  .card-custom {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+  }
+
+  .card-custom:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  }
+
+  .card-custom .card-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+  }
+
+  .card-custom:hover .card-icon {
+    background: var(--bs-primary);
+    color: white;
+  }
+
+  .stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--bs-primary);
+  }
+
+  .stat-label {
+    color: #6c757d;
+    font-weight: 500;
+  }
+
+  .value-card {
+    padding: 2rem;
+    text-align: center;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+  }
+
+  .value-card:hover {
+    background: #fff5f0;
+    transform: translateY(-5px);
+    border-color: var(--bs-primary);
+  }
+
+  .value-card i {
+    font-size: 2.5rem;
+    color: var(--bs-primary);
+  }
+
+  .program-card {
+    border-radius: 15px;
+    overflow: hidden;
+    border: none;
+    transition: all 0.3s ease;
+  }
+
+  .program-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+
+  .program-tag {
+    background: var(--bs-primary);
+    color: white;
+    padding: 0.25rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    display: inline-block;
+  }
+
+  .accent-line {
+    width: 60px;
+    height: 4px;
+    background: var(--bs-primary);
+    margin: 0 auto 1rem;
+    border-radius: 2px;
+  }
+
+  .bg-gradient-custom {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, #e64810 100%);
+  }
+
+  .testimonial-card {
+    border-left: 4px solid var(--bs-primary);
+    transition: all 0.3s ease;
+  }
+
+  .testimonial-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  }
+
+  .stat-card {
+    border-bottom: 3px solid var(--bs-primary);
+    transition: all 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-5px);
+  }
+
+  /* Custom button overrides using existing classes */
+  .btn-primary {
+    background-color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+  }
+
+  .btn-primary:hover {
+    background-color: #e64810 !important;
+    border-color: #e64810 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 82, 22, 0.3);
+  }
+
+  .btn-outline-primary {
+    color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+  }
+
+  .btn-outline-primary:hover {
+    background-color: var(--bs-primary) !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 82, 22, 0.3);
+  }
+
+  .bg-primary {
+    background-color: var(--bs-primary) !important;
+  }
+
+  .text-primary {
+    color: var(--bs-primary) !important;
+  }
+
+  .border-primary {
+    border-color: var(--bs-primary) !important;
+  }
+
+  .badge-primary {
+    background-color: var(--bs-primary) !important;
+    color: white;
+  }
+
+  @media (max-width: 768px) {
+    .hero-slider {
+      height: 450px;
+    }
+
+    .hero-slider .carousel-item {
+      height: 450px;
+    }
+
+    .hero-slider .carousel-caption h1 {
+      font-size: 2rem;
+    }
+
+    .hero-slider .carousel-caption .lead {
+      font-size: 1rem;
+    }
+
+    .hero-slider .carousel-caption {
+      max-width: 100%;
+      padding: 0 20px;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+    }
+  }
+</style>
 {% endblock %}
 
 {% block extra_js %}
-<script src="/dist/app.min.js"></script>
+<script src="{{ config.STATIC_URL }}/dist/app.min.js"></script>
 <script>
-  console.log('XD');
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('ULIMA Entrepreneurship Center loaded');
+    
+    // Auto-play carousel
+    var myCarousel = document.getElementById('heroCarousel');
+    if (myCarousel) {
+      var carousel = new bootstrap.Carousel(myCarousel, {
+        interval: 5000,
+        wrap: true
+      });
+    }
+  });
 </script>
 {% endblock %}
 
 {% block content %}
-<!-- HERO SECTION -->
-<section class="bg-light py-5">
-  <div class="container text-center">
-    <h1 class="display-4 fw-bold">Bienvenido a koa-access</h1>
-    <p class="lead text-muted mt-3">
-      Un sistema rápido, moderno y escalable construido con Flask y Bootstrap 5.
-    </p>
 
-    <div class="mt-4">
-      <a href="/login" class="btn btn-primary btn-lg me-2">Iniciar sesión</a>
-      <a href="/register" class="btn btn-outline-secondary btn-lg">Registrarse</a>
+<!-- HERO SLIDER -->
+<section class="hero-slider">
+  <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+    </div>
+
+    <div class="carousel-inner">
+      <!-- Slide 1 -->
+      <div class="carousel-item active" style="background-image: url('{{ config.STATIC_URL }}/img/entrepreneurship-1.webp');">
+        <div class="carousel-caption">
+          <h1>Centro de Emprendimiento</h1>
+          <p class="lead">Transformando ideas en negocios exitosos desde la Universidad de Lima</p>
+          <div>
+            <a href="#programs" class="btn btn-primary btn-lg me-3">Explora Programas</a>
+            <a href="#contact" class="btn btn-outline-light btn-lg">Contáctanos</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 2 -->
+      <div class="carousel-item" style="background-image: url('{{ config.STATIC_URL }}/img/entrepreneurship-2.webp');">
+        <div class="carousel-caption">
+          <h1>Innovación y Tecnología</h1>
+          <p class="lead">Laboratorios de innovación, coworking y programas de aceleración para startups</p>
+          <div>
+            <a href="/innovacion" class="btn btn-primary btn-lg me-3">Descubre más</a>
+            <a href="/incubadora" class="btn btn-outline-light btn-lg">Incubadora</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 3 -->
+      <div class="carousel-item" style="background-image: url('{{ config.STATIC_URL }}/img/entrepreneurship-3.webp');">
+        <div class="carousel-caption">
+          <h1>Comunidad Emprendedora</h1>
+          <p class="lead">Únete a una red de emprendedores, mentores e inversionistas que están cambiando el mundo</p>
+          <div>
+            <a href="/comunidad" class="btn btn-primary btn-lg me-3">Únete Ahora</a>
+            <a href="/eventos" class="btn btn-outline-light btn-lg">Próximos Eventos</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </button>
+  </div>
+</section>
+
+<!-- ACERCA DEL CENTRO -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6 mb-4 mb-lg-0">
+        <span class="text-primary fw-bold text-uppercase small">Sobre nosotros</span>
+        <h2 class="display-5 fw-bold text-secondary mb-4">
+          Centro de Emprendimiento <br>Universidad de Lima
+        </h2>
+        <p class="lead text-muted">
+          Impulsamos el ecosistema emprendedor a través de educación, mentoría,
+          financiamiento y conexiones estratégicas.
+        </p>
+        <p class="text-muted">
+          Desde 2010, hemos acompañado a más de 500 emprendedores a convertir
+          sus ideas en negocios sostenibles y de alto impacto.
+        </p>
+        <div class="mt-4">
+          <a href="/nosotros" class="btn btn-primary btn-lg">Conoce más</a>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="bg-white p-4 rounded-3 shadow-sm stat-card">
+              <div class="stat-number">500+</div>
+              <div class="stat-label">Emprendedores formados</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="bg-white p-4 rounded-3 shadow-sm stat-card">
+              <div class="stat-number">120+</div>
+              <div class="stat-label">Startups creadas</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="bg-white p-4 rounded-3 shadow-sm stat-card">
+              <div class="stat-number">$5M+</div>
+              <div class="stat-label">Capital gestionado</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="bg-white p-4 rounded-3 shadow-sm stat-card">
+              <div class="stat-number">50+</div>
+              <div class="stat-label">Mentores expertos</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- FEATURES -->
+<!-- PROGRAMAS -->
+<section id="programs" class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="text-primary fw-bold text-uppercase small">Nuestros Programas</span>
+      <div class="accent-line"></div>
+      <h2 class="display-5 fw-bold text-secondary">Impulsa tu emprendimiento</h2>
+      <p class="lead text-muted">
+        Programas diseñados para cada etapa del viaje emprendedor
+      </p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card card-custom h-100 shadow-sm">
+          <div class="card-body p-4">
+            <div class="card-icon">
+              <i class="fa fa-lightbulb-o fa-2x text-primary"></i>
+            </div>
+            <h4 class="fw-bold text-secondary">Ideación</h4>
+            <span class="program-tag mb-2">Descubre tu potencial</span>
+            <p class="text-muted mt-3">
+              Talleres y bootcamps para identificar oportunidades de negocio
+              y validar ideas innovadoras.
+            </p>
+            <ul class="list-unstyled text-muted small">
+              <li><i class="fa fa-check-circle text-primary me-2"></i>Design Thinking</li>
+              <li><i class="fa fa-check-circle text-primary me-2"></i>Validación de mercado</li>
+              <li><i class="fa fa-check-circle text-primary me-2"></i>Prototipado</li>
+            </ul>
+            <a href="/programas/ideacion" class="btn btn-outline-primary w-100 mt-3">Más información</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card card-custom h-100 shadow-sm">
+          <div class="card-body p-4">
+            <div class="card-icon">
+              <i class="fa fa-rocket fa-2x text-primary"></i>
+            </div>
+            <h4 class="fw-bold text-secondary">Aceleración</h4>
+            <span class="program-tag mb-2">Escala tu negocio</span>
+            <p class="text-muted mt-3">
+              Programa intensivo de 6 meses con mentoría personalizada
+              y acceso a inversionistas.
+            </p>
+            <ul class="list-unstyled text-muted small">
+              <li><i class="fa fa-check-circle text-primary me-2"></i>Mentoría 1:1</li>
+              <li><i class="fa fa-check-circle text-primary me-2"></i>Networking estratégico</li>
+              <li><i class="fa fa-check-circle text-primary me-2"></i>Demo Day</li>
+            </ul>
+            <a href="/programas/aceleracion" class="btn btn-primary w-100 mt-3">Postula ahora</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card card-custom h-100 shadow-sm">
+          <div class="card-body p-4">
+            <div class="card-icon">
+              <i class="fa fa-globe fa-2x text-primary"></i>
+            </div>
+            <h4 class="fw-bold text-secondary">Internacionalización</h4>
+            <span class="program-tag mb-2">Expande tu mercado</span>
+            <p class="text-muted mt-3">
+              Prepara tu startup para competir en mercados internacionales
+              y conectar con inversionistas globales.
+            </p>
+            <ul class="list-unstyled text-muted small">
+              <li><i class="fa fa-check-circle text-primary me-2"></i>Estrategias de entrada</li>
+              <li><i class="fa fa-check-circle text-primary me-2"></i>Misiones comerciales</li>
+              <li><i class="fa fa-check-circle text-primary me-2"></i>Networking global</li>
+            </ul>
+            <a href="/programas/internacionalizacion" class="btn btn-outline-primary w-100 mt-3">Más información</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICIOS -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="text-primary fw-bold text-uppercase small">Servicios</span>
+      <div class="accent-line"></div>
+      <h2 class="display-5 fw-bold text-secondary">Ecosistema de apoyo</h2>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-3">
+        <div class="value-card bg-white p-4 rounded-3 shadow-sm">
+          <i class="fa fa-users fa-2x mb-3"></i>
+          <h5 class="fw-bold text-secondary">Coworking</h5>
+          <p class="text-muted small">
+            Espacios colaborativos para emprendedores con todas las comodidades.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="value-card bg-white p-4 rounded-3 shadow-sm">
+          <i class="fa fa-gavel fa-2x mb-3"></i>
+          <h5 class="fw-bold text-secondary">Asesoría Legal</h5>
+          <p class="text-muted small">
+            Consultoría legal para constitución y protección de tu startup.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="value-card bg-white p-4 rounded-3 shadow-sm">
+          <i class="fa fa-pie-chart fa-2x mb-3"></i>
+          <h5 class="fw-bold text-secondary">Financiamiento</h5>
+          <p class="text-muted small">
+            Conexión con inversores ángeles, fondos y programas de financiamiento.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="value-card bg-white p-4 rounded-3 shadow-sm">
+          <i class="fa fa-line-chart fa-2x mb-3"></i>
+          <h5 class="fw-bold text-secondary">Mentoría</h5>
+          <p class="text-muted small">
+            Acompañamiento de mentores expertos en diferentes industrias.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENTOS DESTACADOS -->
 <section class="py-5">
   <div class="container">
-    <div class="row text-center g-4">
+    <div class="text-center mb-5">
+      <span class="text-primary fw-bold text-uppercase small">Próximos Eventos</span>
+      <div class="accent-line"></div>
+      <h2 class="display-5 fw-bold text-secondary">Agenda Emprendedora</h2>
+    </div>
 
+    <div class="row g-4">
       <div class="col-md-4">
-        <div class="p-4 border rounded-3 h-100">
-          <h3 class="h5">Rápido</h3>
-          <p class="text-muted">
-            Backend ligero con Flask optimizado para rendimiento.
-          </p>
+        <div class="card card-custom h-100 border rounded-3">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <span class="badge bg-primary">Octubre 2026</span>
+              <span class="text-muted small"><i class="fa fa-calendar me-1"></i> 15 Oct</span>
+            </div>
+            <h5 class="fw-bold text-secondary">Demo Day 2026</h5>
+            <p class="text-muted small">
+              Presentación de los mejores proyectos de nuestra aceleradora
+              frente a inversionistas.
+            </p>
+            <a href="#" class="btn btn-sm btn-outline-primary">Más detalles</a>
+          </div>
         </div>
       </div>
 
       <div class="col-md-4">
-        <div class="p-4 border rounded-3 h-100">
-          <h3 class="h5">Seguro</h3>
-          <p class="text-muted">
-            Autenticación con JWT y sesiones protegidas.
-          </p>
+        <div class="card card-custom h-100 border rounded-3">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <span class="badge bg-primary">Noviembre 2026</span>
+              <span class="text-muted small"><i class="fa fa-calendar me-1"></i> 5-7 Nov</span>
+            </div>
+            <h5 class="fw-bold text-secondary">Hackathon ULIMA</h5>
+            <p class="text-muted small">
+              48 horas de innovación para resolver los desafíos del futuro.
+            </p>
+            <a href="#" class="btn btn-sm btn-outline-primary">Más detalles</a>
+          </div>
         </div>
       </div>
 
       <div class="col-md-4">
-        <div class="p-4 border rounded-3 h-100">
-          <h3 class="h5">Escalable</h3>
-          <p class="text-muted">
-            Arquitectura modular lista para crecer.
-          </p>
+        <div class="card card-custom h-100 border rounded-3">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <span class="badge bg-primary">Diciembre 2026</span>
+              <span class="text-muted small"><i class="fa fa-calendar me-1"></i> 10 Dic</span>
+            </div>
+            <h5 class="fw-bold text-secondary">Networking Night</h5>
+            <p class="text-muted small">
+              Encuentro de emprendedores, mentores e inversionistas.
+            </p>
+            <a href="#" class="btn btn-sm btn-outline-primary">Más detalles</a>
+          </div>
         </div>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- CTA -->
-<section class="bg-dark text-white py-5">
-  <div class="container text-center">
-    <h2 class="fw-bold">¿Listo para empezar?</h2>
-    <p class="text-white-50">
-      Crea tu cuenta y comienza a usar la plataforma en minutos.
-    </p>
-    <a href="/register" class="btn btn-success btn-lg mt-3">
-      Crear cuenta
-    </a>
+<!-- TESTIMONIOS -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="text-primary fw-bold text-uppercase small">Historias de éxito</span>
+      <div class="accent-line"></div>
+      <h2 class="display-5 fw-bold text-secondary">Emprendedores que transformaron su futuro</h2>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="bg-white p-4 rounded-3 shadow-sm testimonial-card h-100">
+          <i class="fa fa-quote-left fa-2x text-primary opacity-25 mb-3"></i>
+          <p class="text-muted">
+            "El Centro de Emprendimiento me dio las herramientas y el apoyo
+            necesario para convertir mi idea en un negocio exitoso."
+          </p>
+          <div class="d-flex align-items-center mt-3">
+            <div class="bg-light rounded-circle p-3 me-3">
+              <i class="fa fa-user fa-lg text-primary"></i>
+            </div>
+            <div>
+              <h6 class="fw-bold text-secondary mb-0">María González</h6>
+              <small class="text-muted">Founder, EcoTech</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="bg-white p-4 rounded-3 shadow-sm testimonial-card h-100">
+          <i class="fa fa-quote-left fa-2x text-primary opacity-25 mb-3"></i>
+          <p class="text-muted">
+            "La mentoría y el networking fueron clave para escalar nuestra startup
+            y conseguir inversión internacional."
+          </p>
+          <div class="d-flex align-items-center mt-3">
+            <div class="bg-light rounded-circle p-3 me-3">
+              <i class="fa fa-user fa-lg text-primary"></i>
+            </div>
+            <div>
+              <h6 class="fw-bold text-secondary mb-0">Carlos Ruiz</h6>
+              <small class="text-muted">CEO, HealthAI</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="bg-white p-4 rounded-3 shadow-sm testimonial-card h-100">
+          <i class="fa fa-quote-left fa-2x text-primary opacity-25 mb-3"></i>
+          <p class="text-muted">
+            "El apoyo del centro fue fundamental para validar mi modelo de negocio
+            y construir un equipo sólido."
+          </p>
+          <div class="d-flex align-items-center mt-3">
+            <div class="bg-light rounded-circle p-3 me-3">
+              <i class="fa fa-user fa-lg text-primary"></i>
+            </div>
+            <div>
+              <h6 class="fw-bold text-secondary mb-0">Andrea Morales</h6>
+              <small class="text-muted">Co-founder, EduTech</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
+
+<!-- CONVOCATORIA -->
+<section id="contact" class="py-5 bg-gradient-custom">
+  <div class="container text-center text-white">
+    <h2 class="display-5 fw-bold">¿Listo para emprender?</h2>
+    <p class="lead mb-4">
+      Únete al ecosistema emprendedor de la Universidad de Lima
+    </p>
+    <div>
+      <a href="/postula" class="btn btn-light btn-lg me-3">Postula ahora</a>
+      <a href="/contacto" class="btn btn-outline-light btn-lg">Contáctanos</a>
+    </div>
+  </div>
+</section>
+
 {% endblock %}
