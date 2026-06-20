@@ -53,6 +53,7 @@ def sign_out():
 def react():
   return render_template('demo.html')
 
+"""
 @view.route('/sign-in', methods=["POST"])
 def sign_in_login():
   # data
@@ -74,3 +75,4 @@ def sign_in_login():
       'title': 'Ingresar al Sitema'
     }
     return render_template('sign-in.html', locals=locals)
+"""
