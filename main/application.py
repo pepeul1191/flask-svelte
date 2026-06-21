@@ -9,7 +9,7 @@ APP = Flask(
   __name__,
   static_folder='../static',
   static_url_path='/',
-  template_folder='../templates'
+  #template_folder='../templates'
 )
 
 APP.config['SECRET_KEY'] = 'your_secret_key'

@@ -1,18 +1,15 @@
 # main/blueprints.py
-from main.views import view as main_views
-from main.apis import api as main_apis
 # from admin.blueprints import blueprints as admin_blueprints
-from web.configs.blueprints import blueprints as web_blueprints
+from web.blueprints import blueprints as web_blueprints
+from auth.blueprints import blueprints as auth_blueprints
 
 def register(app):
   # append sub blueprints
   modules_blueprints = [
     # admin_blueprints,
-    web_blueprints
+    web_blueprints,
+    auth_blueprints
   ]
-  # load main blueprint to app
-  app.register_blueprint(main_views)
-  app.register_blueprint(main_apis)
   # load sub blueprints to app
   for blueprints in modules_blueprints:
     for blueprint in blueprints:

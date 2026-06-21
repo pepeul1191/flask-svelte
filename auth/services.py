@@ -1,4 +1,4 @@
-# web/services/auth_service.py
+# auth/services.py
 import os
 import requests
 from main.services import ApplicationService

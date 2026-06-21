@@ -1,4 +1,4 @@
-# main/database.py
+# main/databases.py
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 

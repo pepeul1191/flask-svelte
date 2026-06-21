@@ -1,1 +1,0 @@
-# web/configs/middlewares.py

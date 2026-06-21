@@ -1,33 +1,19 @@
-# web/configs/views.py
+# auth/views.py
 from flask import Blueprint, flash, redirect, render_template, request, session
 
-from web.services.auth_service import AuthService
+from auth.services import AuthService
 
-view = Blueprint('web-view', __name__)
+views = Blueprint('auth-views', __name__, template_folder='./templates')
 
-@view.route('/', methods=['GET'])
-def index():
-  locals = {
-    'title': 'Home',
-    'nav_active': 'home',
-    'message': '',
-  }
-  return render_template('web/index.html', locals=locals)
-
-@view.route('/incubadora', methods=['GET'])
-def incubadora():
-  locals = {
-    'title': 'Inncuvadora',
-    'nav_active': 'home',
-    'message': '',
-  }
-  return render_template('web/incubadora.html', locals=locals)
-
-@view.route('/sign-in', methods=['GET', 'POST'])
+@views.route('/sign-in', methods=['GET', 'POST'])
 def login():
-
   if request.method == 'GET':
-    return render_template('web/sign_in.html')
+    locals = {
+      'title': 'Home',
+      'nav_active': 'home',
+      'message': '',
+    }
+    return render_template('./sign-in.html', locals=locals)
 
   username = request.form.get('username')
   password = request.form.get('password')
@@ -82,12 +68,9 @@ def login():
   # =========================
   flash(result.get("message", "Login failed"), "danger")
 
-  return render_template('web/sign_in.html')
+  return render_template('./sign-in.html')
 
-@view.route('/error/403')
-def error_403():
-  return render_template('web/403.html')
-
-@view.route('/error/404')
-def error_404():
-  return render_template('web/404.html'), 404
+@views.route('/sign-out', methods=["GET"])
+def sign_out():
+  session.clear()
+  return redirect('/')

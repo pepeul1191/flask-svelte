@@ -1,0 +1,17 @@
+{# templates/layouts/website.html #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ locals.title if locals is defined and locals.title else "Bienvenido" }}</title>
+  <link href="{{ config.STATIC_URL }}/dist/vendor.min.css" rel="stylesheet">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <!-- content -->
+  {% block content %}{% endblock %}
+  <script src="{{ config.STATIC_URL }}/dist/vendor.js"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
