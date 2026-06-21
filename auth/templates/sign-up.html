@@ -1,0 +1,299 @@
+{# auth/templates/sign_up.html #}
+{% extends 'layouts/blank.html' %}
+
+{% block title %}Crear Cuenta | TicketMaster{% endblock %}
+
+{% block extra_css %}
+<style>
+  .auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    padding: 2rem 1rem;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .icon {
+    margin-bottom: 30px;
+  }
+
+  .terms-status {
+    font-size: 0.95rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card card shadow-sm">
+    <div class="card-body p-4">
+
+      <div class="text-center mb-4">
+        <img
+          src="{{ config.STATIC_URL }}/img/logo-letters.png"
+          height="70"
+          width="340"
+          alt="Logo"
+          class="icon"
+        >
+
+        <h5 class="mb-2">Crear Cuenta</h5>
+
+        <p class="text-muted">
+          Completa la información para registrarte en TicketMaster.
+        </p>
+      </div>
+
+      {% include 'partials/flash_messages.html' %}
+
+      <form method="post" action="/sign-up" id="signupForm">
+
+        <div class="mb-3">
+          <label for="username" class="form-label">
+            Usuario
+          </label>
+          <input
+            type="text"
+            name="username"
+            id="username"
+            class="form-control"
+            required
+            autofocus
+          >
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">
+            Correo Electrónico
+          </label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            class="form-control"
+            required
+          >
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">
+            Contraseña
+          </label>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            class="form-control"
+            minlength="8"
+            required
+          >
+        </div>
+
+        <div class="mb-3">
+          <label for="confirm_password" class="form-label">
+            Repetir Contraseña
+          </label>
+          <input
+            type="password"
+            name="confirm_password"
+            id="confirm_password"
+            class="form-control"
+            minlength="8"
+            required
+          >
+          <div class="invalid-feedback">
+            Las contraseñas no coinciden.
+          </div>
+        </div>
+
+        <div class="alert alert-light border">
+          <div class="d-flex justify-content-between align-items-center">
+
+            <div id="termsStatus" class="terms-status text-danger">
+              ✗ Términos y condiciones pendientes de aceptación
+            </div>
+
+            <button
+              type="button"
+              class="btn btn-outline-primary btn-sm"
+              data-bs-toggle="modal"
+              data-bs-target="#termsModal"
+            >
+              Leer términos
+            </button>
+
+          </div>
+        </div>
+
+        <input
+          type="hidden"
+          name="accept_terms"
+          id="acceptTermsHidden"
+          value="0"
+        >
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">
+            <i class="fa fa-user-plus me-1"></i>
+            Crear Cuenta
+          </button>
+        </div>
+
+      </form>
+
+      <div class="text-center mt-3">
+        <a href="/sign-in" class="text-decoration-none">
+          ¿Ya tienes una cuenta? Inicia sesión
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Términos -->
+<div
+  class="modal fade"
+  id="termsModal"
+  tabindex="-1"
+  aria-labelledby="termsModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="termsModalLabel">
+          Términos y Condiciones
+        </h5>
+
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+
+      <div class="modal-body">
+
+        <h6>1. Uso del sistema</h6>
+        <p>
+          El usuario acepta utilizar la plataforma de forma responsable y
+          conforme a la legislación vigente.
+        </p>
+
+        <h6>2. Protección de datos</h6>
+        <p>
+          La información proporcionada será utilizada únicamente para la
+          operación del sistema y conforme a las políticas de privacidad.
+        </p>
+
+        <h6>3. Responsabilidades</h6>
+        <p>
+          El usuario es responsable de mantener la confidencialidad de sus
+          credenciales de acceso.
+        </p>
+
+        <h6>4. Aceptación</h6>
+        <p>
+          Al aceptar estos términos, el usuario declara haber leído y
+          comprendido todas las condiciones aquí descritas.
+        </p>
+
+      </div>
+
+      <div class="modal-footer">
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Cerrar
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          id="acceptTermsBtn"
+        >
+          Aceptar términos
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  const form = document.getElementById('signupForm');
+
+  const password = document.getElementById('password');
+  const confirmPassword = document.getElementById('confirm_password');
+
+  const acceptTermsBtn = document.getElementById('acceptTermsBtn');
+  const acceptTermsHidden = document.getElementById('acceptTermsHidden');
+  const termsStatus = document.getElementById('termsStatus');
+
+  acceptTermsBtn.addEventListener('click', () => {
+
+    acceptTermsHidden.value = '1';
+
+    termsStatus.classList.remove('text-danger');
+    termsStatus.classList.add('text-success');
+
+    termsStatus.innerHTML =
+      '✓ Términos y condiciones aceptados';
+
+    const modal =
+      bootstrap.Modal.getInstance(
+        document.getElementById('termsModal')
+      );
+
+    modal.hide();
+  });
+
+  confirmPassword.addEventListener('input', () => {
+    if (password.value === confirmPassword.value) {
+      confirmPassword.classList.remove('is-invalid');
+    }
+  });
+
+  form.addEventListener('submit', (event) => {
+
+    let valid = true;
+
+    if (password.value !== confirmPassword.value) {
+      confirmPassword.classList.add('is-invalid');
+      valid = false;
+    }
+
+    if (acceptTermsHidden.value !== '1') {
+      valid = false;
+
+      alert(
+        'Debes leer y aceptar los términos y condiciones antes de continuar.'
+      );
+    }
+
+    if (!valid) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  });
+
+});
+</script>
+{% endblock %}

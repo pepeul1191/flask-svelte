@@ -70,6 +70,14 @@ def login():
 
   return render_template('./sign-in.html')
 
+@views.route('/reset-password', methods=["GET"])
+def reset_password():
+  return render_template('./reset-password.html')
+
+@views.route('/sign-up', methods=["GET"])
+def sign_up():
+  return render_template('./sign-up.html')
+
 @views.route('/sign-out', methods=["GET"])
 def sign_out():
   session.clear()
