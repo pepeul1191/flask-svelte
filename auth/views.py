@@ -66,7 +66,7 @@ def login():
   # =========================
   # ERROR (flash Rails equivalent)
   # =========================
-  flash(result.get("message", "Login failed"), "danger")
+  flash(result.get("message"), "alert")
 
   return render_template('./sign-in.html')
 

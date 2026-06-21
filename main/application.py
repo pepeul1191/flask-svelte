@@ -1,9 +1,13 @@
 # main/application.py
-from flask import Flask, jsonify
+from flask import Flask, jsonify, flash
 from flask_jwt_extended import JWTManager
 from flask_session import Session
+from flask_wtf.csrf import CSRFProtect, CSRFError
 from main.middlewares import set_global_headers
 from main.constants import ENV
+
+from flask import Blueprint, flash, redirect, render_template, request, session
+
 
 APP = Flask(
   __name__,
@@ -22,6 +26,8 @@ APP.config['JWT_SECRET_KEY'] = 'tu_clave_secreta_aqui'
 APP.config.update(ENV)
 
 APP.after_request(set_global_headers)
+
+csrf = CSRFProtect(APP)
 
 Session(APP)
 
@@ -49,3 +55,18 @@ def invalid_token_response(reason):
 @jwt.needs_fresh_token_loader
 def needs_fresh_token_response(jwt_header, jwt_payload):
   return jsonify({"error": "Se requiere un token fresco. Vuelve a iniciar sesión."}), 401
+
+@APP.errorhandler(CSRFError)
+def handle_csrf_error(e):
+  reason = e.description.lower()
+
+  if "expired" in reason:
+    flash("La sesión ha expirado. Por favor inicia sesión nuevamente.", "alert")
+    return redirect("/sign-in")
+
+  if "missing" in reason:
+    flash("Falta el token CSRF. Intenta enviar nuevamente el formulario.", "alert")
+    return redirect(request.referrer or "/")
+
+  flash("Error de validación CSRF.", "alert")
+  return redirect(request.referrer or "/")

@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Auto-cerrar alerts después de 5 segundos (opcional)
+  // Auto-cerrar alerts después de 7 segundos (opcional)
   const alerts = document.querySelectorAll('.alert');
   alerts.forEach(alert => {
     setTimeout(() => {
@@ -29,6 +29,6 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         }, 600);
       }
-    }, 5000);
+    }, 7000);
   });
 });

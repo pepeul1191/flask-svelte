@@ -3,3 +3,4 @@ sqlalchemy
 Flask-Session
 flask-jwt-extended
 dotenv
+flask-wtf
