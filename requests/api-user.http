@@ -40,3 +40,17 @@ Content-Type: application/json
   "password": "PASS1244444444443",
   "member_id": 101
 }
+
+### Crear un nuevo usuario
+POST http://localhost:5000/api/v1/demo
+Content-Type: application/json
+
+{
+  "user_name": "USER1",
+  "password": "PASS123",
+  "member_id": 101
+}
+
+### Crear un nuevo usuario
+GET http://localhost:5000/api/v1/demo
+Content-Type: application/json
