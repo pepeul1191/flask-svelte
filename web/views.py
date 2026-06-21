@@ -10,7 +10,7 @@ def index():
     'nav_active': 'home',
     'message': '',
   }
-  return render_template('index.html', locals=locals)
+  return render_template('web_index.html', locals=locals)
 
 @views.route('/incubadora', methods=['GET'])
 def incubadora():
@@ -19,7 +19,7 @@ def incubadora():
     'nav_active': 'home',
     'message': '',
   }
-  return render_template('incubadora.html', locals=locals)
+  return render_template('web/incubadora.html', locals=locals)
 
 @views.route('/error/403')
 def error_403():

@@ -60,6 +60,11 @@ def login():
     except Exception as e:
       print("LoginLog error:", e)
     """
+    # en función al rol el redirect
+    roles = user_data.get("roles", [])
+
+    if "admin" in roles:
+      return redirect("/admin")
 
     return redirect('/')
 

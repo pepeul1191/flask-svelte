@@ -4,6 +4,7 @@ from main.application import csrf
 # modules blueprints
 from web.blueprints import blueprints as web_blueprints
 from auth.blueprints import blueprints as auth_blueprints
+from admin.configs.blueprints import blueprints as admin_blueprints
 # doules apis for csrf excluding
 from auth.apis import apis as auth_apis
 
@@ -12,7 +13,8 @@ def register(app):
   modules_blueprints = [
     # admin_blueprints,
     web_blueprints,
-    auth_blueprints
+    auth_blueprints,
+    admin_blueprints,
   ]
   # load sub blueprints to app
   for blueprints in modules_blueprints:
