@@ -11,10 +11,12 @@
     "dev:access": "bash -c 'cd /home/pepe/Documents/go/access-v2 && npm run dev:gin 2>/dev/null'",
     "dev:files": "bash -c 'cd /home/pepe/Documents/go/files && go run main.go 2>/dev/null'",
     "dev-all": "concurrently -p \"[{name}]\" -n \"RAILS,ACCESS,FILES\" -c \"bgRed.bold,bgGreen.bold,bgBlue.bold,bgOrange.bold\" \"npm run dev\" \"npm run dev:access\" \"npm run dev:files\"",
-    "db:new": "npx dbmate -d \"db/migrations\" -e \"DB\" new ",
-    "db:up": "npx dbmate -d \"db/migrations\" -e \"DB\" up",
-    "db:rollback": "npx dbmate -d \"db/migrations\" -e \"DB\" rollback",
-    "db:dump": "npx dbmate -d \"db/migrations\" -e \"DB\" dump "
+    "db:new": "npx dbmate -d \"db/migrations\" -e \"DATABASE_URL\" new ",
+    "db:up": "npx dbmate -d \"db/migrations\" -e \"DATABASE_URL\" up",
+    "db:rollback": "npx dbmate -d \"db/migrations\" -e \"DATABASE_URL\" rollback",
+    "db:schema": "npx dbmate -d \"db/migrations\" -e \"DATABASE_URL\" dump ",
+    "db:dump": "mysqldump -u root -p classroom > db/backup.sql",
+    "db:restore": "mysql -u root -p classroom < db/backup.sql"
   },
   "keywords": [],
   "author": "",
@@ -24,7 +26,7 @@
     "bootstrap": "^5.3.3",
     "font-awesome": "^4.7.0",
     "simplemde": "^1.11.2",
-    "sqlite3": "^5.1.7"
+    "mysql2": "^3.17.1"
   },
   "devDependencies": {
     "@babel/core": "^7.27.4",

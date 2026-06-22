@@ -30,7 +30,8 @@ Este es un proyecto base que integra un backend en **Flask** con un frontend en 
 
     # .env
     #### DBMATE
-    DB=sqlite:db/app.db
+    # DBMATE
+    DATABASE_URL=mysql://root:123@localhost:3306/classroom
     #### SERVER
     BASE_URL=http://localhost:5000
     STATIC_URL=http://localhost:5000

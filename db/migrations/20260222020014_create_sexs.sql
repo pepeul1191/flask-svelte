@@ -1,0 +1,11 @@
+-- migrate:up
+
+CREATE TABLE sexs (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(20) NOT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- migrate:down
+
+DROP TABLE sexs;
