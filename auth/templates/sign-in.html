@@ -46,6 +46,9 @@
         {# CSRF token #}
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
+        {# Flash messages #}
+        {% include './partials/flash_messages.html' %}
+
         <div class="mb-3">
           <label for="username" class="form-label">
             Usuario
@@ -72,9 +75,6 @@
             required
           >
         </div>
-
-        {# Flash messages #}
-        {% include './partials/flash_messages.html' %}
 
         <div class="d-grid gap-2">
           <button type="submit" class="btn btn-primary">

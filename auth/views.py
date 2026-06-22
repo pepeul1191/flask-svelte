@@ -86,4 +86,5 @@ def sign_up():
 @views.route('/sign-out', methods=["GET"])
 def sign_out():
   session.clear()
-  return redirect('/')
+  flash("Gracias, vuelva pronto", "notice")
+  return redirect('/sign-in')
