@@ -7,4 +7,9 @@ views = Blueprint('admin-index-views', __name__, template_folder='../templates')
 @views.route('/admin', methods=["GET"])
 @only_logged
 def index():
-  return render_template('admin_index.html')
+  locals = {
+    'title': 'Home',
+    'nav_link': 'home',
+    'message': '',
+  }
+  return render_template('admin_index.html', locals=locals)

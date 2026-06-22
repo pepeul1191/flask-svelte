@@ -1,0 +1,73 @@
+{# admin/templates/partials/sidebar.html #}
+
+<div class="sidebar bg-primary text-white">
+  <div class="sidebar-header">
+    <h3 class="d-flex align-items-center mb-0">
+      <img
+        src="{{ assets_path }}/img/logo-contrast.png"
+        height="37"
+        width="220"
+        alt=""
+        class="icon"
+      >
+    </h3>
+  </div>
+
+  <hr>
+
+  <ul class="nav flex-column">
+    <li class="nav-item">
+      <a
+        class="nav-link {% if locals.nav_link == 'home' %}active{% endif %}"
+        href="/"
+      >
+        <i class="fa fa-home me-2"></i> Inicio
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a
+        class="nav-link {% if locals.nav_link == 'worker-management' %}active{% endif %}"
+        href="/admin/workers"
+      >
+        <i class="fa fa-briefcase me-2"></i> Colaboradores
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a
+        class="nav-link {% if locals.nav_link == 'users' %}active{% endif %}"
+        href="/admin/user"
+      >
+        <i class="fa fa-users me-2"></i> Usuarios
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a
+        class="nav-link {% if locals.nav_link == 'master-data' %}active{% endif %}"
+        href="/admin/master-data"
+      >
+        <i class="fa fa-cc-mastercard me-2"></i> Datos Maestros
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a
+        class="nav-link {% if locals.nav_link == 'student-management' %}active{% endif %}"
+        href="/admin/students"
+      >
+        <i class="fa fa-graduation-cap me-2"></i> Alumnos
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a
+        class="nav-link {% if locals.nav_link == 'program-management' %}active{% endif %}"
+        href="/admin/programs"
+      >
+        <i class="fa fa-cogs me-2"></i> Programas
+      </a>
+    </li>
+  </ul>
+</div>

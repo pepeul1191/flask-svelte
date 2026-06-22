@@ -1,0 +1,74 @@
+{# admin/templates/layouts/dashboard.html #}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="icon" href="{{ config.STATIC_URL }}/icon.ico" type="image/x-icon">
+
+
+  <link rel="icon" type="image/x-icon" href="{{ config.STATIC_URL }}/favicon.ico">
+
+  <title>{{ locals.title if locals is defined and locals.title else "Bienvenido" }}</title>
+
+  <link rel="stylesheet" href="{{ config.STATIC_URL }}/dist/simplemde.min.css">
+  <link rel="stylesheet" href="{{ config.STATIC_URL }}/dist/vendor.min.css">
+  <link rel="stylesheet" href="{{ config.STATIC_URL }}/dist/app.min.css">
+
+  <script>
+    const URLS = {
+      BASE: "{{ base_url }}",
+      FILES: "{{ url_files_service }}"
+    };
+  </script>
+
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body class="dashboard-layout">
+
+  {% set roles = session.get('roles', []) %}
+
+  <div class="wrapper">
+
+    <!-- Navbar -->
+    {% include './partials/admin_navbar.html' %}
+
+    <!-- Sidebar -->
+    {% if 'admin' in roles %}
+      {% include './partials/admin_sidebar.html' %}
+    {% else %}
+      {% include './partials/admin_sidebar.html' %}
+    {% endif %}
+
+    <!-- Content -->
+    <div class="content-wrapper">
+      {% block content %}{% endblock %}
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="fixed-footer py-2 border-top">
+    <div class="container-fluid">
+      <div class="pull-right text-muted small">
+        Desarrollado por
+        <a
+          href="https://www.ulima.edu.pe/centros-e-institutos/innova-ul"
+          target="_blank"
+          class="text-decoration-none"
+        >
+          Centro de Emprendimiento ULIMA
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ config.STATIC_URL }}/dist/simplemde.min.js"></script>
+  <script src="{{ config.STATIC_URL }}/dist/vendor.js"></script>
+  <script src="{{ config.STATIC_URL }}/dist/app.min.js"></script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
