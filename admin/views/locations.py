@@ -41,7 +41,6 @@ def indexs(department_id=None):
     if provinces_response["success"]:
       provinces = provinces_response["data"]
       selected_department = int(department_id)
-      print(provinces)
     else:
       flash(provinces_response["message"], "danger")
 
