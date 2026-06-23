@@ -203,8 +203,67 @@
 					<!-- DISTRITOS -->
 					<div class="col-md-4">
 
-						<div class="alert alert-light text-center mb-0">
-							Seleccione una provincia
+						<div class="d-flex justify-content-between align-items-center mb-3">
+							<h6 class="mb-0">
+								Distritos
+							</h6>
+
+							{% if locals.selected_department and locals.selected_province %}
+								<a
+									href="/admin/departments/{{ locals.selected_department }}/provinces/{{ locals.selected_province }}/districts/new"
+									class="btn btn-success btn-sm">
+									<i class="fa fa-plus"></i> Agregar Distrito
+								</a>
+							{% endif %}
+						</div>
+
+						<div class="list-group">
+
+							{% if locals.districts and locals.districts|length > 0 %}
+
+								{% for district in locals.districts %}
+
+									<div class="list-group-item d-flex justify-content-between align-items-center">
+
+										<span>
+											{{ district.name }}
+										</span>
+
+										<div class="btn-group btn-group-sm">
+
+											<a
+												href="/admin/departments/{{ locals.selected_department }}/provinces/{{ locals.selected_province }}/districts/{{ district.id }}/edit"
+												class="btn btn-outline-secondary">
+												<i class="fa fa-edit"></i> Editar
+											</a>
+
+											<a
+												href="/admin/departments/{{ locals.selected_department }}/provinces/{{ locals.selected_province }}/districts/{{ district.id }}/delete"
+												class="btn btn-outline-danger"
+												onclick="return confirm('¿Eliminar distrito?');">
+												<i class="fa fa-trash"></i> Eliminar
+											</a>
+
+										</div>
+
+									</div>
+
+								{% endfor %}
+
+							{% else %}
+
+								<div class="list-group-item text-center text-muted">
+
+									{% if locals.selected_province %}
+										No hay distritos registrados
+									{% else %}
+										Seleccione una provincia
+									{% endif %}
+
+								</div>
+
+							{% endif %}
+
 						</div>
 
 					</div>

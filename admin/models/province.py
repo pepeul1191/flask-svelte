@@ -27,7 +27,15 @@ class Province(Base, ToString):
   )
 
   # (opcional pero recomendado)
-  department = relationship("Department", backref="provinces")
+  department = relationship(
+    "Department",
+    back_populates="provinces"
+  )
+
+  districts = relationship(
+    "District",
+    back_populates="province"
+  )
 
   def __init__(self, name, department_id):
     self.name = name

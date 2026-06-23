@@ -1,0 +1,86 @@
+{# admin/templates/locations/district_new.html #}
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin/locations">
+        <i class="fa fa-map-marker me-2"></i>
+        Locaciones
+      </a>
+      /
+      Nuevo Distrito
+    </h3>
+
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-plus me-2"></i>
+          Crear Distrito
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <form action="/admin/districts" method="POST" class="row g-3">
+
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <input type="hidden" name="department_id" value="{{ locals.department_id }}">
+          <input type="hidden" name="province_id" value="{{ locals.province_id }}">
+
+          <!-- Nombre -->
+          <div class="col-md-4">
+            <label class="form-label">Nombre</label>
+            <input
+              type="text"
+              name="name"
+              class="form-control"
+              maxlength="45"
+              required>
+          </div>
+
+          <!-- Provincia (solo display) -->
+          <div class="col-md-4">
+            <label class="form-label">Provincia</label>
+
+            <input type="hidden" name="province_id" value="{{ locals.province_id }}">
+
+            <select class="form-select" disabled>
+              <option selected>
+                {{ locals.province_response.name }}
+              </option>
+            </select>
+
+          </div>
+
+          <!-- Actions -->
+          <div class="col-12 mt-4">
+
+            <button type="submit" class="btn btn-success">
+              <i class="fa fa-save me-2"></i>
+              Guardar
+            </button>
+
+            <a href="/admin/departments/{{ locals.department_id }}/provinces/{{ locals.province_id }}/districts"
+               class="btn btn-warning ms-2">
+              <i class="fa fa-times me-2"></i>
+              Cancelar
+            </a>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+{% endblock %}
