@@ -1,0 +1,97 @@
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin/locations">
+        <i class="fa fa-map-marker me-2"></i>
+        Locaciones
+      </a>
+      /
+      Nueva Provincia
+    </h3>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-plus me-2"></i>
+          Crear Provincia
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <form action="/admin/provinces" method="POST" class="row g-3">
+
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <!-- Nombre -->
+          <div class="col-md-4">
+            <label class="form-label">Nombre</label>
+            <input
+              type="text"
+              name="name"
+              class="form-control"
+              maxlength="45"
+              required>
+          </div>
+
+          <!-- Departamento -->
+          <div class="col-md-4">
+            <label class="form-label">Departamento</label>
+
+            <input type="hidden" name="department_id" value="{{locals.selected_department_id}}">
+
+            <select name="department_id" class="form-select" disabled>
+
+              {% for d in locals.departments %}
+                <option value="{{ d.id }}"
+                  {% if d.id == locals.selected_department_id %}selected{% endif %}>
+                  {{ d.name }}
+                </option>
+              {% endfor %}
+
+            </select>
+
+          </div>
+
+          <!-- Actions -->
+          <div class="col-12 mt-4">
+
+            <button type="submit" class="btn btn-success">
+              <i class="fa fa-save me-2"></i>
+              Guardar
+            </button>
+
+            <a href="/admin/locations" class="btn btn-warning ms-2">
+              <i class="fa fa-times me-2"></i>
+              Cancelar
+            </a>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+{% endblock %}

@@ -1,0 +1,693 @@
+tengo esta vista donde ahorita listo de los departamentos, pero quiero listar todos los departamentos mas sus provincias del departmento en la segunda columna de segundo card-body, para ello falta crear el modelo, service, vistas y rutas para el crud
+
+{# admin/templates/locations/index.html #}
+
+{# admin/templates/admin_index.html #}
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+    <h3 class="mb-4">
+    <a href="/admin"><i class="fa fa-map-marker me-2"></i>Gestión de Datos Maestros</a> / Locaciones
+    </h3>
+
+    <div class="card mb-4">
+			<div class="card-header">
+				<h6 class="mb-0">
+				<i class="fa fa-filter me-2"></i>
+				Prueba de Buscador de Locaciones
+				</h6>
+			</div>
+
+			<div class="card-body">
+				<form method="GET" action="/teachers/abet">
+					<input type="hidden" name="per_page" value="<%= @pagination[:per_page] %>">
+
+					<div class="row mb-3 align-items-end">
+
+							<!-- NAME -->
+							<div class="col-md-3">
+							<label class="form-label">Nombre</label>
+							<input type="text"
+											name="name"
+											class="form-control"
+											value="<%= @search_query %>">
+							</div>
+
+							<!-- BUTTON -->
+							<div class="col-md-2">
+							<button class="btn btn-primary">
+									<i class="fa fa-search"></i> Filtrar
+							</button>
+							</div>
+
+					</div>
+					</form>
+			</div>
+    </div>
+
+		{# Flash messages #}
+    {% include './partials/flash_messages.html' %}
+
+		<div class="card mb-4">
+			<div class="card-header">
+				<h6 class="mb-0">
+				<i class="fa fa-list me-2"></i>
+				Gestión de Departamentos, Provincias y Distritos
+				</h6>
+			</div>
+
+			<div class="card-body">
+
+				<div class="row">
+
+					<!-- DEPARTAMENTOS -->
+					<div class="col-md-4">
+
+						<div class="d-flex justify-content-between align-items-center mb-3">
+							<h6 class="mb-0">
+								Departamentos
+							</h6>
+
+							<a
+								href="/admin/departments/new"
+								class="btn btn-success btn-sm">
+								<i class="fa fa-plus"></i> Agregar Deparamento
+							</a>
+						</div>
+
+						<div class="list-group">
+
+							{% if locals.departments %}
+
+								{% for department in locals.departments %}
+
+									<div
+										class="list-group-item d-flex justify-content-between align-items-center">
+
+										<span>
+											{{ department.name }}
+										</span>
+
+										<div class="btn-group btn-group-sm">
+
+											<a
+												href="/admin/departments/{{ department.id }}/edit"
+												class="btn btn-outline-secondary">
+												<i class="fa fa-edit"></i> Editar
+											</a>
+
+											<a
+												href="/admin/departments/{{ department.id }}/provinces"
+												class="btn btn-outline-secondary">
+												<i class="fa fa-list"></i> Provincias
+											</a>
+
+											<a
+												href="/admin/departments/{{ department.id }}/delete"
+												class="btn btn-outline-danger"
+												onclick="return confirm('¿Está seguro de eliminar este departamento?');">
+												<i class="fa fa-trash"></i> Eliminar
+											</a>
+
+										</div>
+
+									</div>
+
+								{% endfor %}
+
+							{% else %}
+
+								<div class="list-group-item text-center text-muted">
+									No se encontraron departamentos
+								</div>
+
+							{% endif %}
+
+						</div>
+
+					</div>
+
+					<!-- PROVINCIAS -->
+					<div class="col-md-4">
+
+						<div class="alert alert-light text-center mb-0">
+							Seleccione un departamento
+						</div>
+
+					</div>
+
+					<!-- DISTRITOS -->
+					<div class="col-md-4">
+
+						<div class="alert alert-light text-center mb-0">
+							Seleccione una provincia
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+  </div>
+</main>
+{% endblock %}
+
+actualemnte tengo este modelo
+
+# admin/models/departament.py
+from sqlalchemy import Column, Integer, String
+from main.databases import Base, ToString
+
+class Department(Base, ToString):
+  __tablename__ = "departments"
+
+  id = Column(
+    Integer,
+    primary_key=True,
+    autoincrement=True
+  )
+
+  name = Column(
+    String(45),
+    nullable=False
+  )
+
+  def __init__(self, name):
+    self.name = name
+
+crea el modeo para la provincia en # admin/models/province.py guiandote de esta tabla
+
+entity provinces {
+  * id : INT <<PK>>
+  --
+  name : VARCHAR(45)
+  department_id : INT <<FK>>
+}
+
+tambien crea el service para provincia, guiate de este de departments
+
+# admin/services/departments_service.py
+
+from sqlalchemy.exc import SQLAlchemyError
+
+from admin.models.departament import Department
+from main.databases import SessionLocal
+from main.services import ApplicationService
+
+
+class DepartmentService(ApplicationService):
+
+  @classmethod
+  def fetch_all(cls):
+    db = SessionLocal()
+
+    try:
+      departments = (
+        db.query(Department)
+        .order_by(Department.id.asc())
+        .all()
+      )
+
+      return cls.build_response(
+        data=[department.to_dict() for department in departments],
+        message="Lista de departamentos obtenida exitosamente"
+      )
+
+    except SQLAlchemyError as e:
+      return cls.handle_error(
+        f"Error al obtener los departamentos: {str(e)}"
+      )
+
+    finally:
+      db.close()
+
+  @classmethod
+  def fetch_one(cls, department_id):
+    db = SessionLocal()
+
+    try:
+      department = (
+        db.query(Department)
+        .filter(Department.id == department_id)
+        .first()
+      )
+
+      if not department:
+        return cls.handle_not_found(
+          "Departamento no encontrado"
+        )
+
+      return cls.build_response(
+        data=department.to_dict(),
+        message="Departamento encontrado"
+      )
+
+    except SQLAlchemyError as e:
+      return cls.handle_error(
+        f"Error al buscar el departamento: {str(e)}"
+      )
+
+    finally:
+      db.close()
+
+  @classmethod
+  def create(cls, params):
+    db = SessionLocal()
+
+    try:
+      department = Department(
+        name=params.get("name")
+      )
+
+      db.add(department)
+      db.commit()
+      db.refresh(department)
+
+      return cls.build_response(
+        data=department.to_dict(),
+        message="Departamento creado exitosamente"
+      )
+
+    except SQLAlchemyError as e:
+      db.rollback()
+
+      return cls.handle_error(
+        f"Error al crear departamento: {str(e)}"
+      )
+
+    finally:
+      db.close()
+
+  @classmethod
+  def update(cls, department_id, params):
+    db = SessionLocal()
+
+    try:
+      department = (
+        db.query(Department)
+        .filter(Department.id == department_id)
+        .first()
+      )
+
+      if not department:
+        return cls.handle_not_found(
+          "Departamento no encontrado"
+        )
+
+      if "name" in params:
+        department.name = params["name"]
+
+      db.commit()
+      db.refresh(department)
+
+      return cls.build_response(
+        data=department.to_dict(),
+        message="Departamento actualizado exitosamente"
+      )
+
+    except SQLAlchemyError as e:
+      db.rollback()
+
+      return cls.handle_error(
+        f"Error al actualizar departamento: {str(e)}"
+      )
+
+    finally:
+      db.close()
+
+  @classmethod
+  def delete(cls, department_id):
+    db = SessionLocal()
+
+    try:
+      department = (
+        db.query(Department)
+        .filter(Department.id == department_id)
+        .first()
+      )
+
+      if not department:
+        return cls.handle_not_found(
+          "Departamento no encontrado"
+        )
+
+      db.delete(department)
+      db.commit()
+
+      return cls.build_response(
+        message="Departamento eliminado exitosamente"
+      )
+
+    except SQLAlchemyError as e:
+      db.rollback()
+
+      return cls.handle_error(
+        f"Error al eliminar departamento: {str(e)}"
+      )
+
+    finally:
+      db.close()
+
+agrega las rutas en este archivo y que llame a los services de provinces
+
+# admin/views/master_data.py
+
+from flask import Blueprint, flash, render_template, request, redirect
+
+from admin.configs.middlewares import only_logged
+from admin.services.departments_services import DepartmentService
+
+views = Blueprint(
+  "admin-locations-views",
+  __name__,
+  template_folder="../templates"
+)
+
+
+@views.route("/admin/locations", methods=["GET"])
+@only_logged
+def indexs():
+
+  departments_response = DepartmentService.fetch_all()
+
+  departments = []
+
+  if departments_response["success"]:
+    departments = departments_response["data"]
+  else:
+    flash(
+      departments_response["message"],
+      "danger"
+    )
+
+  locals = {
+    "title": "Locaciones",
+    "nav_link": "master-data",
+    "departments": departments
+  }
+
+  return render_template(
+    "locations/index.html",
+    locals=locals
+  )
+
+@views.route("/admin/departments/new", methods=["GET"])
+@only_logged
+def department_new():
+
+  locals = {
+    "title": "Nuevo Departamento",
+    "nav_link": "master-data"
+  }
+
+  return render_template(
+    "locations/department_new.html",
+    locals=locals
+  )
+
+@views.route("/admin/departments", methods=["POST"])
+@only_logged
+def department_create():
+
+  response = DepartmentService.create({
+    "name": request.form.get("name")
+  })
+
+  if response["success"]:
+    flash(response["message"], "success")
+    return redirect("/admin/locations")
+
+  flash(response["message"], "alert")
+
+  return redirect("/admin/departments/new")
+
+@views.route("/admin/departments/<int:department_id>/delete", methods=["GET"])
+@only_logged
+def department_delete(department_id):
+
+  response = DepartmentService.delete(department_id)
+
+  if response["success"]:
+    flash(response["message"], "success")
+  else:
+    flash(response["message"], "danger")
+
+  return redirect("/admin/locations")
+
+@views.route("/admin/departments/<int:department_id>/edit", methods=["GET"])
+@only_logged
+def department_edit(department_id):
+
+  response = DepartmentService.fetch_one(department_id)
+
+  if not response["success"]:
+    flash(response["message"], "danger")
+    return redirect("/admin/locations")
+
+  locals = {
+    "title": "Editar Departamento",
+    "nav_link": "master-data",
+    "department": response["data"]
+  }
+
+  return render_template(
+    "locations/department_edit.html",
+    locals=locals
+  )
+
+@views.route("/admin/departments/<int:department_id>/update", methods=["POST"])
+@only_logged
+def department_update(department_id):
+
+  response = DepartmentService.update(
+    department_id,
+    {
+      "name": request.form.get("name")
+    }
+  )
+
+  if response["success"]:
+    flash(response["message"], "success")
+  else:
+    flash(response["message"], "danger")
+
+  return redirect("/admin/locations")
+
+para las vistas guiate de estas de departemnts
+
+{# admin/templates/locations/department_edit.html #}
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin/master-data">
+        <i class="fa fa-cc-mastercard me-2"></i>
+        Gestión de Datos Maestros
+      </a>
+      /
+      <a href="/admin/locations">
+        Locaciones
+      </a>
+      /
+      Editar Departamento
+    </h3>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-edit me-2"></i>
+          Editar Departamento
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <form
+          action="/admin/departments/{{ locals.department.id }}/update"
+          method="POST"
+          class="row g-3">
+
+          {# CSRF token #}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="col-md-4">
+            <label for="name" class="form-label">
+              Nombre
+            </label>
+
+            <input
+              type="text"
+              id="name"
+              name="name"
+              class="form-control"
+              maxlength="45"
+              required
+              value="{{ locals.department.name }}">
+          </div>
+
+          <div class="col-12 mt-4">
+
+            <button type="submit" class="btn btn-success">
+              <i class="fa fa-save me-2"></i>
+              Actualizar
+            </button>
+
+            <a href="/admin/locations" class="btn btn-warning ms-2">
+              <i class="fa fa-times me-2"></i>
+              Cancelar
+            </a>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+{% endblock %}
+
+{# admin/templates/locations/deparment_new.html #}
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin/master-data">
+        <i class="fa fa-cc-mastercard me-2"></i>
+        Gestión de Datos Maestros
+      </a>
+      /
+      <a href="/admin/locations">
+        Locaciones
+      </a>
+      /
+      Crear Departamento
+    </h3>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show">
+            {{ message }}
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert">
+            </button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-plus me-2"></i>
+          Nuevo Departamento
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <form
+          action="/admin/departments"
+          method="POST"
+          class="row g-3">
+
+          {# CSRF token #}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="col-md-4">
+            <label
+              for="name"
+              class="form-label">
+
+              Nombre
+            </label>
+
+            <input
+              type="text"
+              id="name"
+              name="name"
+              class="form-control"
+              maxlength="45"
+              required>
+          </div>
+
+          <div class="col-12 mt-4">
+
+            <button
+              type="submit"
+              class="btn btn-success">
+
+              <i class="fa fa-save me-2"></i>
+              Guardar
+            </button>
+
+            <a
+              href="/admin/locations"
+              class="btn btn-warning ms-2">
+
+              <i class="fa fa-times me-2"></i>
+              Cancelar
+            </a>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+{% endblock %}

@@ -1,4 +1,4 @@
-# admin/services/departments_service.py
+# admin/services/department_service.py
 
 from sqlalchemy.exc import SQLAlchemyError
 

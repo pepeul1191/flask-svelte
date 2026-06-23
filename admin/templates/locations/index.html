@@ -1,4 +1,4 @@
-{# admin/templates/admin_index.html #}
+{# admin/templates/locations/index.html #}
 
 {# admin/templates/admin_index.html #}
 {% extends './layouts/admin_dashboard.html' %}
@@ -105,6 +105,12 @@
 											</a>
 
 											<a
+												href="/admin/departments/{{ department.id }}/provinces"
+												class="btn btn-outline-secondary">
+												<i class="fa fa-list"></i> Provincias
+											</a>
+
+											<a
 												href="/admin/departments/{{ department.id }}/delete"
 												class="btn btn-outline-danger"
 												onclick="return confirm('¿Está seguro de eliminar este departamento?');">
@@ -132,8 +138,64 @@
 					<!-- PROVINCIAS -->
 					<div class="col-md-4">
 
-						<div class="alert alert-light text-center mb-0">
-							Seleccione un departamento
+						<div class="d-flex justify-content-between align-items-center mb-3">
+							<h6 class="mb-0">Provincias</h6>
+
+							{% if locals.selected_department %}
+								<a href="/admin/departments/{{ locals.selected_department }}/provinces/new"
+									class="btn btn-success btn-sm">
+									<i class="fa fa-plus"></i> Agregar Provincia
+								</a>
+							{% endif %}
+						</div>
+
+						<div class="list-group">
+
+							{% if locals.provinces and locals.provinces|length > 0 %}
+
+								{% for province in locals.provinces %}
+
+									<div class="list-group-item d-flex justify-content-between align-items-center">
+
+										<span>{{ province.name }}</span>
+
+										<div class="btn-group btn-group-sm">
+
+											<a href="/admin/departments/{{locals.selected_department}}/provinces/{{ province.id }}/edit"
+												class="btn btn-outline-secondary">
+												<i class="fa fa-edit"></i> Editar
+											</a>
+
+											<a
+												href="/admin/departments/{{locals.selected_department}}/provinces/{{ province.id }}/districts"
+												class="btn btn-outline-secondary">
+												<i class="fa fa-list"></i> Distritos
+											</a>
+
+											<a href="/admin/departments/{{locals.selected_department}}/provinces/{{ province.id }}/delete"
+												class="btn btn-outline-danger"
+												onclick="return confirm('¿Eliminar provincia?');">
+												<i class="fa fa-trash"></i> Eliminar
+											</a>
+
+										</div>
+
+									</div>
+
+								{% endfor %}
+
+							{% else %}
+
+								<div class="list-group-item text-center text-muted">
+									{% if locals.selected_department %}
+										No hay provincias registradas
+									{% else %}
+										Seleccione un departamento
+									{% endif %}
+								</div>
+
+							{% endif %}
+
 						</div>
 
 					</div>
