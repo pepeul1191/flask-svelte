@@ -61,12 +61,12 @@ def handle_csrf_error(e):
   reason = e.description.lower()
 
   if "expired" in reason:
-    flash("La sesión ha expirado. Por favor inicia sesión nuevamente.", "alert")
+    flash("La sesión ha expirado. Por favor inicia sesión nuevamente.", "danger")
     return redirect("/sign-in")
 
   if "missing" in reason:
-    flash("Falta el token CSRF. Intenta enviar nuevamente el formulario.", "alert")
+    flash("Falta el token CSRF. Intenta enviar nuevamente el formulario.", "danger")
     return redirect(request.referrer or "/")
 
-  flash("Error de validación CSRF.", "alert")
+  flash("Error de validación CSRF.", "danger")
   return redirect(request.referrer or "/")

@@ -4,7 +4,7 @@
   {% if messages %}
     {% for category, message in messages %}
 
-      {% if category == 'alert' %}
+      {% if category == 'danger' %}
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
           {{ message }}
           <button type="button"
@@ -14,7 +14,7 @@
         </div>
       {% endif %}
 
-      {% if category == 'notice' %}
+      {% if category == 'success'%}
         <div class="alert alert-success alert-dismissible fade show" role="alert">
           {{ message }}
           <button type="button"

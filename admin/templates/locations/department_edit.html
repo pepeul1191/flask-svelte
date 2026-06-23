@@ -1,0 +1,96 @@
+{# admin/templates/locations/department_edit.html #}
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin/master-data">
+        <i class="fa fa-cc-mastercard me-2"></i>
+        Gestión de Datos Maestros
+      </a>
+      /
+      <a href="/admin/locations">
+        Locaciones
+      </a>
+      /
+      Editar Departamento
+    </h3>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-edit me-2"></i>
+          Editar Departamento
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <form
+          action="/admin/departments/{{ locals.department.id }}/update"
+          method="POST"
+          class="row g-3">
+
+          {# CSRF token #}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="col-md-4">
+            <label for="name" class="form-label">
+              Nombre
+            </label>
+
+            <input
+              type="text"
+              id="name"
+              name="name"
+              class="form-control"
+              maxlength="45"
+              required
+              value="{{ locals.department.name }}">
+          </div>
+
+          <div class="col-12 mt-4">
+
+            <button type="submit" class="btn btn-success">
+              <i class="fa fa-save me-2"></i>
+              Actualizar
+            </button>
+
+            <a href="/admin/locations" class="btn btn-warning ms-2">
+              <i class="fa fa-times me-2"></i>
+              Cancelar
+            </a>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+{% endblock %}

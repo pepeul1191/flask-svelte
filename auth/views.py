@@ -71,7 +71,7 @@ def login():
   # =========================
   # ERROR (flash Rails equivalent)
   # =========================
-  flash(result.get("message"), "alert")
+  flash(result.get("message"), "danger")
 
   return render_template('./sign-in.html')
 
@@ -86,5 +86,5 @@ def sign_up():
 @views.route('/sign-out', methods=["GET"])
 def sign_out():
   session.clear()
-  flash("Gracias, vuelva pronto", "notice")
+  flash("Gracias, vuelva pronto", "success")
   return redirect('/sign-in')

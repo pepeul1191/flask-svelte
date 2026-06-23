@@ -16,7 +16,7 @@ class DepartmentService(ApplicationService):
     try:
       departments = (
         db.query(Department)
-        .order_by(Department.name.asc())
+        .order_by(Department.id.asc())
         .all()
       )
 
