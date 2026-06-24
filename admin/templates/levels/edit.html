@@ -1,0 +1,86 @@
+# admin/templates/levels/edit.html
+
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin/master-data">
+        <i class="fa fa-cc-mastercard me-2"></i>
+        Gestión de Datos Maestros
+      </a>
+      /
+      <a href="/admin/levels">
+        Niveles
+      </a>
+      /
+      Editar Nivel
+    </h3>
+
+    {% include 'partials/flash_messages.html' %}
+
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-edit me-2"></i>
+          Editar Nivel: {{ locals.level.name }}
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <form
+          action="/admin/levels/{{ locals.level.id }}/update"
+          method="POST"
+          class="row g-3">
+
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="col-md-4">
+
+            <label class="form-label">Nombre</label>
+
+            <input
+              type="text"
+              name="name"
+              class="form-control"
+              maxlength="30"
+              value="{{ locals.level.name }}"
+              required>
+
+          </div>
+
+          <div class="col-12 mt-4">
+
+            <button class="btn btn-success">
+              <i class="fa fa-save me-2"></i>
+              Guardar Cambios
+            </button>
+
+            <a href="/admin/levels" class="btn btn-warning ms-2">
+              <i class="fa fa-times me-2"></i>
+              Cancelar
+            </a>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+</main>
+{% endblock %}
