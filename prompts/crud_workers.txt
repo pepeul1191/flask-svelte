@@ -1,0 +1,1033 @@
+tengo estos modelos
+
+# admin/models/worker.py
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
+
+from main.databases import Base, ToString
+
+
+class Worker(Base, ToString):
+  __tablename__ = "workers"
+
+  id = Column(
+    Integer,
+    primary_key=True,
+    autoincrement=True
+  )
+
+  code = Column(
+    String(20),
+    nullable=False,
+    unique=True
+  )
+
+  email = Column(
+    String(100),
+    nullable=False
+  )
+
+  person_id = Column(
+    Integer,
+    ForeignKey("persons.id"),
+    nullable=False,
+    unique=True
+  )
+
+  person = relationship(
+    "Person",
+    back_populates="worker"
+  )
+
+  def to_dict(self):
+    return {
+      "id": self.id,
+      "code": self.code,
+      "email": self.email,
+      "person_id": self.person_id,
+      "person": self.person.to_dict() if self.person else None
+    }
+
+  def __init__(
+    self,
+    code,
+    email,
+    person_id
+  ):
+    self.code = code
+    self.email = email
+    self.person_id = person_id
+
+# admin/models/person.py
+from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+
+from main.databases import Base, ToString
+
+
+class Person(Base, ToString):
+  __tablename__ = "persons"
+
+  id = Column(
+    Integer,
+    primary_key=True,
+    autoincrement=True
+  )
+
+  names = Column(String(45), nullable=False)
+  last_names = Column(String(45), nullable=False)
+
+  document_number = Column(String(12), nullable=False)
+
+  image_url = Column(String(70), nullable=True)
+
+  birth_date = Column(Date, nullable=True)
+
+  created = Column(DateTime, nullable=True)
+  updated = Column(DateTime, nullable=True)
+
+  sex_id = Column(Integer, ForeignKey("sexs.id"), nullable=False)
+  document_type_id = Column(Integer, ForeignKey("document_types.id"), nullable=False)
+
+  sex = relationship(
+    "Sex",
+    back_populates="persons"
+  )
+
+  document_type = relationship(
+    "DocumentType",
+    back_populates="persons"
+  )
+
+  worker = relationship(
+    "Worker",
+    back_populates="person",
+    uselist=False
+  )
+
+  def to_dict(self):
+    return {
+      "id": self.id,
+      "names": self.names,
+      "last_names": self.last_names,
+      "document_number": self.document_number,
+      "image_url": self.image_url,
+      "birth_date": self.birth_date.isoformat() if self.birth_date else None,
+      "created": self.created.isoformat() if self.created else None,
+      "updated": self.updated.isoformat() if self.updated else None,
+      "sex_id": self.sex_id,
+      "document_type_id": self.document_type_id,
+
+      # 👇 agregado
+      "document_type": {
+        "id": self.document_type.id,
+        "name": self.document_type.name
+      } if self.document_type else None
+    }
+  
+  def __init__(
+    self,
+    names,
+    last_names,
+    document_number,
+    image_url,
+    birth_date,
+    sex_id,
+    document_type_id
+  ):
+    self.names = names
+    self.last_names = last_names
+    self.document_number = document_number
+    self.image_url = image_url
+    self.birth_date = birth_date
+    self.sex_id = sex_id
+    self.document_type_id = document_type_id
+
+# admin/models/document_type.py
+
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
+
+from main.databases import Base, ToString
+
+
+class DocumentType(Base, ToString):
+  __tablename__ = "document_types"
+
+  id = Column(
+    Integer,
+    primary_key=True,
+    autoincrement=True
+  )
+
+  name = Column(
+    String(20),
+    nullable=False
+  )
+
+  persons = relationship(
+    "Person",
+    back_populates="document_type"
+  )
+
+  def __init__(self, name):
+    self.name = name
+
+# admin/models/sex.py
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
+
+from main.databases import Base, ToString
+
+
+class Sex(Base, ToString):
+  __tablename__ = "sexs"
+
+  id = Column(
+    Integer,
+    primary_key=True,
+    autoincrement=True
+  )
+
+  name = Column(
+    String(45),
+    nullable=False
+  )
+
+  persons = relationship(
+    "Person",
+    back_populates="sex"
+  )
+
+  def __init__(self, name):
+    self.name = name
+
+y estos servicios
+
+# admin/services/sex_service.py
+
+from sqlalchemy.exc import SQLAlchemyError
+
+from admin.models.sex import Sex
+from main.databases import SessionLocal
+from main.services import ApplicationService
+
+
+class SexService(ApplicationService):
+
+  @classmethod
+  def fetch_all(cls):
+    db = SessionLocal()
+
+    try:
+      sexes = (
+        db.query(Sex)
+        .order_by(Sex.id.asc())
+        .all()
+      )
+
+      return cls.build_response(
+        data=[sex.to_dict() for sex in sexes],
+        message="Lista de sexos obtenida exitosamente"
+      )
+
+    except SQLAlchemyError as e:
+      return cls.handle_error(
+        f"Error al obtener los sexos: {str(e)}"
+      )
+
+    finally:
+      db.close()
+
+  @classmethod
+  def fetch_one(cls, sex_id):
+    db = SessionLocal()
+
+    try:
+      sex = (
+        db.query(Sex)
+        .filter(Sex.id == sex_id)
+        .first()
+      )
+
+      if not sex:
+        return cls.handle_not_found(
+          "Sexo no encontrado"
+        )
+
+      return cls.build_response(
+        data=sex.to_dict(),
+        message="Sexo encontrado"
+      )
+
+    except SQLAlchemyError as e:
+      return cls.handle_error(
+        f"Error al buscar el sexo: {str(e)}"
+      )
+
+    finally:
+      db.close()
+
+
+# admin/services/document_type_service.py
+
+from sqlalchemy.exc import SQLAlchemyError
+
+from admin.models.document_type import DocumentType
+from main.databases import SessionLocal
+from main.services import ApplicationService
+
+
+class DocumentTypeService(ApplicationService):
+
+  @classmethod
+  def fetch_all(cls):
+    db = SessionLocal()
+
+    try:
+      document_types = (
+        db.query(DocumentType)
+        .order_by(DocumentType.id.asc())
+        .all()
+      )
+
+      return cls.build_response(
+        data=[
+          document_type.to_dict()
+          for document_type in document_types
+        ],
+        message="Lista de tipos de documento obtenida exitosamente"
+      )
+
+    except SQLAlchemyError as e:
+      return cls.handle_error(
+        f"Error al obtener los tipos de documento: {str(e)}"
+      )
+
+    finally:
+      db.close()
+
+  @classmethod
+  def fetch_one(cls, document_type_id):
+    db = SessionLocal()
+
+    try:
+      document_type = (
+        db.query(DocumentType)
+        .filter(DocumentType.id == document_type_id)
+        .first()
+      )
+
+      if not document_type:
+        return cls.handle_not_found(
+          "Tipo de documento no encontrado"
+        )
+
+      return cls.build_response(
+        data=document_type.to_dict(),
+        message="Tipo de documento encontrado"
+      )
+
+    except SQLAlchemyError as e:
+      return cls.handle_error(
+        f"Error al buscar el tipo de documento: {str(e)}"
+      )
+
+    finally:
+      db.close()
+
+# admin/services/worker_service.py
+
+from sqlalchemy import or_, func
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import joinedload
+
+from admin.models.worker import Worker
+from admin.models.person import Person
+from main.databases import SessionLocal
+from main.services import ApplicationService
+
+
+class WorkerService(ApplicationService):
+
+  @classmethod
+  def fetch_all(
+    cls,
+    page=1,
+    per_page=10,
+    names=None,
+    last_names=None,
+    dni=None,
+    code=None,
+    email=None
+  ):
+
+    db = SessionLocal()
+
+    try:
+
+      query = (
+        db.query(Worker)
+        .options(joinedload(Worker.person))
+        .join(Person)
+      )
+
+      # =========================
+      # FILTERS
+      # =========================
+
+      if names:
+        query = query.filter(
+          Person.names.ilike(f"%{names}%")
+        )
+
+      if last_names:
+        query = query.filter(
+          Person.last_names.ilike(f"%{last_names}%")
+        )
+
+      if dni:
+        query = query.filter(
+          Person.document_number.ilike(f"%{dni}%")
+        )
+
+      if code:
+        query = query.filter(
+          Worker.code.ilike(f"%{code}%")
+        )
+
+      if email:
+        query = query.filter(
+          Worker.email.ilike(f"%{email}%")
+        )
+
+      # =========================
+      # PAGINATION
+      # =========================
+
+      total_workers = query.count()
+
+      workers = (
+        query
+        .order_by(Worker.id.asc())
+        .offset((page - 1) * per_page)
+        .limit(per_page)
+        .all()
+      )
+
+      total_pages = (
+        total_workers + per_page - 1
+      ) // per_page
+
+      start_record = (
+        (page - 1) * per_page + 1
+        if total_workers > 0
+        else 0
+      )
+
+      end_record = min(
+        page * per_page,
+        total_workers
+      )
+
+      return cls.build_response(
+        data={
+          "workers": [
+            worker.to_dict()
+            for worker in workers
+          ],
+          "pagination": {
+            "page": page,
+            "per_page": per_page,
+            "total_workers": total_workers,
+            "total_pages": total_pages,
+            "start_record": start_record,
+            "end_record": end_record
+          }
+        },
+        message="Lista de trabajadores obtenida exitosamente"
+      )
+
+    except SQLAlchemyError as e:
+      return cls.handle_error(
+        f"Error al obtener trabajadores: {str(e)}"
+      )
+
+    finally:
+      db.close()
+
+  @classmethod
+  def fetch_one(cls, worker_id):
+    db = SessionLocal()
+
+    try:
+      worker = (
+        db.query(Worker)
+        .filter(Worker.id == worker_id)
+        .first()
+      )
+
+      if not worker:
+        return cls.handle_not_found(
+          "Trabajador no encontrado"
+        )
+
+      return cls.build_response(
+        data=worker.to_dict(),
+        message="Trabajador encontrado"
+      )
+
+    except SQLAlchemyError as e:
+      return cls.handle_error(
+        f"Error al buscar trabajador: {str(e)}"
+      )
+
+    finally:
+      db.close()
+
+  @classmethod
+  def create(cls, params):
+    db = SessionLocal()
+
+    try:
+      worker = Worker(
+        code=params.get("code"),
+        email=params.get("email"),
+        person_id=params.get("person_id")
+      )
+
+      db.add(worker)
+      db.commit()
+      db.refresh(worker)
+
+      return cls.build_response(
+        data=worker.to_dict(),
+        message="Trabajador creado exitosamente"
+      )
+
+    except SQLAlchemyError as e:
+      db.rollback()
+
+      return cls.handle_error(
+        f"Error al crear trabajador: {str(e)}"
+      )
+
+    finally:
+      db.close()
+
+  @classmethod
+  def update(cls, worker_id, params):
+    db = SessionLocal()
+
+    try:
+      worker = (
+        db.query(Worker)
+        .filter(Worker.id == worker_id)
+        .first()
+      )
+
+      if not worker:
+        return cls.handle_not_found(
+          "Trabajador no encontrado"
+        )
+
+      if "code" in params:
+        worker.code = params["code"]
+
+      if "email" in params:
+        worker.email = params["email"]
+
+      if "person_id" in params:
+        worker.person_id = params["person_id"]
+
+      db.commit()
+      db.refresh(worker)
+
+      return cls.build_response(
+        data=worker.to_dict(),
+        message="Trabajador actualizado exitosamente"
+      )
+
+    except SQLAlchemyError as e:
+      db.rollback()
+
+      return cls.handle_error(
+        f"Error al actualizar trabajador: {str(e)}"
+      )
+
+    finally:
+      db.close()
+
+  @classmethod
+  def delete(cls, worker_id):
+    db = SessionLocal()
+
+    try:
+      worker = (
+        db.query(Worker)
+        .filter(Worker.id == worker_id)
+        .first()
+      )
+
+      if not worker:
+        return cls.handle_not_found(
+          "Trabajador no encontrado"
+        )
+
+      db.delete(worker)
+      db.commit()
+
+      return cls.build_response(
+        message="Trabajador eliminado exitosamente"
+      )
+
+    except SQLAlchemyError as e:
+      db.rollback()
+
+      return cls.handle_error(
+        f"Error al eliminar trabajador: {str(e)}"
+      )
+
+    finally:
+      db.close()
+
+# admin/services/level_service.py
+
+from sqlalchemy.exc import SQLAlchemyError
+
+from admin.models.level import Level
+from main.databases import SessionLocal
+from main.services import ApplicationService
+
+
+class LevelService(ApplicationService):
+
+  @classmethod
+  def fetch_all(cls, page=1, per_page=10, search_query=None):
+    db = SessionLocal()
+
+    try:
+      query = db.query(Level)
+
+      # SEARCH
+      if search_query:
+        query = query.filter(Level.name.ilike(f"%{search_query}%"))
+
+      total_levels = query.count()
+
+      levels = (
+        query
+        .order_by(Level.id.asc())
+        .offset((page - 1) * per_page)
+        .limit(per_page)
+        .all()
+      )
+
+      total_pages = (total_levels + per_page - 1) // per_page
+
+      start_record = (page - 1) * per_page + 1 if total_levels > 0 else 0
+      end_record = min(page * per_page, total_levels)
+
+      return cls.build_response(
+        data={
+          "levels": [l.to_dict() for l in levels],
+          "pagination": {
+            "page": page,
+            "per_page": per_page,
+            "total_levels": total_levels,
+            "total_pages": total_pages,
+            "start_record": start_record,
+            "end_record": end_record
+          }
+        },
+        message="Lista de niveles obtenida exitosamente"
+      )
+
+    except SQLAlchemyError as e:
+      return cls.handle_error(
+        f"Error al obtener niveles: {str(e)}"
+      )
+
+    finally:
+      db.close()
+
+  @classmethod
+  def fetch_one(cls, level_id):
+    db = SessionLocal()
+
+    try:
+      level = (
+        db.query(Level)
+        .filter(Level.id == level_id)
+        .first()
+      )
+
+      if not level:
+        return cls.handle_not_found("Nivel no encontrado")
+
+      return cls.build_response(
+        data=level.to_dict(),
+        message="Nivel encontrado"
+      )
+
+    except SQLAlchemyError as e:
+      return cls.handle_error(
+        f"Error al buscar nivel: {str(e)}"
+      )
+
+    finally:
+      db.close()
+
+  @classmethod
+  def create(cls, params):
+    db = SessionLocal()
+
+    try:
+      level = Level(name=params.get("name"))
+
+      db.add(level)
+      db.commit()
+      db.refresh(level)
+
+      return cls.build_response(
+        data=level.to_dict(),
+        message="Nivel creado exitosamente"
+      )
+
+    except SQLAlchemyError as e:
+      db.rollback()
+      return cls.handle_error(f"Error al crear nivel: {str(e)}")
+
+    finally:
+      db.close()
+
+  @classmethod
+  def update(cls, level_id, params):
+    db = SessionLocal()
+
+    try:
+      level = db.query(Level).filter(Level.id == level_id).first()
+
+      if not level:
+        return cls.handle_not_found("Nivel no encontrado")
+
+      if "name" in params:
+        level.name = params["name"]
+
+      db.commit()
+      db.refresh(level)
+
+      return cls.build_response(
+        data=level.to_dict(),
+        message="Nivel actualizado exitosamente"
+      )
+
+    except SQLAlchemyError as e:
+      db.rollback()
+      return cls.handle_error(f"Error al actualizar nivel: {str(e)}")
+
+    finally:
+      db.close()
+
+  @classmethod
+  def delete(cls, level_id):
+    db = SessionLocal()
+
+    try:
+      level = db.query(Level).filter(Level.id == level_id).first()
+
+      if not level:
+        return cls.handle_not_found("Nivel no encontrado")
+
+      db.delete(level)
+      db.commit()
+
+      return cls.build_response(
+        message="Nivel eliminado exitosamente"
+      )
+
+    except SQLAlchemyError as e:
+      db.rollback()
+      return cls.handle_error(f"Error al eliminar nivel: {str(e)}")
+
+    finally:
+      db.close()
+
+crear una vista new para worker siguiendo este ejemplo
+
+# admin/templates/levels/new.html
+
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin/master-data">
+        <i class="fa fa-cc-mastercard me-2"></i>
+        Gestión de Datos Maestros
+      </a>
+      /
+      <a href="/admin/levels">
+        Niveles
+      </a>
+      /
+      Crear Nivel
+    </h3>
+
+    {% include 'partials/flash_messages.html' %}
+
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-plus me-2"></i>
+          Nuevo Nivel
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <form action="/admin/levels" method="POST" class="row g-3">
+
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="col-md-4">
+            <label class="form-label">Nombre</label>
+            <input
+              type="text"
+              name="name"
+              class="form-control"
+              maxlength="30"
+              required>
+          </div>
+
+          <div class="col-12 mt-4">
+
+            <button class="btn btn-success">
+              <i class="fa fa-save me-2"></i>
+              Guardar
+            </button>
+
+            <a href="/admin/levels" class="btn btn-warning ms-2">
+              <i class="fa fa-times me-2"></i>
+              Cancelar
+            </a>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+</main>
+{% endblock %}
+
+donde los datos de Person de Worker estén en un card independeinte a los datos de Worker, el view que tiene que manejar ese template deberia corregir el nwe este de aca´
+
+# admin/views/worker.py
+
+from flask import Blueprint, flash, render_template, request, redirect
+
+from admin.configs.middlewares import only_logged
+from admin.services.worker_service import WorkerService
+
+
+views = Blueprint(
+  "admin-workers-views",
+  __name__,
+  template_folder="../templates"
+)
+
+
+# =====================
+# INDEX (LIST + SEARCH + PAGINATION)
+# =====================
+@views.route("/admin/workers", methods=["GET"])
+@only_logged
+def index():
+
+  page = request.args.get("page", default=1, type=int)
+  per_page = request.args.get("per_page", default=10, type=int)
+
+  # 🔥 NUEVOS FILTROS
+  names = request.args.get("names", default="")
+  last_names = request.args.get("last_names", default="")
+  dni = request.args.get("dni", default="")
+  code = request.args.get("code", default="")
+  email = request.args.get("email", default="")
+
+  if page < 1:
+    page = 1
+
+  if per_page < 1:
+    per_page = 10
+
+  response = WorkerService.fetch_all(
+    page=page,
+    per_page=per_page,
+    names=names,
+    last_names=last_names,
+    dni=dni,
+    code=code,
+    email=email
+  )
+
+  workers = []
+
+  pagination = {
+    "page": page,
+    "per_page": per_page,
+    "total_workers": 0,
+    "total_pages": 0,
+    "start_record": 0,
+    "end_record": 0
+  }
+
+  # 🔥 IMPORTANTE: enviamos filtros al template
+  filters = {
+    "names": names,
+    "last_names": last_names,
+    "dni": dni,
+    "code": code,
+    "email": email
+  }
+
+  if response["success"]:
+    workers = response["data"]["workers"]
+    pagination = response["data"]["pagination"]
+  else:
+    flash(response["message"], "danger")
+
+  return render_template(
+    "workers/index.html",
+    locals={
+      "title": "Trabajadores",
+      "nav_link": "workers",
+      "workers": workers,
+      "pagination": pagination,
+      "filters": filters
+    }
+  )
+
+
+# =====================
+# NEW
+# =====================
+@views.route("/admin/workers/new", methods=["GET"])
+@only_logged
+def new():
+
+  return render_template(
+    "workers/new.html",
+    locals={
+      "title": "Nuevo Trabajador",
+      "nav_link": "workers"
+    }
+  )
+
+
+# =====================
+# CREATE
+# =====================
+@views.route("/admin/workers", methods=["POST"])
+@only_logged
+def create():
+
+  response = WorkerService.create({
+    "code": request.form.get("code"),
+    "email": request.form.get("email"),
+    "person_id": request.form.get("person_id")
+  })
+
+  if response["success"]:
+    flash(response["message"], "success")
+    return redirect("/admin/workers")
+
+  flash(response["message"], "danger")
+
+  return redirect("/admin/workers/new")
+
+
+# =====================
+# EDIT
+# =====================
+@views.route("/admin/workers/<int:worker_id>/edit", methods=["GET"])
+@only_logged
+def edit(worker_id):
+
+  response = WorkerService.fetch_one(worker_id)
+
+  if not response["success"]:
+    flash(response["message"], "danger")
+    return redirect("/admin/workers")
+
+  return render_template(
+    "workers/edit.html",
+    locals={
+      "title": "Editar Trabajador",
+      "nav_link": "workers",
+      "worker": response["data"]
+    }
+  )
+
+
+# =====================
+# UPDATE
+# =====================
+@views.route(
+  "/admin/workers/<int:worker_id>/update",
+  methods=["POST"]
+)
+@only_logged
+def update(worker_id):
+
+  response = WorkerService.update(
+    worker_id,
+    {
+      "code": request.form.get("code"),
+      "email": request.form.get("email"),
+      "person_id": request.form.get("person_id")
+    }
+  )
+
+  if response["success"]:
+    flash(response["message"], "success")
+  else:
+    flash(response["message"], "danger")
+
+  return redirect(
+    f"/admin/workers/{worker_id}/edit"
+  )
+
+
+# =====================
+# DELETE
+# =====================
+@views.route(
+  "/admin/workers/<int:worker_id>/delete",
+  methods=["GET"]
+)
+@only_logged
+def delete(worker_id):
+
+  response = WorkerService.delete(worker_id)
+
+  if response["success"]:
+    flash(response["message"], "success")
+  else:
+    flash(response["message"], "danger")
+
+  return redirect("/admin/workers")

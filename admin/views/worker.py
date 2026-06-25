@@ -4,6 +4,8 @@ from flask import Blueprint, flash, render_template, request, redirect
 
 from admin.configs.middlewares import only_logged
 from admin.services.worker_service import WorkerService
+from admin.services.sex_service import SexService
+from admin.services.document_type_service import DocumentTypeService
 
 
 views = Blueprint(
@@ -45,8 +47,6 @@ def index():
     code=code,
     email=email
   )
-
-  print(response)
 
   workers = []
 
@@ -92,14 +92,36 @@ def index():
 @views.route("/admin/workers/new", methods=["GET"])
 @only_logged
 def new():
+  sexes_response = SexService.fetch_all()
+  document_types_response = DocumentTypeService.fetch_all()
+
+  sexes = []
+  document_types = []
+
+  if sexes_response["success"]:
+    sexes = sexes_response["data"]
+  else:
+    flash(sexes_response["message"], "danger")
+
+  if document_types_response["success"]:
+    document_types = document_types_response["data"]
+  else:
+    flash(document_types_response["message"], "danger")
+
+  print('1 +++++++++++++++++++++++++++')
+  print(sexes)
+  print(document_types)
+  print('2 +++++++++++++++++++++++++++')
 
   return render_template(
     "workers/new.html",
     locals={
-      "title": "Nuevo Trabajador",
-      "nav_link": "workers"
-    }
-  )
+        "title": "Nuevo Trabajador",
+        "nav_link": "workers",
+        "sexes": sexes,
+        "document_types": document_types
+      }
+    )
 
 
 # =====================
