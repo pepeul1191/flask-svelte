@@ -1,6 +1,9 @@
 # admin/models/sex.py
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
+
 from main.databases import Base, ToString
+
 
 class Sex(Base, ToString):
   __tablename__ = "sexs"
@@ -14,6 +17,11 @@ class Sex(Base, ToString):
   name = Column(
     String(45),
     nullable=False
+  )
+
+  persons = relationship(
+    "Person",
+    back_populates="sex"
   )
 
   def __init__(self, name):

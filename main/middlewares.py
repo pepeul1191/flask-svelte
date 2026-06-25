@@ -1,6 +1,6 @@
 # main/middlewares.py
 from functools import wraps
-from flask import session, redirect, request, Response, jsonify
+from flask import session, redirect, request, Response, jsonify, render_template
 
 def only_logged(fn):
   @wraps(fn)
@@ -47,7 +47,9 @@ def not_found(e):
     }), 404
 
   # 3. FRONTEND → redirect
-  return redirect('/error/404')
+  #return redirect('/error/404')
+  # template es web/templates/404.html
+  return render_template('404.html'), 404
 
 def set_global_headers(response):
   response.headers["Server"] = "Werkzeug/3.1.8 Python/3.12.3/Ubuntu"

@@ -1,6 +1,8 @@
 # admin/models/document_type.py
 
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
+
 from main.databases import Base, ToString
 
 
@@ -16,6 +18,11 @@ class DocumentType(Base, ToString):
   name = Column(
     String(20),
     nullable=False
+  )
+
+  persons = relationship(
+    "Person",
+    back_populates="document_type"
   )
 
   def __init__(self, name):
