@@ -1,0 +1,175 @@
+{# admin/templates/partials/_person.html #}
+<form action="/admin/workers/personal" method="POST" class="card mb-4">
+
+  <input
+    type="hidden"
+    name="csrf_token"
+    value="{{ csrf_token() }}">
+
+  <div class="card-header">
+    <h6 class="mb-0">
+      <i class="fa fa-user me-2"></i>
+      Datos Personales
+    </h6>
+  </div>
+
+  <div class="card-body">
+
+    <div class="row">
+
+      <!-- ================================= -->
+      <!-- FOTO -->
+      <!-- ================================= -->
+
+      <div class="col-md-3">
+
+        <label class="form-label">
+          Fotografía
+        </label>
+
+        <div class="text-center">
+
+          <img
+            id="worker-photo-preview"
+            src="/static/images/no-image.png"
+            class="img-thumbnail mb-3"
+            style="width:220px;height:220px;object-fit:cover;">
+
+        </div>
+
+      </div>
+
+      <!-- ================================= -->
+      <!-- DATOS -->
+      <!-- ================================= -->
+
+      <div class="col-md-9">
+
+        <div class="row g-3">
+
+          <div class="col-md-6">
+            <label class="form-label">
+              Nombres
+            </label>
+
+            <input
+              type="text"
+              name="names"
+              class="form-control"
+              maxlength="45"
+              required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">
+              Apellidos
+            </label>
+
+            <input
+              type="text"
+              name="last_names"
+              class="form-control"
+              maxlength="45"
+              required>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">
+              Tipo Documento
+            </label>
+
+            <select
+              name="document_type_id"
+              class="form-select"
+              required>
+
+              <option value="">Seleccione...</option>
+
+              {% for item in document_types %}
+              <option value="{{ item.id }}">
+                {{ item.name }}
+              </option>
+              {% endfor %}
+
+            </select>
+
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">
+              Número Documento
+            </label>
+
+            <input
+              type="text"
+              name="document_number"
+              class="form-control"
+              maxlength="12"
+              required>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">
+              Sexo
+            </label>
+
+            <select
+              name="sex_id"
+              class="form-select"
+              required>
+
+              <option value="">Seleccione...</option>
+
+              {% for item in sexes %}
+              <option value="{{ item.id }}">
+                {{ item.name }}
+              </option>
+              {% endfor %}
+
+            </select>
+
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">
+              Fecha de nacimiento
+            </label>
+
+            <input
+              type="date"
+              name="birth_date"
+              class="form-control">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">
+              Seleccionar imagen
+            </label>
+
+            <input
+              type="file"
+              class="form-control"
+              name="image"
+              accept="image/*">
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- BOTÓN GUARDAR DENTRO DEL BODY -->
+    <!-- ========================= -->
+    <div class="mt-4 text-end">
+      <button class="btn btn-success">
+        <i class="fa fa-save me-2"></i>
+        Guardar
+      </button>
+    </div>
+
+  </div>
+
+</form>

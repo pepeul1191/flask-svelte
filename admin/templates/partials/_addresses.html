@@ -1,0 +1,31 @@
+{# admin/templates/partials/_addresses.html #}
+<form action="/admin/workers/addresses" method="POST" class="card mb-4">
+
+  <input
+    type="hidden"
+    name="csrf_token"
+    value="{{ csrf_token() }}">
+
+  <div class="card-header">
+    <h6 class="mb-0">
+      <i class="fa fa-address-card me-2"></i>
+      Direcciones
+    </h6>
+  </div>
+
+  <div class="card-body">
+    <!-- Contenido para direcciones -->
+
+    <!-- ========================= -->
+    <!-- BOTÓN GUARDAR DENTRO DEL BODY -->
+    <!-- ========================= -->
+    <div class="mt-4 text-end">
+      <a href="/admin/workers/create" class="btn btn-primary me-2">
+        <i class="fa fa-plus me-2"></i>
+        Agregar
+      </a>
+    </div>
+
+  </div>
+
+</form>
