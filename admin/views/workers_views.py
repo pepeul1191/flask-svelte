@@ -3,6 +3,7 @@
 from flask import Blueprint, flash, render_template, request, redirect
 
 from admin.configs.middlewares import only_logged
+from admin.services.person_service import PersonService
 from admin.services.worker_service import WorkerService
 from admin.services.sex_service import SexService
 from admin.services.document_type_service import DocumentTypeService
@@ -127,27 +128,35 @@ def new():
 @only_logged
 def create():
 
-  response = WorkerService.create({
-    "code": request.form.get("document_number"),  # o genera uno propio si quieres
-    "email": request.form.get("email"),  # si no viene del form, puede ser None
-    "person": {
-      "names": request.form.get("names"),
-      "last_names": request.form.get("last_names"),
-      "document_type_id": request.form.get("document_type_id"),
-      "document_number": request.form.get("document_number"),
-      "sex_id": request.form.get("sex_id"),
-      "birth_date": request.form.get("birth_date"),
-      "image_url": request.form.get("image_url")
-    }
+  # 1. Crear la persona en PersonService
+  person_response = PersonService.create({
+    "names": request.form.get("names"),
+    "last_names": request.form.get("last_names"),
+    "document_type_id": request.form.get("document_type_id"),
+    "document_number": request.form.get("document_number"),
+    "sex_id": request.form.get("sex_id"),
+    "birth_date": request.form.get("birth_date"),
+    "image_url": request.form.get("image_url")
   })
 
-  if response["success"]:
-    flash(response["message"], "success")
+  if not person_response["success"]:
+    flash(person_response["message"], "danger")
+    return redirect("/admin/workers/new")
 
-    worker_id = response["data"]["id"]
+  # 2. Con el id de la persona creada, se genera el registro del trabajador
+  person_id = person_response["data"]["id"]
+  worker_response = WorkerService.create({
+    "code": request.form.get("document_number"),
+    "email": request.form.get("email"),
+    "person_id": person_id
+  })
+
+  if worker_response["success"]:
+    flash(worker_response["message"], "success")
+    worker_id = worker_response["data"]["id"]
     return redirect(f"/admin/workers/{worker_id}/edit")
 
-  flash(response["message"], "danger")
+  flash(worker_response["message"], "danger")
   return redirect("/admin/workers/new")
 
 
@@ -160,16 +169,35 @@ def edit(worker_id):
 
   response = WorkerService.fetch_one(worker_id)
 
+  sexes_response = SexService.fetch_all()
+  document_types_response = DocumentTypeService.fetch_all()
+
   if not response["success"]:
     flash(response["message"], "danger")
     return redirect("/admin/workers")
+  
+  sexes = []
+  document_types = []
+
+  if sexes_response["success"]:
+    sexes = sexes_response["data"]
+  else:
+    flash(sexes_response["message"], "danger")
+
+  if document_types_response["success"]:
+    document_types = document_types_response["data"]
+  else:
+    flash(document_types_response["message"], "danger")
 
   return render_template(
     "workers/edit.html",
     locals={
       "title": "Editar Trabajador",
       "nav_link": "workers",
-      "worker": response["data"]
+      "worker": response["data"],
+      "person": response["data"]["person"],
+      "sexes": sexes,
+      "document_types": document_types,
     }
   )
 
@@ -177,31 +205,35 @@ def edit(worker_id):
 # =====================
 # UPDATE
 # =====================
-@views.route(
-  "/admin/workers/<int:worker_id>/update",
-  methods=["POST"]
-)
+@views.route("/admin/workers/personal/<int:person_id>/edit", methods=["POST"])
 @only_logged
-def update(worker_id):
+def edit_personal(person_id):
 
-  response = WorkerService.update(
-    worker_id,
-    {
-      "code": request.form.get("code"),
-      "email": request.form.get("email"),
-      "person_id": request.form.get("person_id")
-    }
-  )
+  response = PersonService.update(person_id, {
+    "names": request.form.get("names"),
+    "last_names": request.form.get("last_names"),
+    "document_type_id": request.form.get("document_type_id"),
+    "document_number": request.form.get("document_number"),
+    "sex_id": request.form.get("sex_id"),
+    "birth_date": request.form.get("birth_date"),
+    "image_url": request.form.get("image_url")
+  })
 
   if response["success"]:
-    flash(response["message"], "success")
-  else:
-    flash(response["message"], "danger")
+    # Buscamos el trabajador asociado a esa persona usando WorkerService
+    worker_response = WorkerService.fetch_by_person_id(person_id)
+    
+    if worker_response["success"]:
+      flash(response["message"], "success")
+      worker_id = worker_response["data"]["id"]
+      return redirect(f"/admin/workers/{worker_id}/edit")
+    
+    # En caso de que la persona se actualice pero no se encuentre su Worker
+    flash("Persona actualizada, pero no se encontró el trabajador asociado.", "warning")
+    return redirect(request.referrer)
 
-  return redirect(
-    f"/admin/workers/{worker_id}/edit"
-  )
-
+  flash(response["message"], "danger")
+  return redirect(request.referrer)
 
 # =====================
 # DELETE

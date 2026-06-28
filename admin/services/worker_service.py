@@ -152,27 +152,11 @@ class WorkerService(ApplicationService):
     db = SessionLocal()
 
     try:
-      person_data = params.get("person")
-
-      # 1. Crear PERSONA primero
-      person = Person(
-        names=person_data.get("names"),
-        last_names=person_data.get("last_names"),
-        document_number=person_data.get("document_number"),
-        image_url=person_data.get("image_url"),
-        birth_date=person_data.get("birth_date"),
-        sex_id=person_data.get("sex_id"),
-        document_type_id=person_data.get("document_type_id")
-      )
-
-      db.add(person)
-      db.flush()  # 👈 obtiene person.id sin commit
-
-      # 2. Crear WORKER
+      # Crear WORKER directamente vinculando el person_id recibido
       worker = Worker(
-        code=None,
-        email=None,
-        person_id=person.id
+        code=params.get("code"),
+        email=params.get("email"),
+        person_id=params.get("person_id")
       )
 
       db.add(worker)
@@ -187,6 +171,35 @@ class WorkerService(ApplicationService):
     except SQLAlchemyError as e:
       db.rollback()
       return cls.handle_error(f"Error al crear trabajador: {str(e)}")
+
+    finally:
+      db.close()
+
+  @classmethod
+  def fetch_by_person_id(cls, person_id):
+    db = SessionLocal()
+
+    try:
+      worker = (
+        db.query(Worker)
+        .filter(Worker.person_id == person_id)
+        .first()
+      )
+
+      if not worker:
+        return cls.handle_not_found(
+          "Trabajador no encontrado para esta persona"
+        )
+
+      return cls.build_response(
+        data=worker.to_dict(),
+        message="Trabajador encontrado"
+      )
+
+    except SQLAlchemyError as e:
+      return cls.handle_error(
+        f"Error al buscar trabajador por persona: {str(e)}"
+      )
 
     finally:
       db.close()
