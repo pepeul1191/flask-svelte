@@ -80,7 +80,7 @@ def index():
     "workers/index.html",
     locals={
       "title": "Trabajadores",
-      "nav_link": "workers",
+      "nav_link": "worker-management",
       "workers": workers,
       "pagination": pagination,
       "filters": filters
@@ -114,7 +114,7 @@ def new():
     "workers/new.html",
     locals={
         "title": "Nuevo Trabajador",
-        "nav_link": "workers",
+        "nav_link": "worker-management",
         "sexes": sexes,
         "document_types": document_types,
       }
@@ -193,7 +193,7 @@ def edit(worker_id):
     "workers/edit.html",
     locals={
       "title": "Editar Trabajador",
-      "nav_link": "workers",
+      "nav_link": "worker-management",
       "worker": response["data"],
       "person": response["data"]["person"],
       "sexes": sexes,
@@ -231,6 +231,25 @@ def edit_personal(person_id):
     # En caso de que la persona se actualice pero no se encuentre su Worker
     flash("Persona actualizada, pero no se encontró el trabajador asociado.", "warning")
     return redirect(request.referrer)
+
+  flash(response["message"], "danger")
+  return redirect(request.referrer)
+
+@views.route("/admin/workers/<int:worker_id>/edit", methods=["POST"])
+@only_logged
+def edit_worker(worker_id):
+
+  response = WorkerService.update(worker_id, {
+    "code": request.form.get("code"),
+    "email": request.form.get("email"),
+    "user_id": request.form.get("user_id"),
+    "bio": request.form.get("bio"),
+  })
+
+  if response["success"]:
+    # En caso de que la persona se actualice pero no se encuentre su Worker
+    flash("Trabajador actualizado.", "success")
+    return redirect(f"/admin/workers/{worker_id}/edit")
 
   flash(response["message"], "danger")
   return redirect(request.referrer)

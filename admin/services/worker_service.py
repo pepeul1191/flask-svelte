@@ -226,8 +226,11 @@ class WorkerService(ApplicationService):
       if "email" in params:
         worker.email = params["email"]
 
-      if "person_id" in params:
-        worker.person_id = params["person_id"]
+      if "bio" in params:
+        worker.bio = params["bio"]
+
+      if "user_id" in params:
+        worker.user_id = params["user_id"]
 
       db.commit()
       db.refresh(worker)

@@ -46,19 +46,4 @@
 
     </div>
     </main>
-
-    <select
-              name="document_type_id"
-              class="form-select"
-              required>
-
-              <option value="">Seleccione...</option>
-
-              {% for item in document_types %}
-              <option value="{{ item.id }}">
-                {{ item.name }}
-              </option>
-              {% endfor %}
-
-            </select>
 {% endblock %}

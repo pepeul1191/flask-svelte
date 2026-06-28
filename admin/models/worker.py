@@ -1,5 +1,4 @@
-# admin/models/worker.py
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
 from main.databases import Base, ToString
@@ -25,6 +24,11 @@ class Worker(Base, ToString):
     nullable=False
   )
 
+  bio = Column(
+    Text,
+    nullable=True
+  )
+
   person_id = Column(
     Integer,
     ForeignKey("persons.id"),
@@ -42,6 +46,7 @@ class Worker(Base, ToString):
       "id": self.id,
       "code": self.code,
       "email": self.email,
+      "bio": self.bio,
       "person_id": self.person_id,
       "person": self.person.to_dict() if self.person else None
     }
@@ -50,8 +55,10 @@ class Worker(Base, ToString):
     self,
     code,
     email,
-    person_id
+    person_id,
+    bio=None
   ):
     self.code = code
     self.email = email
     self.person_id = person_id
+    self.bio = bio
