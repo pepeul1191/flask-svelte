@@ -517,7 +517,7 @@ CREATE TABLE `worker_roles` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `workers` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `code` int NOT NULL,
+  `code` int DEFAULT NULL,
   `bio` text,
   `email` varchar(100) DEFAULT NULL,
   `user_id` int DEFAULT NULL,
@@ -635,5 +635,6 @@ INSERT INTO `schema_migrations` (version) VALUES
   ('20260316153033'),
   ('20260316153628'),
   ('20260316163800'),
-  ('20260317045206');
+  ('20260317045206'),
+  ('20260628011714');
 UNLOCK TABLES;

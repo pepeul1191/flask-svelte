@@ -1,6 +1,7 @@
 # admin/models/person.py
 from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
+from datetime import datetime
 
 from main.databases import Base, ToString
 
@@ -23,8 +24,8 @@ class Person(Base, ToString):
 
   birth_date = Column(Date, nullable=True)
 
-  created = Column(DateTime, nullable=True)
-  updated = Column(DateTime, nullable=True)
+  created = Column(DateTime, default=datetime.now, nullable=False)
+  updated = Column(DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
   sex_id = Column(Integer, ForeignKey("sexs.id"), nullable=False)
   document_type_id = Column(Integer, ForeignKey("document_types.id"), nullable=False)

@@ -6,6 +6,7 @@ from admin.configs.middlewares import only_logged
 from admin.services.worker_service import WorkerService
 from admin.services.sex_service import SexService
 from admin.services.document_type_service import DocumentTypeService
+from admin.models.person import Person
 
 
 views = Blueprint(
@@ -108,41 +109,45 @@ def new():
   else:
     flash(document_types_response["message"], "danger")
 
-  print('1 +++++++++++++++++++++++++++')
-  print(sexes)
-  print(document_types)
-  print('2 +++++++++++++++++++++++++++')
-
   return render_template(
     "workers/new.html",
     locals={
         "title": "Nuevo Trabajador",
         "nav_link": "workers",
         "sexes": sexes,
-        "document_types": document_types
+        "document_types": document_types,
       }
     )
 
 
 # =====================
-# CREATE
+# CREATE WORKER FROM PERSON
 # =====================
-@views.route("/admin/workers", methods=["POST"])
+@views.route("/admin/workers/personal", methods=["POST"])
 @only_logged
 def create():
 
   response = WorkerService.create({
-    "code": request.form.get("code"),
-    "email": request.form.get("email"),
-    "person_id": request.form.get("person_id")
+    "code": request.form.get("document_number"),  # o genera uno propio si quieres
+    "email": request.form.get("email"),  # si no viene del form, puede ser None
+    "person": {
+      "names": request.form.get("names"),
+      "last_names": request.form.get("last_names"),
+      "document_type_id": request.form.get("document_type_id"),
+      "document_number": request.form.get("document_number"),
+      "sex_id": request.form.get("sex_id"),
+      "birth_date": request.form.get("birth_date"),
+      "image_url": request.form.get("image_url")
+    }
   })
 
   if response["success"]:
     flash(response["message"], "success")
-    return redirect("/admin/workers")
+
+    worker_id = response["data"]["id"]
+    return redirect(f"/admin/workers/{worker_id}/edit")
 
   flash(response["message"], "danger")
-
   return redirect("/admin/workers/new")
 
 

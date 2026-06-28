@@ -1,4 +1,5 @@
 # server.py
+import os
 from main.application import APP
 from main.blueprints import register
 from main.middlewares import not_found
@@ -10,5 +11,5 @@ if __name__ == '__main__':
   APP.run(
     debug=True,
     host='0.0.0.0',
-    port=5000
+    port=os.getenv("PORT")
   )

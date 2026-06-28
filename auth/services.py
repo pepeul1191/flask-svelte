@@ -25,8 +25,8 @@ class AuthService(ApplicationService):
         },
         "roles": ["admin"],
         "tokens": {
-          "access": "admin-access-token",
-          "file": "admin-file-token"
+          "access": os.getenv("ACCESS_TOKEN"),
+          "file": os.getenv("FILES_TOKEN")
         }
       }
 

@@ -52,6 +52,9 @@ Este es un proyecto base que integra un backend en **Flask** con un frontend en 
     #### GOOGLE OAUTH
     GOOGLE_CLIENT_ID=your_google_client_id
     GOOGLE_CLIENT_SECRET=your_google_client_secret
+    # PATHS
+    ACCESS_PATH=/home/pepe/Documentos/node/access
+    FILES_PATH=/home/pepe/Documentos/node/files
 
 Ejemplos de código en Sqlite3
 

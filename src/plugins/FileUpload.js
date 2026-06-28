@@ -17,7 +17,7 @@ export class FileUpload {
     this.acceptedFormats = options.acceptedFormats || ["jpg", "jpeg", "png"];
     this.maxSizeMB = options.maxSizeMB || 2;
     this.baseURL = options.baseURL || "";
-    this.url = this.baseURL + "/" + options.url || "/api/upload";
+    this.url = this.baseURL + options.url || "/api/upload";
     this.fileKey = options.fileKey || "file";
     this.extraParams = options.extraParams || {};
     this.jwt = options.jwt || "";

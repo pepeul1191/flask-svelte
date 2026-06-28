@@ -30,8 +30,8 @@
         <div class="text-center">
 
           <img
-            id="worker-photo-preview"
-            src="/static/images/no-image.png"
+            id="imagePreview"
+            src="{{ config.URL_FILES_SERVICE }}/img/user.png"
             class="img-thumbnail mb-3"
             style="width:220px;height:220px;object-fit:cover;">
 
@@ -85,7 +85,7 @@
 
               <option value="">Seleccione...</option>
 
-              {% for item in document_types %}
+              {% for item in locals.document_types %}
               <option value="{{ item.id }}">
                 {{ item.name }}
               </option>
@@ -120,7 +120,7 @@
 
               <option value="">Seleccione...</option>
 
-              {% for item in sexes %}
+              {% for item in locals.sexes %}
               <option value="{{ item.id }}">
                 {{ item.name }}
               </option>
@@ -142,16 +142,26 @@
           </div>
 
           <div class="col-md-6">
-            <label class="form-label">
-              Seleccionar imagen
-            </label>
+            <div id="fileUploadContainer">
+              <label class="form-label">Foto de Perfil</label>
+              <input type="hidden" name="image_url" id="uploadedImageUrl" value="img/user.png">
+              <div class="d-flex gap-2 mb-2">
+                <button type="button" id="triggerFileButton" class="btn btn-outline-secondary flex-fill">
+                  <i class="fa fa-folder-open me-1"></i> Buscar
+                </button>
+                <button type="button" id="uploadButton" class="btn btn-primary flex-fill">
+                  <i class="fa fa-cloud-upload me-1"></i> Subir
+                </button>
+                <button type="button" id="viewImageButton" class="btn btn-info flex-fill d-none">
+                  <i class="fa fa-eye me-1"></i> Ver
+                </button>
+              </div>
 
-            <input
-              type="file"
-              class="form-control"
-              name="image"
-              accept="image/*">
-
+              <div id="fileNameDisplay" class="small text-muted"></div>
+              <div id="helpText" class="small text-muted"></div>
+              <div id="errorMessage" class="small text-danger"></div>
+              <div id="successMessage" class="small text-success"></div>
+            </div>
           </div>
 
         </div>
@@ -173,3 +183,71 @@
   </div>
 
 </form>
+
+<!-- 📝 INPUT FILE -->
+<input type="file" id="imageFile" name="image_file" style="display: none;">
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Asegurar que FileUpload esté disponible globalmente
+    if (typeof FileUpload === 'undefined') {
+      console.error('FileUpload class not loaded!');
+      return;
+    }
+
+    // Inicializar FileUpload usando los elementos existentes
+    const fileUpload = new FileUpload({
+      containerId: "fileUploadContainer",
+      fileInputId: "imageFile",
+      triggerButtonId: "triggerFileButton",
+      uploadButtonId: "uploadButton",
+      viewButtonId: "viewImageButton",
+      errorMessageId: "errorMessage",
+      successMessageId: "successMessage",
+      helpTextId: "helpText",
+      fileNameDisplayId: "fileNameDisplay",
+      label: "Foto de perfil",
+      acceptedFormats: ["jpg", "jpeg", "png"],
+      maxSizeMB: 5,
+      baseURL: URLS.FILES,
+      url: "/api/v1/public",
+      triggerButtonText: "Buscar imagen",
+      triggerButtonIcon: "fa-folder-open",
+      jwt: localStorage.getItem('jwtFilesToken'),
+      extraParams: {
+        //user_id: {{ user.id if user else 'null' }},
+        //authenticity_token: localStorage.getItem('jwtFilesToken'),
+        folder: 'users'
+      },
+      onSuccess: function(response) {
+        document.getElementById('uploadedImageUrl').value = response.data.folder + '/' + response.data.filename;
+        // Actualizar la vista previa
+        const previewImg = document.getElementById('imagePreview');
+        if (previewImg && URLS.FILES + '/' + response.data.folder + '/' + response.data.filename) {
+          previewImg.src = URLS.FILES + '/' + response.data.folder + '/' + response.data.filename;
+        }
+        if (document.getElementById('fileNameDisplay')) {
+          document.getElementById('fileNameDisplay').dataset.imageUrl = URLS.FILES + '/' + response.data.folder + '/' + response.data.filename;
+        }
+      },
+      onViewClick: function(file, imageUrl) {
+        const urlToView = imageUrl || document.getElementById('uploadedImageUrl').value;
+        if (urlToView) {
+          window.open(urlToView, '_blank');
+        } else if (file) {
+          const tempUrl = URL.createObjectURL(file);
+          window.open(tempUrl, '_blank');
+          setTimeout(() => URL.revokeObjectURL(tempUrl), 100);
+        } else {
+          alert('No hay imagen para visualizar');
+        }
+      }
+    });
+    
+    // Si hay una imagen existente, establecerla
+    const existingImageUrl = document.getElementById('uploadedImageUrl')?.value;
+    if (existingImageUrl && fileUpload.setExistingImageUrl) {
+      fileUpload.setExistingImageUrl(existingImageUrl);
+    }
+  });
+</script>
