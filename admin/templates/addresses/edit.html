@@ -1,0 +1,173 @@
+{# admin/templates/addresses/edit.html #}
+
+{% extends "layouts/admin_dashboard.html" %}
+
+{% block extra_css %}
+<style>
+  /* Estilos específicos si son necesarios */
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const jwtToken = document.querySelector('meta[name="csrf-token"]')?.content || 
+                    document.querySelector('meta[name="jwt-token"]')?.content;
+
+    try {
+      const autoComplete = new AutoComplete({
+        inputId: 'district-search',
+        suggestionsId: 'district-suggestions',
+        hiddenInputId: 'district-id',
+        apiUrl: '/api/v1/districts',
+        jwtToken: jwtToken,
+        minChars: 2,
+        displayKey: 'name',
+        valueKey: 'id',
+        dataWrapper: 'data',
+        emptyMessage: 'No se encontraron distritos',
+        debounceTime: 300,
+        initialValue: {
+          id: '{{ locals.address.district_id }}',
+          name: '{{ locals.address.district_name or "" }}'
+        }
+      });
+
+      // Evento cuando se selecciona un ítem
+      document.getElementById('district-search').addEventListener('autocomplete-select', function(e) {
+        console.log('Distrito seleccionado:', e.detail);
+        console.log('ID seleccionado:', document.getElementById('district-id').value);
+      });
+
+      console.log('✅ AutoComplete inicializado correctamente');
+
+    } catch (error) {
+      console.error('❌ Error inicializando AutoComplete:', error);
+    }
+  });
+</script>
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin/workers">
+        <i class="fa fa-users me-2"></i>
+        Gestión de Trabajadores
+      </a>
+      /
+      <a href="/admin/workers/{{ locals.worker_id }}/edit">
+        Editar Trabajador
+      </a>
+      /
+      Editar Dirección
+    </h3>
+
+    {% include 'partials/flash_messages.html' %}
+
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-edit me-2"></i>
+          Editar Dirección
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <form action="/admin/addresses/{{ locals.address.id or ''}}/edit" method="POST" class="row g-3">
+
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          
+          <!-- Person ID y Worker ID (Hidden) -->
+          <input type="hidden" name="person_id" value="{{ locals.worker.person_id }}">
+          <input type="hidden" name="worker_id" value="{{ locals.worker.id }}">
+
+          <!-- Fila: Dirección y Distrito -->
+          <div class="col-md-8">
+            <label class="form-label">
+              <i class="fa fa-map-marker me-1"></i>
+              Dirección <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              name="address"
+              class="form-control"
+              placeholder="Ej: Av. Siempreviva 123, Urbanización Los Pinos"
+              required
+              value="{{ locals.address.address or ''}}">
+            <small class="text-muted">Ingrese la dirección completa (calle, número, urbanización, etc.)</small>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">
+              <i class="fa fa-map-pin me-1"></i>
+              Distrito <span class="text-danger">*</span>
+            </label>
+            <div class="position-relative">
+              <input type="text"
+                    id="district-search"
+                    name="district_search"
+                    class="form-control"
+                    placeholder="Escribe para buscar distrito..."
+                    autocomplete="off"
+                    required
+                    value="{{ locals.address.district.name or ''}}">
+              
+              <!-- Contenedor de sugerencias -->
+              <div id="district-suggestions" 
+                  class="list-group position-absolute w-100" 
+                  style="z-index: 1000; max-height: 300px; overflow-y: auto; display: none;">
+              </div>
+            </div>
+            <!-- Input hidden para guardar el ID seleccionado -->
+            <input type="hidden" 
+                  id="district-id" 
+                  name="district_id" 
+                  value="{{ locals.address.district_id or ''}}">
+            <small class="text-muted">Comience a escribir el nombre del distrito para buscar</small>
+          </div>
+
+          <!-- Descripción -->
+          <div class="col-md-6">
+            <label class="form-label">
+              <i class="fa fa-tag me-1"></i>
+              Descripción
+            </label>
+            <input
+              type="text"
+              name="description"
+              class="form-control"
+              maxlength="40"
+              placeholder="Ej: Casa principal, Oficina, Domicilio particular"
+              value="{{ locals.address.description or ''}}">
+            <small class="text-muted">Máximo 40 caracteres (opcional)</small>
+          </div>
+
+          <!-- Botones -->
+          <div class="col-12 mt-4">
+
+            <button type="submit" class="btn btn-success">
+              <i class="fa fa-save me-2"></i>
+              Actualizar
+            </button>
+
+            <a href="/admin/workers/{{ locals.worker.id }}/edit" class="btn btn-warning ms-2">
+              <i class="fa fa-times me-2"></i>
+              Cancelar
+            </a>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+</main>
+{% endblock %}

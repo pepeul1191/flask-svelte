@@ -209,7 +209,7 @@
                                 {% if worker.person.image_url.startswith('http') %}
                                 {{ worker.person.image_url }}
                                 {% else %}
-                                {{ config.STATIC_URL }}/{{ worker.person.image_url }}
+                                {{ config.URL_FILES_SERVICE }}/{{ worker.person.image_url }}
                                 {% endif %}
                             {% else %}
                                 {{ config.STATIC_URL }}/images/avatar.png

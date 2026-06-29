@@ -94,6 +94,7 @@ entity addresses {
   * id : INT <<PK>>
   --
   person_id : INT <<FK>>
+  district_id : INT <<FK>>
   description : VARCHAR(40)
   address : VARCHAR(255)
 }

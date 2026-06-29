@@ -11,12 +11,14 @@
       <i class="fa fa-phone me-2"></i>
       Teléfonos
     </h6>
+    {% if locals.worker.person.phones and locals.worker.person.phones|length > 0 %}
     <a
       href="/admin/phones/new?worker_id={{ locals.worker.id }}"
       class="btn btn-success btn-sm">
       <i class="fa fa-plus me-1"></i>
       Agregar Teléfono
     </a>
+    {% endif %}
   </div>
 
   <div class="card-body">
@@ -50,7 +52,7 @@
                 <td class="text-end btn-group-sm">
 
                   <a
-                    href="/admin/phones/{{ phone.id }}/edit?worker_id={{ locals.worker.person_id }}"
+                    href="/admin/phones/{{ phone.id }}/edit?worker_id={{ locals.worker.id }}"
                     class="btn btn-outline-secondary me-1">
 
                     <i class="fa fa-edit"></i>
@@ -83,7 +85,7 @@
         <i class="fa fa-phone fa-2x text-muted mb-2 d-block"></i>
         <p class="text-muted mb-0">No hay teléfonos registrados para esta persona</p>
         <a
-          href="/admin/workers/{{ locals.person.id }}/phones/new"
+          href="/admin/phones/new?worker_id={{ locals.worker.id }}"
           class="btn btn-primary btn-sm mt-2">
           <i class="fa fa-plus me-1"></i>
           Agregar primer teléfono

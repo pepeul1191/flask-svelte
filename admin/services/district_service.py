@@ -191,3 +191,35 @@ class DistrictService(ApplicationService):
 
     finally:
       db.close()
+
+  @classmethod
+  def search_by_id(cls, id):
+    """Busca ubicaciones por nombre usando LIKE contra la vista"""
+    db = SessionLocal()
+
+    try:
+      # Búsqueda case-insensitive con LIKE
+
+      district = (
+        db.query(VwLocation)
+        .filter(VwLocation.id == id)
+        .first()
+      )
+
+      if not district:
+        return cls.handle_not_found(
+          "Distrito no encontrado"
+        )
+
+      return cls.build_response(
+        data=district.to_dict(),
+        message="Ubicaciones encontradas",
+      )
+
+    except SQLAlchemyError as e:
+      return cls.handle_error(
+        f"Error al buscar ubicaciones: {str(e)}"
+      )
+
+    finally:
+      db.close()

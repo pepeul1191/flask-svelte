@@ -1,18 +1,24 @@
 # admin/configs/blueprints.py
+# views
 from admin.views.index import views as index_views
 from admin.views.locations_views import views as locations_views
-from admin.views.respresentative_role import views as respresentative_role_views
-from admin.views.level import views as level_views
+from admin.views.respresentative_role_views import views as respresentative_role_views
+from admin.views.level_views import views as level_views
 from admin.views.workers_views import views as worker_views
 from admin.views.phones_views import views as phone_views
+from admin.views.addresses_views import views as addresses_views
+# apis
 from admin.apis.district_apis import apis as district_apis
 
 blueprints = [
+  # views
   index_views,
   locations_views,
   respresentative_role_views,
   level_views,
   worker_views,
   phone_views,
+  addresses_views,
+  # apis
   district_apis,
 ]

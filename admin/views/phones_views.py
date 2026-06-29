@@ -20,7 +20,7 @@ def phone_new():
     return redirect("/admin/workers")
   
   return render_template(
-    "phone/new.html",
+    "phones/new.html",
     locals={
       "title": "Agregar Teléfono a Trabajador",
       "nav_link": "worker-management",

@@ -54,6 +54,13 @@ class Person(Base, ToString):
     cascade="all, delete-orphan"  # Elimina teléfonos cuando se elimina la persona
   )
 
+  # Agregar al final de las relaciones:
+  addresses = relationship(
+    "Address",
+    back_populates="person",
+    cascade="all, delete-orphan"
+  )
+
   def to_dict(self):
     return {
       "id": self.id,
@@ -71,7 +78,8 @@ class Person(Base, ToString):
         "name": self.document_type.name
       } if self.document_type else None,
       # 👇 Agregar teléfonos
-      "phones": [p.to_dict() for p in self.phones] if self.phones else []
+      "phones": [p.to_dict() for p in self.phones] if self.phones else [],
+      "addresses": [a.to_dict() for a in self.addresses] if self.addresses else []
     }
   
   def __init__(
