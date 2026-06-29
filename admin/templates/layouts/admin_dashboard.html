@@ -1,6 +1,7 @@
 {# admin/templates/layouts/dashboard.html #}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,8 +19,9 @@
 
   <script>
     const URLS = {
-      BASE: "{{ base_url }}",
-      FILES: "{{ config.URL_FILES_SERVICE }}"
+      BASE: "{{ config.BASE_URL }}",
+      FILES: "{{ config.URL_FILES_SERVICE }}",
+      ACCESS: "{{ config.URL_ACCESS_SERVICE }}",
     };
   </script>
 
@@ -37,9 +39,9 @@
 
     <!-- Sidebar -->
     {% if 'admin' in roles %}
-      {% include './partials/admin_sidebar.html' %}
+    {% include './partials/admin_sidebar.html' %}
     {% else %}
-      {% include './partials/admin_sidebar.html' %}
+    {% include './partials/admin_sidebar.html' %}
     {% endif %}
 
     <!-- Content -->
@@ -54,11 +56,7 @@
     <div class="container-fluid">
       <div class="pull-right text-muted small">
         Desarrollado por
-        <a
-          href="https://www.ulima.edu.pe/centros-e-institutos/innova-ul"
-          target="_blank"
-          class="text-decoration-none"
-        >
+        <a href="https://www.ulima.edu.pe/centros-e-institutos/innova-ul" target="_blank" class="text-decoration-none">
           Centro de Emprendimiento ULIMA
         </a>
       </div>
@@ -71,4 +69,5 @@
 
   {% block extra_js %}{% endblock %}
 </body>
+
 </html>

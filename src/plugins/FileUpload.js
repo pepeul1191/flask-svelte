@@ -11,7 +11,7 @@ export class FileUpload {
     this.helpTextId = options.helpTextId || "helpText";
     this.labelElementId = options.labelElementId || null;
     this.fileNameDisplayId = options.fileNameDisplayId || "fileNameDisplay"; // Para mostrar el nombre del archivo
-    
+
     // Component configuration
     this.label = options.label || "Seleccionar imagen";
     this.acceptedFormats = options.acceptedFormats || ["jpg", "jpeg", "png"];
@@ -23,22 +23,22 @@ export class FileUpload {
     this.jwt = options.jwt || "";
     this.triggerButtonText = options.triggerButtonText || "Seleccionar archivo";
     this.triggerButtonIcon = options.triggerButtonIcon || "fa-folder-open";
-    
+
     // Callbacks
     this.onSuccess = options.onSuccess || ((response) => console.log("Upload success:", response));
     this.onError = options.onError || ((error) => console.error("Upload error:", error));
     this.onViewClick = options.onViewClick || (() => {
       console.log("View button clicked");
     });
-    
+
     this.file = null;
     this.isLoading = false;
-    
+
     this.initElements();
     this.setupEventListeners();
     this.updateUI();
   }
-  
+
   initElements() {
     // Get all DOM elements by configurable IDs
     this.container = document.getElementById(this.containerId);
@@ -50,27 +50,27 @@ export class FileUpload {
     this.successMessage = document.getElementById(this.successMessageId);
     this.helpText = document.getElementById(this.helpTextId);
     this.fileNameDisplay = document.getElementById(this.fileNameDisplayId);
-    
+
     // Get label element (either by ID or as first label in container)
-    this.labelElement = this.labelElementId 
+    this.labelElement = this.labelElementId
       ? document.getElementById(this.labelElementId)
       : this.container.querySelector('label');
-    
+
     // Update initial values
     if (this.labelElement) {
       this.labelElement.textContent = this.label;
     }
-    
+
     // Configurar input file (oculto)
     this.fileInput.style.display = 'none';
     this.fileInput.accept = this.acceptedFormats.map(f => `.${f}`).join(',');
-    
+
     // Configurar texto de ayuda
     if (this.helpText) {
-      this.helpText.textContent = 
+      this.helpText.textContent =
         `Formatos aceptados: ${this.acceptedFormats.join(", ").toUpperCase()} (Máx. ${this.maxSizeMB}MB)`;
     }
-    
+
     // Configurar botón trigger si no tiene icono/texto personalizado
     if (this.triggerButton && this.triggerButtonText) {
       const existingIcon = this.triggerButton.querySelector('i');
@@ -81,7 +81,7 @@ export class FileUpload {
       }
     }
   }
-  
+
   setupEventListeners() {
     // Trigger button abre el selector de archivos
     if (this.triggerButton) {
@@ -89,14 +89,14 @@ export class FileUpload {
         this.fileInput.click();
       });
     }
-    
+
     this.fileInput.addEventListener('change', this.handleFileChange.bind(this));
     this.uploadButton.addEventListener('click', this.uploadFile.bind(this));
     this.viewButton.addEventListener('click', () => {
       this.onViewClick(this.file, document.getElementById(this.fileNameDisplayId)?.dataset.imageUrl);
     });
   }
-  
+
   handleFileChange(event) {
     const selectedFile = event.target.files[0];
     if (!selectedFile) return;
@@ -118,17 +118,17 @@ export class FileUpload {
 
     this.clearMessages();
     this.file = selectedFile;
-    
+
     // Mostrar nombre del archivo seleccionado
     if (this.fileNameDisplay) {
       this.fileNameDisplay.textContent = `📎 ${selectedFile.name}`;
       this.fileNameDisplay.style.color = '#28a745';
       this.fileNameDisplay.dataset.imageUrl = '';
     }
-    
+
     this.updateUI();
   }
-  
+
   async uploadFile() {
     if (!this.file) {
       this.showError("Por favor seleccione un archivo");
@@ -152,29 +152,29 @@ export class FileUpload {
       if (this.jwt) {
         headers["Authorization"] = `Bearer ${this.jwt}`;
       }
-      
+
       const response = await fetch(this.url, {
         method: "POST",
         headers: headers,
-        body: formData, 
+        body: formData,
         mode: "cors",
         credentials: "include"
       });
 
       const data = await response.json();
       console.log(data);
-      
+
       if (!response.ok) {
         throw new Error(data.message || "Error al subir el archivo");
       }
 
       this.showSuccess("Archivo subido correctamente");
-      
+
       // Guardar URL en el display si existe
       if (this.fileNameDisplay && data.image_url) {
         this.fileNameDisplay.dataset.imageUrl = data.image_url;
       }
-      
+
       this.onSuccess(data);
     } catch (error) {
       this.showError(error.message);
@@ -184,7 +184,7 @@ export class FileUpload {
       this.updateUI();
     }
   }
-  
+
   showError(message) {
     if (this.errorMessage) {
       this.errorMessage.textContent = message;
@@ -194,7 +194,7 @@ export class FileUpload {
       this.successMessage.textContent = "";
     }
   }
-  
+
   showSuccess(message) {
     if (this.successMessage) {
       this.successMessage.textContent = message;
@@ -204,12 +204,12 @@ export class FileUpload {
       this.errorMessage.textContent = "";
     }
   }
-  
+
   clearMessages() {
     if (this.errorMessage) this.errorMessage.textContent = "";
     if (this.successMessage) this.successMessage.textContent = "";
   }
-  
+
   updateUI() {
     // Update buttons state
     if (this.uploadButton) {
@@ -221,12 +221,12 @@ export class FileUpload {
     if (this.triggerButton) {
       this.triggerButton.disabled = this.isLoading;
     }
-    
+
     // Update upload button text and icon
     if (this.uploadButton) {
       const uploadIcon = this.uploadButton.querySelector('i');
       const uploadText = this.uploadButton.childNodes[2];
-      
+
       if (this.isLoading) {
         if (uploadIcon) uploadIcon.className = "fa fa-spinner spinner";
         if (uploadText) uploadText.nodeValue = " Subiendo...";
@@ -235,13 +235,13 @@ export class FileUpload {
         if (uploadText) uploadText.nodeValue = " Subir";
       }
     }
-    
+
     // Update input state
     if (this.fileInput) {
       this.fileInput.disabled = this.isLoading;
     }
   }
-  
+
   // Método público para limpiar el archivo seleccionado
   clearFile() {
     this.file = null;
@@ -253,7 +253,7 @@ export class FileUpload {
     this.clearMessages();
     this.updateUI();
   }
-  
+
   // Método público para establecer URL de imagen existente
   setExistingImageUrl(url) {
     if (this.fileNameDisplay) {

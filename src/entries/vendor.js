@@ -3,12 +3,12 @@ import 'font-awesome/css/font-awesome.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import '../stylesheets/styles.css';
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   // Cerrar alerts al hacer click en el botón
   const closeButtons = document.querySelectorAll('.alert .btn-close');
-  
+
   closeButtons.forEach(button => {
-    button.addEventListener('click', function() {
+    button.addEventListener('click', function () {
       const alert = this.closest('.alert');
       alert.style.opacity = '0';
       setTimeout(() => {

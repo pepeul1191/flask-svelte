@@ -4,7 +4,8 @@
 {% block extra_css %}
 <style>
   .CodeMirror {
-    min-height: 120px; /* Ajusta la altura que desees */
+    min-height: 120px;
+    /* Ajusta la altura que desees */
     height: 180px;
   }
 </style>
@@ -13,13 +14,13 @@
 {% block extra_js %}
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener("DOMContentLoaded", function () {
     new SimpleMDE({
       element: document.getElementById("bio_content"),
       spellChecker: false,
       autosave: {
         enabled: false,
-        uniqueId: "1", // Opcional, para guardar automáticamente
+        uniqueId: "1",
       },
       initialValue: "",
       promptURLs: true,
@@ -27,12 +28,109 @@
         "bold", "italic", "heading", "|",
         "quote", "unordered-list", "ordered-list", "|",
         "link", "image", "table", "horizontal-rule", "|",
-        "preview", 
+        "preview",
       ]
     });
+
+    // Buscar automáticamente si el campo ya tiene un correo
+    if (document.getElementById("email").value.trim() !== "") {
+      searchUserByEmail();
+    }
   });
 
-  console.log(JSON.stringify(document.getElementById("bio_content").value));
+  function updateEmailMessage(type, message) {
+    const msg = document.getElementById("email-message");
+
+    msg.classList.remove(
+      "d-none",
+      "text-danger",
+      "text-success",
+      "text-warning",
+      "text-muted"
+    );
+
+    if (!message) {
+      msg.textContent = "";
+      msg.classList.add("d-none");
+      return;
+    }
+
+    msg.textContent = message;
+    msg.classList.add(`text-${type}`);
+
+    clearTimeout(msg.timeout);
+
+    msg.timeout = setTimeout(() => {
+      msg.textContent = "";
+      msg.classList.add("d-none");
+    }, 4000);
+  }
+
+  async function searchUserByEmail() {
+    const emailInput = document.getElementById("email");
+    const userIdInput = document.getElementById("user_id");
+    const userNameInput = document.getElementById("user_name");
+
+    const email = emailInput.value.trim();
+
+    if (email === "") {
+      userIdInput.value = "";
+      userNameInput.value = "Sin usuario asociado";
+      updateEmailMessage("", "");
+      return null;
+    }
+
+    try {
+      const response = await fetch(
+        `${URLS.ACCESS}/api/v1/users/search-id-by-email?email=${encodeURIComponent(email)}`,
+        {
+          method: "GET",
+          headers: {
+            "Accept": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("jwtAccessToken")}`
+          },
+          mode: "cors",
+          credentials: "include"
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        userIdInput.value = "";
+        userNameInput.value = "Sin usuario asociado";
+        updateEmailMessage("danger", data.error || data.message);
+        return null;
+      }
+
+      userIdInput.value = data.data.id;
+      userNameInput.value = data.data.username;
+
+      updateEmailMessage("success", data.message);
+
+      return data.data;
+
+    } catch (error) {
+      console.error(error);
+
+      userIdInput.value = "";
+      userNameInput.value = "Sin usuario asociado";
+
+      updateEmailMessage("danger", "No se pudo consultar el usuario.");
+
+      return null;
+    }
+  }
+
+  document.getElementById("btn-link-user").addEventListener("click", function () {
+    searchUserByEmail();
+  });
+
+  document.getElementById("btn-unlink-user").addEventListener("click", function () {
+    document.getElementById("user_id").value = "";
+    document.getElementById("user_name").value = "Sin usuario asociado";
+    updateEmailMessage("", "");
+  });
 </script>
 {% endblock %}
 
@@ -64,10 +162,7 @@
 
     <form action="/admin/workers/{{ locals.worker.id }}/edit" method="POST" class="card mb-4">
 
-      <input
-        type="hidden"
-        name="csrf_token"
-        value="{{ csrf_token() }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
       <div class="card-header">
         <h6 class="mb-0">
@@ -86,12 +181,7 @@
               Biografía
             </label>
 
-            <textarea
-              name="bio"
-              id="bio_content"
-              class="form-control"
-              rows="5"
-              maxlength="1000"
+            <textarea name="bio" id="bio_content" class="form-control" rows="5" maxlength="1000"
               placeholder="Ingrese una breve descripción del trabajador">{{ locals.worker.bio }}</textarea>
           </div>
 
@@ -101,12 +191,7 @@
               Código
             </label>
 
-            <input
-              type="text"
-              name="code"
-              maxlength="20"
-              class="form-control"
-              value="{{ locals.worker.code }}"
+            <input type="text" name="code" maxlength="20" class="form-control" value="{{ locals.worker.code }}"
               required>
           </div>
 
@@ -116,13 +201,10 @@
               Correo
             </label>
 
-            <input
-              type="email"
-              name="email"
-              maxlength="100"
-              class="form-control"
-              value="{{ locals.worker.email }}"
-              required>
+            <input type="email" name="email" maxlength="100" id="email" class="form-control"
+              value="{{ locals.worker.email }}" required>
+            <small id="email-message" class="form-text d-none">
+            </small>
           </div>
 
           <!-- USUARIO -->
@@ -133,25 +215,17 @@
             </label>
 
             <div class="input-group">
-              <input type="hidden" name="user_id" value="{{ locals.worker.user_id }}">
+              <input type="hidden" id="user_id" name="user_id" value="{{ locals.worker.user_id }}">
 
-              <input
-                type="text"
-                class="form-control"
-                value="Sin usuario asociado"
-                disabled>
+              <input type="text" class="form-control" id="user_name" value="Sin usuario asociado" disabled>
 
-              <button
-                type="button"
-                class="btn btn-primary">
+              <button type="button" id="btn-link-user" class="btn btn-primary">
 
                 <i class="fa fa-link me-1"></i>
                 Asociar usuario
 
               </button>
-              <button
-                type="button"
-                class="btn btn-secondary">
+              <button type="button" id="btn-unlink-user" class="btn btn-secondary">
 
                 <i class="fa fa-times me-1"></i>
                 Desasoaiar usuario
@@ -163,7 +237,7 @@
           </div>
 
         </div>
-        
+
         <!-- ========================= -->
         <!-- BOTÓN GUARDAR DENTRO DEL BODY -->
         <!-- ========================= -->
@@ -194,10 +268,8 @@
     <!-- BOTÓN CANCELAR AL FINAL -->
     <!-- ========================= -->
     <div class="mt-3 text-end">
-      
-      <a
-        href="/admin/workers"
-        class="btn btn-warning">
+
+      <a href="/admin/workers" class="btn btn-warning">
 
         <i class="fa fa-times me-2"></i>
         Cancelar
@@ -205,6 +277,6 @@
       </a>
     </div>
 
-    </div>
-  </main>
+  </div>
+</main>
 {% endblock %}
