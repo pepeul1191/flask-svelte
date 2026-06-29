@@ -1,22 +1,72 @@
-.suggestion-list {
+/* src/plugins/AutoComplete.css */
+
+/* Contenedor de sugerencias - genérico */
+.autocomplete-suggestions {
   position: absolute;
   z-index: 1000;
   background: #fff;
-  width: inherit;
+  width: 100%;
   max-height: 300px;
   overflow-y: auto;
   margin-top: 2px;
+  border-radius: 0 0 4px 4px;
+  border: 1px solid #ced4da;
+  border-top: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: none;
+}
+
+/* Cada item de sugerencia */
+.autocomplete-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.15s ease-in-out;
+  color: #333;
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+/* Hover y active (seleccionado con teclado) */
+.autocomplete-item:hover,
+.autocomplete-item.active {
+  background-color: #f0f0f0;
+  color: #0d6efd;
+}
+
+/* Input con focus - genérico */
+.autocomplete-input:focus {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(26, 26, 26, 0.25);
+}
+
+/* Mensaje de "No se encontraron resultados" */
+.autocomplete-empty {
+  padding: 12px;
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Scrollbar personalizado (opcional) */
+.autocomplete-suggestions::-webkit-scrollbar {
+  width: 6px;
+}
+
+.autocomplete-suggestions::-webkit-scrollbar-track {
+  background: #f1f1f1;
   border-radius: 4px;
 }
 
-.suggestion-item {
-  padding: 8px 12px;
-  cursor: pointer;
-  border: 1px solid #eee;
+.autocomplete-suggestions::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
 }
 
-.suggestion-item:hover, 
-.suggestion-item.active {
-  background-color: #e1e1e1;
-  border: 0px;
+.autocomplete-suggestions::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }

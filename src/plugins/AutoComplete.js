@@ -1,16 +1,5 @@
 /**
  * Clase AutoComplete - Autocompletado avanzado con búsqueda remota
- * @param {Object} config - Configuración del autocompletado
- * @param {string} config.inputId - ID del input de búsqueda (requerido)
- * @param {string} config.suggestionsId - ID del contenedor de sugerencias (requerido)
- * @param {string} [config.hiddenInputId] - ID del input hidden para guardar el ID seleccionado
- * @param {string} config.apiUrl - URL del endpoint de búsqueda (requerido)
- * @param {string} [config.jwtToken] - Token JWT para autorización
- * @param {number} [config.minChars=3] - Mínimo de caracteres para activar búsqueda
- * @param {string} [config.displayKey='full_name'] - Campo a mostrar en sugerencias
- * @param {string} [config.valueKey='id'] - Campo a guardar como valor seleccionado
- * @param {string} [config.emptyMessage='No se encontraron resultados'] - Mensaje para resultados vacíos
- * @param {number} [config.debounceTime=300] - Tiempo de espera después de escribir (ms)
  */
 export class AutoComplete {
   constructor(config) {
@@ -18,7 +7,7 @@ export class AutoComplete {
     if (!config || typeof config !== 'object') {
       throw new Error('Se requiere un objeto de configuración');
     }
-    console.log(config)
+
     const required = ['inputId', 'suggestionsId', 'apiUrl'];
     const missing = required.filter(field => !config[field]);
     if (missing.length > 0) {
@@ -27,11 +16,12 @@ export class AutoComplete {
 
     // Configuración con valores por defecto
     this.config = {
-      minChars: 3,
-      displayKey: 'full_name',
+      minChars: 2,  // Cambiado a 2 para mejor UX
+      displayKey: 'name',
       valueKey: 'id',
       emptyMessage: 'No se encontraron resultados',
       debounceTime: 300,
+      dataWrapper: 'data',
       ...config
     };
 
@@ -42,7 +32,6 @@ export class AutoComplete {
       ? document.getElementById(this.config.hiddenInputId) 
       : null;
 
-    // Validar elementos del DOM
     if (!this.input || !this.suggestionsDiv) {
       throw new Error('No se encontraron los elementos del DOM especificados');
     }
@@ -52,25 +41,18 @@ export class AutoComplete {
     this.currentSuggestions = [];
     this.lastRequest = null;
 
-    // Inicializar eventos
     this.initEvents();
   }
 
-  // Métodos públicos
   initEvents() {
-    // Limpiar búsquedas previas al enfocar
-    this.input.addEventListener('focus', () => {
-      if (this.input.value.length >= this.config.minChars) {
-        this.handleInput();
-      }
-    });
+    // ELIMINADO: No hay evento focus que haga búsqueda
 
-    // Búsqueda con debounce
+    // SOLO búsqueda con debounce al escribir (teclado)
     this.input.addEventListener('input', this.debounce(() => {
       this.handleInput();
     }, this.config.debounceTime));
 
-    // Navegación con teclado
+    // Navegación con teclado (flechas, enter, escape)
     this.input.addEventListener('keydown', (e) => this.handleKeydown(e));
 
     // Cerrar al hacer clic fuera
@@ -90,8 +72,10 @@ export class AutoComplete {
     const query = this.input.value.trim();
     this.activeIndex = -1;
 
+    // Si el texto es menor al mínimo, limpiar y ocultar sugerencias
     if (query.length < this.config.minChars) {
       this.clearSuggestions();
+      this.currentSuggestions = [];
       return;
     }
 
@@ -122,7 +106,16 @@ export class AutoComplete {
       if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
 
       const data = await response.json();
-      this.currentSuggestions = Array.isArray(data) ? data : data.data || [];
+      
+      // Extraer los datos según el wrapper configurado
+      if (this.config.dataWrapper && data[this.config.dataWrapper]) {
+        this.currentSuggestions = data[this.config.dataWrapper];
+      } else if (Array.isArray(data)) {
+        this.currentSuggestions = data;
+      } else {
+        this.currentSuggestions = [];
+      }
+      
       this.renderSuggestions();
 
     } catch (error) {
@@ -142,6 +135,9 @@ export class AutoComplete {
       this.showEmptyMessage();
       return;
     }
+
+    // Mostrar el contenedor
+    this.suggestionsDiv.style.display = 'block';
 
     const fragment = document.createDocumentFragment();
 
@@ -169,7 +165,14 @@ export class AutoComplete {
 
   handleKeydown(e) {
     const items = this.suggestionsDiv.querySelectorAll('.suggestion-item');
-    if (!items || items.length === 0) return;
+    if (!items || items.length === 0) {
+      // Si no hay sugerencias y presiona Enter, no hacer nada
+      if (e.key === 'Enter') {
+        // Permitir el envío del formulario si no hay sugerencias
+        return;
+      }
+      return;
+    }
 
     switch (e.key) {
       case 'ArrowDown':
@@ -186,12 +189,13 @@ export class AutoComplete {
 
       case 'Enter':
         e.preventDefault();
-        if (this.activeIndex >= 0) {
+        if (this.activeIndex >= 0 && this.activeIndex < items.length) {
           this.selectItem(this.activeIndex);
         }
         break;
 
       case 'Escape':
+        e.preventDefault();
         this.clearSuggestions();
         break;
 
@@ -244,10 +248,12 @@ export class AutoComplete {
 
   clearSuggestions() {
     this.suggestionsDiv.innerHTML = '';
+    this.suggestionsDiv.style.display = 'none';
     this.activeIndex = -1;
   }
 
   showEmptyMessage() {
+    this.suggestionsDiv.style.display = 'block';
     const emptyMsg = document.createElement('div');
     emptyMsg.className = 'list-group-item text-muted';
     emptyMsg.textContent = this.config.emptyMessage;

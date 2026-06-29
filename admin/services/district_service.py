@@ -3,6 +3,7 @@
 from sqlalchemy.exc import SQLAlchemyError
 
 from admin.models.district import District
+from admin.models.vw_location import VwLocation
 from main.databases import SessionLocal
 from main.services import ApplicationService
 
@@ -157,6 +158,35 @@ class DistrictService(ApplicationService):
       db.rollback()
       return cls.handle_error(
         f"Error: {str(e)}"
+      )
+
+    finally:
+      db.close()
+
+  @classmethod
+  def search_by_name(cls, name):
+    """Busca ubicaciones por nombre usando LIKE contra la vista"""
+    db = SessionLocal()
+
+    try:
+      # Búsqueda case-insensitive con LIKE
+      search_pattern = f"%{name}%"
+      locations = (
+        db.query(VwLocation)
+        .filter(VwLocation.name.ilike(search_pattern))  # ilike = case-insensitive LIKE
+        .order_by(VwLocation.name.asc())
+        .limit(10)  # Límite para evitar sobrecarga
+        .all()
+      )
+
+      return cls.build_response(
+        data=[loc.to_dict() for loc in locations],
+        message="Ubicaciones encontradas",
+      )
+
+    except SQLAlchemyError as e:
+      return cls.handle_error(
+        f"Error al buscar ubicaciones: {str(e)}"
       )
 
     finally:
