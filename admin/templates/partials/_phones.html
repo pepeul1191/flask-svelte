@@ -12,7 +12,7 @@
       Teléfonos
     </h6>
     <a
-      href="/admin/workers/{{ locals.person.id }}/phones/new"
+      href="/admin/phones/new?worker_id={{ locals.worker.id }}"
       class="btn btn-success btn-sm">
       <i class="fa fa-plus me-1"></i>
       Agregar Teléfono
@@ -50,7 +50,7 @@
                 <td class="text-end btn-group-sm">
 
                   <a
-                    href="/admin/phones/{{ phone.id }}/edit?person_id={{ locals.worker.person_id }}"
+                    href="/admin/phones/{{ phone.id }}/edit?worker_id={{ locals.worker.person_id }}"
                     class="btn btn-outline-secondary me-1">
 
                     <i class="fa fa-edit"></i>

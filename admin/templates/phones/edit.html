@@ -1,4 +1,4 @@
-<!-- admin/templates/phones/new.html -->
+<!-- admin/templates/phones/edit.html -->
 
 {% extends './layouts/admin_dashboard.html' %}
 
@@ -22,11 +22,11 @@
         Gestión de Trabajadores
       </a>
       /
-      <a href="/admin/workers/{{locals.worker_id}}/edit">
+      <a href="/admin/workers/{{ worker_id }}/edit">
         Editar Trabajador
       </a>
       /
-      Agregar Teléfono
+      Editar Teléfono
     </h3>
 
     {% include 'partials/flash_messages.html' %}
@@ -35,18 +35,20 @@
 
       <div class="card-header">
         <h6 class="mb-0">
-          <i class="fa fa-plus me-2"></i>
-          Nuevo Teléfono
+          <i class="fa fa-edit me-2"></i>
+          Editar Teléfono
         </h6>
       </div>
 
       <div class="card-body">
-        <form action="/admin/workers/{{locals.worker_id}}/phones" method="POST" class="row g-3">
+
+        <form action="/admin/phones/{{ locals.phone.id or ''}}/edit" method="POST" class="row g-3">
 
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           
           <!-- Person ID (Hidden) -->
-          <input type="hidden" name="person_id" value="{{ locals.person.id or '' }}">
+          <input type="hidden" name="person_id" value="{{ locals.worker.person_id }}">
+          <input type="hidden" name="worker_id" value="{{ locals.worker.id }}">
 
           <!-- Description -->
           <div class="col-md-6">
@@ -60,7 +62,7 @@
               class="form-control"
               maxlength="40"
               placeholder="Ej: Casa, Trabajo, Celular, etc."
-              value="{{ request.form.description or '' }}">
+              value="{{ locals.phone.description or ''}}">
             <small class="text-muted">Máximo 40 caracteres (opcional)</small>
           </div>
 
@@ -77,7 +79,7 @@
               maxlength="20"
               placeholder="Ej: 999888777"
               required
-              value="{{ request.form.phone or '' }}">
+              value="{{ locals.phone.phone }}">
             <small class="text-muted">Máximo 20 caracteres (requerido)</small>
           </div>
 
@@ -86,10 +88,10 @@
 
             <button type="submit" class="btn btn-success">
               <i class="fa fa-save me-2"></i>
-              Guardar
+              Actualizar
             </button>
 
-            <a href="/admin/workers/{{locals.worker_id}}/edit" class="btn btn-warning ms-2">
+            <a href="/admin/workers/{{ locals.worker.id }}/edit" class="btn btn-warning ms-2">
               <i class="fa fa-times me-2"></i>
               Cancelar
             </a>

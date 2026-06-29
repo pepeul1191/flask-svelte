@@ -141,3 +141,31 @@ class PhoneService(ApplicationService):
 
     finally:
       db.close()
+      
+  @classmethod
+  def fetch_one(cls, phone_id):
+    """Obtiene un teléfono por su ID"""
+    db = SessionLocal()
+
+    try:
+      phone = (
+        db.query(Phone)
+        .filter(Phone.id == phone_id)
+        .first()
+      )
+
+      if not phone:
+        return cls.handle_not_found("Teléfono no encontrado")
+
+      return cls.build_response(
+        data=phone.to_dict(),
+        message="Teléfono encontrado"
+      )
+
+    except SQLAlchemyError as e:
+      return cls.handle_error(
+        f"Error al obtener teléfono: {str(e)}"
+      )
+
+    finally:
+      db.close()
