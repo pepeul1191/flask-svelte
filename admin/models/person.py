@@ -1,4 +1,5 @@
 # admin/models/person.py
+
 from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -46,6 +47,13 @@ class Person(Base, ToString):
     uselist=False
   )
 
+  # 👇 Agregar relación con teléfonos
+  phones = relationship(
+    "Phone",
+    back_populates="person",
+    cascade="all, delete-orphan"  # Elimina teléfonos cuando se elimina la persona
+  )
+
   def to_dict(self):
     return {
       "id": self.id,
@@ -58,12 +66,12 @@ class Person(Base, ToString):
       "updated": self.updated.isoformat() if self.updated else None,
       "sex_id": self.sex_id,
       "document_type_id": self.document_type_id,
-
-      # 👇 agregado
       "document_type": {
         "id": self.document_type.id,
         "name": self.document_type.name
-      } if self.document_type else None
+      } if self.document_type else None,
+      # 👇 Agregar teléfonos
+      "phones": [p.to_dict() for p in self.phones] if self.phones else []
     }
   
   def __init__(
@@ -83,4 +91,3 @@ class Person(Base, ToString):
     self.birth_date = birth_date
     self.sex_id = sex_id
     self.document_type_id = document_type_id
-

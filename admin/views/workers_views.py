@@ -7,6 +7,7 @@ from admin.services.person_service import PersonService
 from admin.services.worker_service import WorkerService
 from admin.services.sex_service import SexService
 from admin.services.document_type_service import DocumentTypeService
+from admin.services.phone_service import PhoneService
 from admin.models.person import Person
 
 
@@ -272,3 +273,40 @@ def delete(worker_id):
     flash(response["message"], "danger")
 
   return redirect("/admin/workers")
+
+# =====================
+# ADD/PHONE
+# =====================
+@views.route("/admin/workers/<int:worker_id>/phones/new", methods=["GET"])
+@only_logged
+def phone_new(worker_id):
+
+  response = WorkerService.fetch_one(worker_id)
+
+  if not response["success"]:
+    flash(response["message"], "danger")
+    return redirect("/admin/workers")
+  
+  return render_template(
+    "workers/phone.html",
+    locals={
+      "title": "Agregar Teléfono a Trabajador",
+      "nav_link": "worker-management",
+      "worker_id": worker_id,
+      "person": response["data"]["person"],
+    }
+  )
+
+@views.route("/admin/workers/<int:worker_id>/phones", methods=["POST"])
+@only_logged
+def phone_create(worker_id):
+
+  response = PhoneService.create(request.form)
+
+  if response["success"]:
+    # En caso de que la persona se actualice pero no se encuentre su Worker
+    flash("Se ha agregado teléfono a trabajador", "success")
+    return redirect(f"/admin/workers/{worker_id}/edit")
+
+  flash(response["message"], "danger")
+  return redirect(request.referrer)

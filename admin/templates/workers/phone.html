@@ -1,0 +1,107 @@
+<!-- admin/templates/phones/new.html -->
+
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_css %}
+<style>
+  /* Estilos específicos si son necesarios */
+</style>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin/workers">
+        <i class="fa fa-users me-2"></i>
+        Gestión de Trabajadores
+      </a>
+      /
+      <a href="/admin/workers/{{locals.worker_id}}/edit">
+        Editar Trabajador
+      </a>
+      /
+      Agregar Teléfono
+    </h3>
+
+    {% include 'partials/flash_messages.html' %}
+
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-plus me-2"></i>
+          Nuevo Teléfono
+        </h6>
+      </div>
+
+      <div class="card-body">
+        <form action="/admin/workers/{{locals.worker_id}}/phones" method="POST" class="row g-3">
+
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          
+          <!-- Person ID (Hidden) -->
+          <input type="hidden" name="person_id" value="{{ locals.person.id or '' }}">
+
+          <!-- Description -->
+          <div class="col-md-6">
+            <label class="form-label">
+              <i class="fa fa-tag me-1"></i>
+              Descripción
+            </label>
+            <input
+              type="text"
+              name="description"
+              class="form-control"
+              maxlength="40"
+              placeholder="Ej: Casa, Trabajo, Celular, etc."
+              value="{{ request.form.description or '' }}">
+            <small class="text-muted">Máximo 40 caracteres (opcional)</small>
+          </div>
+
+          <!-- Phone Number -->
+          <div class="col-md-6">
+            <label class="form-label">
+              <i class="fa fa-phone me-1"></i>
+              Teléfono <span class="text-danger">*</span>
+            </label>
+            <input
+              type="tel"
+              name="phone"
+              class="form-control"
+              maxlength="20"
+              placeholder="Ej: 999888777"
+              required
+              value="{{ request.form.phone or '' }}">
+            <small class="text-muted">Máximo 20 caracteres (requerido)</small>
+          </div>
+
+          <!-- Botones -->
+          <div class="col-12 mt-4">
+
+            <button type="submit" class="btn btn-success">
+              <i class="fa fa-save me-2"></i>
+              Guardar
+            </button>
+
+            <a href="/admin/workers/{{locals.worker_id}}/edit" class="btn btn-warning ms-2">
+              <i class="fa fa-times me-2"></i>
+              Cancelar
+            </a>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+</main>
+{% endblock %}
