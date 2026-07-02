@@ -1,10 +1,10 @@
-# admin/views/workers_view.py
+# admin/views/students_views.py
 
 from flask import Blueprint, flash, render_template, request, redirect
 
 from admin.configs.middlewares import only_logged
 from admin.services.person_service import PersonService
-from admin.services.worker_service import WorkerService
+from admin.services.student_service import StudentService
 from admin.services.sex_service import SexService
 from admin.services.document_type_service import DocumentTypeService
 from admin.services.phone_service import PhoneService
@@ -12,7 +12,7 @@ from admin.models.person import Person
 
 
 views = Blueprint(
-  "admin-workers-views",
+  "admin-students-views",
   __name__,
   template_folder="../templates"
 )
@@ -21,14 +21,14 @@ views = Blueprint(
 # =====================
 # INDEX (LIST + SEARCH + PAGINATION)
 # =====================
-@views.route("/admin/workers", methods=["GET"])
+@views.route("/admin/students", methods=["GET"])
 @only_logged
 def index():
 
   page = request.args.get("page", default=1, type=int)
   per_page = request.args.get("per_page", default=10, type=int)
 
-  # 🔥 NUEVOS FILTROS
+  # Filtros
   names = request.args.get("names", default="")
   last_names = request.args.get("last_names", default="")
   dni = request.args.get("dni", default="")
@@ -41,7 +41,7 @@ def index():
   if per_page < 1:
     per_page = 10
 
-  response = WorkerService.fetch_all(
+  response = StudentService.fetch_all(
     page=page,
     per_page=per_page,
     names=names,
@@ -51,18 +51,18 @@ def index():
     email=email
   )
 
-  workers = []
+  students = []
 
   pagination = {
     "page": page,
     "per_page": per_page,
-    "total_workers": 0,
+    "total_students": 0,
     "total_pages": 0,
     "start_record": 0,
     "end_record": 0
   }
 
-  # 🔥 IMPORTANTE: enviamos filtros al template
+  # Filtros para el template
   filters = {
     "names": names,
     "last_names": last_names,
@@ -72,17 +72,17 @@ def index():
   }
 
   if response["success"]:
-    workers = response["data"]["workers"]
+    students = response["data"]["students"]
     pagination = response["data"]["pagination"]
   else:
     flash(response["message"], "danger")
 
   return render_template(
-    "workers/index.html",
+    "students/index.html",
     locals={
-      "title": "Trabajadores",
-      "nav_link": "worker-management",
-      "workers": workers,
+      "title": "Estudiantes",
+      "nav_link": "student-management",
+      "students": students,
       "pagination": pagination,
       "filters": filters
     }
@@ -92,7 +92,7 @@ def index():
 # =====================
 # NEW
 # =====================
-@views.route("/admin/workers/new", methods=["GET"])
+@views.route("/admin/students/new", methods=["GET"])
 @only_logged
 def new():
   sexes_response = SexService.fetch_all()
@@ -112,21 +112,21 @@ def new():
     flash(document_types_response["message"], "danger")
 
   return render_template(
-    "workers/new.html",
+    "students/new.html",
     locals={
-        "title": "Nuevo Trabajador",
-        "nav_link": "worker-management",
-        "sexes": sexes,
-        "document_types": document_types,
-        "entity": "workers"
-      }
-    )
+      "title": "Nuevo Estudiante",
+      "nav_link": "student-management",
+      "sexes": sexes,
+      "document_types": document_types,
+      "entity": "students"
+    }
+  )
 
 
 # =====================
-# CREATE WORKER FROM PERSON
+# CREATE STUDENT FROM PERSON
 # =====================
-@views.route("/admin/workers/personal", methods=["POST"])
+@views.route("/admin/students/personal", methods=["POST"])
 @only_logged
 def create():
 
@@ -143,40 +143,41 @@ def create():
 
   if not person_response["success"]:
     flash(person_response["message"], "danger")
-    return redirect("/admin/workers/new")
+    return redirect("/admin/students/new")
 
-  # 2. Con el id de la persona creada, se genera el registro del trabajador
+  # 2. Con el id de la persona creada, se genera el registro del estudiante
   person_id = person_response["data"]["id"]
-  worker_response = WorkerService.create({
+  student_response = StudentService.create({
     "code": request.form.get("document_number"),
     "email": request.form.get("email"),
-    "person_id": person_id
+    "person_id": person_id,
+    "user_id": request.form.get("user_id")  # Opcional, puede venir del formulario
   })
 
-  if worker_response["success"]:
-    flash(worker_response["message"], "success")
-    worker_id = worker_response["data"]["id"]
-    return redirect(f"/admin/workers/{worker_id}/edit")
+  if student_response["success"]:
+    flash(student_response["message"], "success")
+    student_id = student_response["data"]["id"]
+    return redirect(f"/admin/students/{student_id}/edit")
 
-  flash(worker_response["message"], "danger")
-  return redirect("/admin/workers/new")
+  flash(student_response["message"], "danger")
+  return redirect("/admin/students/new")
 
 
 # =====================
 # EDIT
 # =====================
-@views.route("/admin/workers/<int:worker_id>/edit", methods=["GET"])
+@views.route("/admin/students/<int:student_id>/edit", methods=["GET"])
 @only_logged
-def edit(worker_id):
+def edit(student_id):
 
-  response = WorkerService.fetch_one(worker_id)
+  response = StudentService.fetch_one(student_id)
 
   sexes_response = SexService.fetch_all()
   document_types_response = DocumentTypeService.fetch_all()
 
   if not response["success"]:
     flash(response["message"], "danger")
-    return redirect("/admin/workers")
+    return redirect("/admin/students")
   
   sexes = []
   document_types = []
@@ -192,23 +193,23 @@ def edit(worker_id):
     flash(document_types_response["message"], "danger")
 
   return render_template(
-    "workers/edit.html",
+    "students/edit.html",
     locals={
-      "title": "Editar Trabajador",
-      "nav_link": "worker-management",
+      "title": "Editar Estudiante",
+      "nav_link": "student-management",
       "record": response["data"],
       "person": response["data"]["person"],
       "sexes": sexes,
       "document_types": document_types,
-      "entity": "workers"
+      "entity": "students"
     }
   )
 
 
 # =====================
-# UPDATE
+# UPDATE PERSON
 # =====================
-@views.route("/admin/workers/personal/<int:person_id>/edit", methods=["POST"])
+@views.route("/admin/students/personal/<int:person_id>/edit", methods=["POST"])
 @only_logged
 def edit_personal(person_id):
 
@@ -223,55 +224,58 @@ def edit_personal(person_id):
   })
 
   if response["success"]:
-    # Buscamos el trabajador asociado a esa persona usando WorkerService
-    worker_response = WorkerService.fetch_by_person_id(person_id)
+    # Buscamos el estudiante asociado a esa persona usando StudentService
+    student_response = StudentService.fetch_by_person_id(person_id)
     
-    if worker_response["success"]:
+    if student_response["success"]:
       flash(response["message"], "success")
-      worker_id = worker_response["data"]["id"]
-      return redirect(f"/admin/workers/{worker_id}/edit")
+      student_id = student_response["data"]["id"]
+      return redirect(f"/admin/students/{student_id}/edit")
     
-    # En caso de que la persona se actualice pero no se encuentre su Worker
-    flash("Persona actualizada, pero no se encontró el trabajador asociado.", "warning")
+    # En caso de que la persona se actualice pero no se encuentre su Student
+    flash("Persona actualizada, pero no se encontró el estudiante asociado.", "warning")
     return redirect(request.referrer)
 
   flash(response["message"], "danger")
   return redirect(request.referrer)
 
-@views.route("/admin/workers/<int:worker_id>/edit", methods=["POST"])
-@only_logged
-def edit_worker(worker_id):
 
-  response = WorkerService.update(worker_id, {
+# =====================
+# UPDATE STUDENT
+# =====================
+@views.route("/admin/students/<int:student_id>/edit", methods=["POST"])
+@only_logged
+def edit_student(student_id):
+
+  response = StudentService.update(student_id, {
     "code": request.form.get("code"),
     "email": request.form.get("email"),
     "user_id": request.form.get("user_id"),
-    "bio": request.form.get("bio"),
   })
 
   if response["success"]:
-    # En caso de que la persona se actualice pero no se encuentre su Worker
-    flash("Trabajador actualizado.", "success")
-    return redirect(f"/admin/workers/{worker_id}/edit")
+    flash("Estudiante actualizado.", "success")
+    return redirect(f"/admin/students/{student_id}/edit")
 
   flash(response["message"], "danger")
   return redirect(request.referrer)
+
 
 # =====================
 # DELETE
 # =====================
 @views.route(
-  "/admin/workers/<int:worker_id>/delete",
+  "/admin/students/<int:student_id>/delete",
   methods=["GET"]
 )
 @only_logged
-def delete(worker_id):
+def delete(student_id):
 
-  response = WorkerService.delete(worker_id)
+  response = StudentService.delete(student_id)
 
   if response["success"]:
     flash(response["message"], "success")
   else:
     flash(response["message"], "danger")
 
-  return redirect("/admin/workers")
+  return redirect("/admin/students")

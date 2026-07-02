@@ -497,6 +497,29 @@ SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = @saved_cs_client;
 
 --
+-- Temporary view structure for view `vw_students`
+--
+
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `vw_students` AS SELECT
+ 1 AS `student_id`,
+ 1 AS `person_id`,
+ 1 AS `code`,
+ 1 AS `email`,
+ 1 AS `user_id`,
+ 1 AS `names`,
+ 1 AS `last_names`,
+ 1 AS `document_number`,
+ 1 AS `sex_id`,
+ 1 AS `document_type_id`,
+ 1 AS `image_url`,
+ 1 AS `birth_date`,
+ 1 AS `created`,
+ 1 AS `updated`*/;
+SET character_set_client = @saved_cs_client;
+
+--
 -- Temporary view structure for view `vw_workers`
 --
 
@@ -593,6 +616,24 @@ CREATE TABLE `workers` (
 /*!50001 SET collation_connection      = @saved_col_connection */;
 
 --
+-- Final view structure for view `vw_students`
+--
+
+/*!50001 DROP VIEW IF EXISTS `vw_students`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_general_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `vw_students` AS select `R`.`id` AS `student_id`,`R`.`person_id` AS `person_id`,`R`.`code` AS `code`,`R`.`email` AS `email`,`R`.`user_id` AS `user_id`,`P`.`names` AS `names`,`P`.`last_names` AS `last_names`,`P`.`document_number` AS `document_number`,`P`.`sex_id` AS `sex_id`,`P`.`document_type_id` AS `document_type_id`,`P`.`image_url` AS `image_url`,`P`.`birth_date` AS `birth_date`,`P`.`created` AS `created`,`P`.`updated` AS `updated` from (`students` `R` join `persons` `P` on((`R`.`person_id` = `P`.`id`))) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
 -- Final view structure for view `vw_workers`
 --
 
@@ -677,5 +718,6 @@ INSERT INTO `schema_migrations` (version) VALUES
   ('20260316163800'),
   ('20260317045206'),
   ('20260628011714'),
-  ('20260702000253');
+  ('20260702000253'),
+  ('20260702012438');
 UNLOCK TABLES;

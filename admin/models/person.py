@@ -1,4 +1,4 @@
-# admin/models/person.py
+# admin/models/person.py (agregar la relación student)
 
 from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
@@ -51,16 +51,21 @@ class Person(Base, ToString):
     "Representative",
     back_populates="person",
     uselist=False
-)
+  )
 
-  # 👇 Agregar relación con teléfonos
+  # 👇 Agregar relación con student
+  student = relationship(
+    "Student",
+    back_populates="person",
+    uselist=False
+  )
+
   phones = relationship(
     "Phone",
     back_populates="person",
-    cascade="all, delete-orphan"  # Elimina teléfonos cuando se elimina la persona
+    cascade="all, delete-orphan"
   )
 
-  # Agregar al final de las relaciones:
   addresses = relationship(
     "Address",
     back_populates="person",
@@ -83,7 +88,6 @@ class Person(Base, ToString):
         "id": self.document_type.id,
         "name": self.document_type.name
       } if self.document_type else None,
-      # 👇 Agregar teléfonos
       "phones": [p.to_dict() for p in self.phones] if self.phones else [],
       "addresses": [a.to_dict() for a in self.addresses] if self.addresses else []
     }

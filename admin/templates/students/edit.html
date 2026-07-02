@@ -1,0 +1,258 @@
+{# admin/templates/students/edit.html #}
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_css %}
+<style>
+  .CodeMirror {
+    min-height: 120px;
+    height: 180px;
+  }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Buscar automáticamente si el campo ya tiene un correo
+    if (document.getElementById("email").value.trim() !== "") {
+      searchUserByEmail();
+    }
+  });
+
+  function updateEmailMessage(type, message) {
+    const msg = document.getElementById("email-message");
+
+    msg.classList.remove(
+      "d-none",
+      "text-danger",
+      "text-success",
+      "text-warning",
+      "text-muted"
+    );
+
+    if (!message) {
+      msg.textContent = "";
+      msg.classList.add("d-none");
+      return;
+    }
+
+    msg.textContent = message;
+    msg.classList.add(`text-${type}`);
+
+    clearTimeout(msg.timeout);
+
+    msg.timeout = setTimeout(() => {
+      msg.textContent = "";
+      msg.classList.add("d-none");
+    }, 4000);
+  }
+
+  async function searchUserByEmail() {
+    const emailInput = document.getElementById("email");
+    const userIdInput = document.getElementById("user_id");
+    const userNameInput = document.getElementById("user_name");
+
+    const email = emailInput.value.trim();
+
+    if (email === "") {
+      userIdInput.value = "";
+      userNameInput.value = "Sin usuario asociado";
+      updateEmailMessage("", "");
+      return null;
+    }
+
+    try {
+      const response = await fetch(
+        `${URLS.ACCESS}/api/v1/users/search-id-by-email?email=${encodeURIComponent(email)}`,
+        {
+          method: "GET",
+          headers: {
+            "Accept": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("jwtAccessToken")}`
+          },
+          mode: "cors",
+          credentials: "include"
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        userIdInput.value = "";
+        userNameInput.value = "Sin usuario asociado";
+        updateEmailMessage("danger", data.error || data.message);
+        return null;
+      }
+
+      userIdInput.value = data.data.id;
+      userNameInput.value = data.data.username;
+
+      updateEmailMessage("success", data.message);
+
+      return data.data;
+
+    } catch (error) {
+      console.error(error);
+
+      userIdInput.value = "";
+      userNameInput.value = "Sin usuario asociado";
+
+      updateEmailMessage("danger", "No se pudo consultar el usuario.");
+
+      return null;
+    }
+  }
+
+  document.getElementById("btn-link-user").addEventListener("click", function () {
+    searchUserByEmail();
+  });
+
+  document.getElementById("btn-unlink-user").addEventListener("click", function () {
+    document.getElementById("user_id").value = "";
+    document.getElementById("user_name").value = "Sin usuario asociado";
+    updateEmailMessage("", "");
+  });
+</script>
+{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin/students">
+        <i class="fa fa-graduation-cap me-2"></i>
+        Gestión de Estudiantes
+      </a>
+      /
+      Editar Estudiante
+    </h3>
+
+    {% include 'partials/flash_messages.html' %}
+
+    <!-- ========================= -->
+    <!-- DATOS PERSONALES -->
+    <!-- ========================= -->
+
+    {% include 'partials/_person.html' %}
+
+    <!-- ========================= -->
+    <!-- DATOS DEL ESTUDIANTE -->
+    <!-- ========================= -->
+
+    <form action="/admin/students/{{ locals.record.id }}/edit" method="POST" class="card mb-4">
+
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-id-card me-2"></i>
+          Datos del Estudiante
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <div class="row g-3">
+
+          <!-- CÓDIGO -->
+          <div class="col-md-3">
+            <label class="form-label">
+              Código <span class="text-danger">*</span>
+            </label>
+
+            <input type="text" name="code" maxlength="20" class="form-control" value="{{ locals.record.code }}"
+              required>
+            <small class="text-muted">Código único del estudiante</small>
+          </div>
+
+          <!-- CORREO -->
+          <div class="col-md-5">
+            <label class="form-label">
+              Correo <span class="text-danger">*</span>
+            </label>
+
+            <input type="email" name="email" maxlength="100" id="email" class="form-control"
+              value="{{ locals.record.email }}" required>
+            <small id="email-message" class="form-text d-none">
+            </small>
+          </div>
+
+          <!-- USUARIO -->
+          <div class="col-md-4">
+
+            <label class="form-label">
+              Usuario asociado
+            </label>
+
+            <div class="input-group">
+              <input type="hidden" id="user_id" name="user_id" value="{{ locals.record.user_id }}">
+
+              <input type="text" class="form-control" id="user_name" 
+                value="{% if locals.record.user_id %}Usuario ID: {{ locals.record.user_id }}{% else %}Sin usuario asociado{% endif %}" 
+                disabled>
+
+              <button type="button" id="btn-link-user" class="btn btn-primary">
+
+                <i class="fa fa-link me-1"></i>
+                Asociar usuario
+
+              </button>
+              <button type="button" id="btn-unlink-user" class="btn btn-secondary">
+
+                <i class="fa fa-times me-1"></i>
+                Desasociar usuario
+
+              </button>
+
+            </div>
+            <small class="text-muted">Asocie un usuario existente al estudiante</small>
+
+          </div>
+
+        </div>
+
+        <!-- ========================= -->
+        <!-- BOTÓN GUARDAR DENTRO DEL BODY -->
+        <!-- ========================= -->
+        <div class="mt-4 text-end">
+          <button class="btn btn-success">
+            <i class="fa fa-save me-2"></i>
+            Guardar
+          </button>
+        </div>
+
+      </div>
+
+    </form>
+
+    <!-- ========================= -->
+    <!-- DIRECCIONES -->
+    <!-- ========================= -->
+
+    {% include 'partials/_addresses.html' %}
+
+    <!-- ========================= -->
+    <!-- TELÉFONOS -->
+    <!-- ========================= -->
+
+    {% include 'partials/_phones.html' %}
+
+    <!-- ========================= -->
+    <!-- BOTÓN CANCELAR AL FINAL -->
+    <!-- ========================= -->
+    <div class="mt-3 text-end">
+
+      <a href="/admin/students" class="btn btn-warning">
+
+        <i class="fa fa-times me-2"></i>
+        Cancelar
+
+      </a>
+    </div>
+
+  </div>
+</main>
+{% endblock %}

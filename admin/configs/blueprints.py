@@ -8,6 +8,7 @@ from admin.views.workers_views import views as worker_views
 from admin.views.phones_views import views as phone_views
 from admin.views.addresses_views import views as addresses_views
 from admin.views.representatives_views import views as representatives_views
+from admin.views.students_views import views as students_views
 # apis
 from admin.apis.district_apis import apis as district_apis
 
@@ -21,6 +22,7 @@ blueprints = [
   phone_views,
   addresses_views,
   representatives_views,
+  students_views,
   # apis
   district_apis,
 ]

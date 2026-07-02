@@ -6,7 +6,7 @@ from admin.configs.middlewares import only_logged
 from admin.services.phone_service import PhoneService
 from admin.services.worker_service import WorkerService
 from admin.services.representative_service import RepresentativeService
-# from admin.services.student_service import StudentService  # Comentado: clase aún no disponible
+from admin.services.student_service import StudentService  # Comentado: clase aún no disponible
 
 views = Blueprint('admin-phone-views', __name__, template_folder='../templates')
 
@@ -14,21 +14,21 @@ views = Blueprint('admin-phone-views', __name__, template_folder='../templates')
 ENTITY_SERVICES = {
   'worker': WorkerService,
   'representative': RepresentativeService,
-  # 'student': StudentService,  # Comentado: clase aún no disponible
+  'student': StudentService,  # Comentado: clase aún no disponible
 }
 
 # Mapeo de tipos de entidad a sus rutas de redirección
 ENTITY_REDIRECTS = {
   'worker': '/admin/workers',
   'representative': '/admin/representatives',
-  # 'student': '/admin/students',  # Comentado: ruta aún no disponible
+  'student': '/admin/students',  # Comentado: ruta aún no disponible
 }
 
 # Mapeo de tipos de entidad a sus nombres para mostrar
 ENTITY_NAMES = {
   'worker': 'Trabajador',
   'representative': 'Representante',
-  # 'student': 'Estudiante',  # Comentado: entidad aún no disponible
+  'student': 'Estudiante',  # Comentado: entidad aún no disponible
 }
 
 

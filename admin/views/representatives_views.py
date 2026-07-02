@@ -111,7 +111,8 @@ def new():
       "title": "Nuevo Representante",
       "nav_link": "representative-management",
       "sexes": sexes,
-      "document_types": document_types
+      "document_types": document_types,
+      "entity": "representatives"
     }
   )
 
