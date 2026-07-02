@@ -8,9 +8,9 @@
 
 {% block extra_js %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const jwtToken = document.querySelector('meta[name="csrf-token"]')?.content || 
-                    document.querySelector('meta[name="jwt-token"]')?.content;
+  document.addEventListener('DOMContentLoaded', function () {
+    const jwtToken = document.querySelector('meta[name="csrf-token"]')?.content ||
+      document.querySelector('meta[name="jwt-token"]')?.content;
 
     try {
       const autoComplete = new AutoComplete({
@@ -28,7 +28,7 @@
       });
 
       // Evento cuando se selecciona un ítem
-      document.getElementById('district-search').addEventListener('autocomplete-select', function(e) {
+      document.getElementById('district-search').addEventListener('autocomplete-select', function (e) {
         console.log('Distrito seleccionado:', e.detail);
         console.log('ID seleccionado:', document.getElementById('district-id').value);
       });
@@ -46,20 +46,22 @@
 <main class="main-content">
   <div class="container-fluid">
     <h3 class="mb-4">
-      <a href="/admin/workers">
+      <a href="/admin/{{ locals.entity_type }}s">
         <i class="fa fa-users me-2"></i>
-        Gestión de Trabajadores
+        Gestión de {{ 'Trabajadores' if locals.entity_type == 'worker' else 'Apoderados' if locals.entity_type ==
+        'representative' else 'Estudiantes' if locals.entity_type == 'student' else 'Entidades' }}
       </a>
       /
-      <a href="/admin/workers/{{locals.worker_id}}/edit">
-        Editar Trabajador
+      <a href="/admin/{{ locals.entity_type }}s/{{ locals.entity_id }}/edit">
+        Editar {{ 'Trabajador' if locals.entity_type == 'worker' else 'Apoderado' if locals.entity_type ==
+        'representative' else 'Estudiante' if locals.entity_type == 'student' else 'Entidad' }}
       </a>
       /
       Agregar Dirección
     </h3>
 
     {% include 'partials/flash_messages.html' %}
-    
+
     <div class="row">
       <div class="col-12">
         <div class="card">
@@ -73,44 +75,39 @@
             <form action="/admin/addresses" method="POST">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-              <input type="hidden" name="person_id" value="{{ locals.person.id }}">
-              <input type="hidden" name="worker_id" value="{{ locals.worker_id }}">
+              <!-- Entity Type (Hidden) -->
+              <input type="hidden" name="entity_type" value="{{ locals.entity_type or 'worker' }}">
+
+              <!-- Entity ID (Hidden) -->
+              <input type="hidden" name="{{ locals.entity_type }}_id" value="{{ locals.entity_id or '' }}">
+
+              <!-- Person ID (Hidden) -->
+              <input type="hidden" name="person_id" value="{{ locals.person.id or '' }}">
 
               <!-- Fila: Dirección y Distrito -->
               <div class="row">
                 <div class="col-md-7 mb-3">
                   <label for="address" class="form-label">Dirección *</label>
-                  <input type="text" 
-                        class="form-control" 
-                        id="address" 
-                        name="address" 
-                        placeholder="Ej: Av. Siempreviva 123, Urbanización Los Pinos"
-                        required>
+                  <input type="text" class="form-control" id="address" name="address"
+                    placeholder="Ej: Av. Siempreviva 123, Urbanización Los Pinos" required
+                    value="{{ request.form.address or '' }}">
                   <div class="form-text">Ingrese la dirección completa (calle, número, urbanización, etc.)</div>
                 </div>
 
                 <div class="col-md-5 mb-3">
                   <label for="district-search" class="form-label">Distrito *</label>
                   <div class="position-relative">
-                    <input type="text"
-                          id="district-search"
-                          name="district_search"
-                          class="form-control"
-                          placeholder="Escribe para buscar distrito..."
-                          autocomplete="off"
-                          required>
-                    
+                    <input type="text" id="district-search" name="district_search" class="form-control"
+                      placeholder="Escribe para buscar distrito..." autocomplete="off" required
+                      value="{{ request.form.district_search or '' }}">
+
                     <!-- Contenedor de sugerencias -->
-                    <div id="district-suggestions" 
-                        class="list-group position-absolute w-100" 
-                        style="z-index: 1000; max-height: 300px; overflow-y: auto; display: none;">
+                    <div id="district-suggestions" class="list-group position-absolute w-100"
+                      style="z-index: 1000; max-height: 300px; overflow-y: auto; display: none;">
                     </div>
                   </div>
                   <!-- Input hidden para guardar el ID seleccionado -->
-                  <input type="hidden" 
-                        id="district-id" 
-                        name="district_id" 
-                        value="">
+                  <input type="hidden" id="district-id" name="district_id" value="{{ request.form.district_id or '' }}">
                   <div class="form-text">Comience a escribir el nombre del distrito para buscar</div>
                 </div>
               </div>
@@ -119,19 +116,16 @@
               <div class="row">
                 <div class="col-12 mb-3">
                   <label for="description" class="form-label">Descripción</label>
-                  <input type="text" 
-                        class="form-control" 
-                        id="description" 
-                        name="description" 
-                        placeholder="Ej: Casa principal, Oficina, Domicilio particular"
-                        maxlength="40">
+                  <input type="text" class="form-control" id="description" name="description"
+                    placeholder="Ej: Casa principal, Oficina, Domicilio particular" maxlength="40"
+                    value="{{ request.form.description or '' }}">
                   <div class="form-text">Opcional: breve descripción de la dirección (máx. 40 caracteres)</div>
                 </div>
               </div>
 
               <!-- Botones -->
               <div class="d-flex justify-content-between">
-                <a href="/admin/workers/{{ locals.worker_id }}/edit" class="btn btn-secondary">
+                <a href="/admin/{{ locals.entity_type }}s/{{ locals.entity_id }}/edit" class="btn btn-secondary">
                   <i class="fa fa-arrow-left me-1"></i>
                   Volver
                 </a>

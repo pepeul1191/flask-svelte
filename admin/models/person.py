@@ -47,6 +47,12 @@ class Person(Base, ToString):
     uselist=False
   )
 
+  representative = relationship(
+    "Representative",
+    back_populates="person",
+    uselist=False
+)
+
   # 👇 Agregar relación con teléfonos
   phones = relationship(
     "Phone",

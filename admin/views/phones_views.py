@@ -5,66 +5,140 @@ from flask import Blueprint, flash, redirect, request, render_template
 from admin.configs.middlewares import only_logged
 from admin.services.phone_service import PhoneService
 from admin.services.worker_service import WorkerService
+from admin.services.representative_service import RepresentativeService
+# from admin.services.student_service import StudentService  # Comentado: clase aún no disponible
 
 views = Blueprint('admin-phone-views', __name__, template_folder='../templates')
+
+# Mapeo de tipos de entidad a sus servicios
+ENTITY_SERVICES = {
+  'worker': WorkerService,
+  'representative': RepresentativeService,
+  # 'student': StudentService,  # Comentado: clase aún no disponible
+}
+
+# Mapeo de tipos de entidad a sus rutas de redirección
+ENTITY_REDIRECTS = {
+  'worker': '/admin/workers',
+  'representative': '/admin/representatives',
+  # 'student': '/admin/students',  # Comentado: ruta aún no disponible
+}
+
+# Mapeo de tipos de entidad a sus nombres para mostrar
+ENTITY_NAMES = {
+  'worker': 'Trabajador',
+  'representative': 'Representante',
+  # 'student': 'Estudiante',  # Comentado: entidad aún no disponible
+}
+
+
+def get_entity_service(entity_type):
+  """Obtiene el servicio correspondiente al tipo de entidad"""
+  service = ENTITY_SERVICES.get(entity_type)
+  if not service:
+    return None
+  return service
+
+
+def get_entity_redirect(entity_type):
+  """Obtiene la ruta de redirección para el tipo de entidad"""
+  return ENTITY_REDIRECTS.get(entity_type, '/admin/dashboard')
+
+
+def get_entity_name(entity_type):
+  """Obtiene el nombre legible del tipo de entidad"""
+  return ENTITY_NAMES.get(entity_type, 'Entidad')
+
 
 @views.route("/admin/phones/new", methods=["GET"])
 @only_logged
 def phone_new():
-  worker_id = request.args.get('worker_id')
-
-  response = WorkerService.fetch_one(worker_id)
+  entity_type = request.args.get('entity_type', 'worker')
+  entity_id = request.args.get('worker_id') or request.args.get('representative_id') or request.args.get('student_id')
+  
+  if not entity_id:
+    flash("ID de entidad no proporcionado", "danger")
+    return redirect(get_entity_redirect(entity_type))
+  
+  service = get_entity_service(entity_type)
+  if not service:
+    flash("Tipo de entidad no válido", "danger")
+    return redirect('/admin/dashboard')
+  
+  response = service.fetch_one(entity_id)
 
   if not response["success"]:
     flash(response["message"], "danger")
-    return redirect("/admin/workers")
+    return redirect(get_entity_redirect(entity_type))
+  
+  entity_name = get_entity_name(entity_type)
   
   return render_template(
     "phones/new.html",
     locals={
-      "title": "Agregar Teléfono a Trabajador",
-      "nav_link": "worker-management",
-      "worker_id": worker_id,
+      "title": f"Agregar Teléfono a {entity_name}",
+      "nav_link": f"{entity_type}-management",
+      "entity_type": entity_type,
+      "entity_id": entity_id,
       "person": response["data"]["person"],
     }
   )
 
+
 @views.route("/admin/phones", methods=["POST"])
 @only_logged
 def phone_create():
-  worker_id = request.form.get('worker_id')
+  entity_type = request.form.get('entity_type', 'worker')
+  entity_id = request.form.get('worker_id') or request.form.get('representative_id') or request.form.get('student_id')
+  
+  if not entity_id:
+    flash("ID de entidad no proporcionado", "danger")
+    return redirect(get_entity_redirect(entity_type))
+  
   response = PhoneService.create(request.form)
 
   if response["success"]:
-    # En caso de que la persona se actualice pero no se encuentre su Worker
-    flash("Se ha agregado teléfono a trabajador", "success")
-    return redirect(f"/admin/workers/{worker_id}/edit")
+    flash("Se ha agregado teléfono", "success")
+    return redirect(f"/admin/{entity_type}s/{entity_id}/edit")
 
   flash(response["message"], "danger")
   return redirect(request.referrer)
+
 
 @views.route('/admin/phones/<int:phone_id>/edit', methods=["GET"])
 @only_logged
 def edit_phone(phone_id):
   """Muestra el formulario para editar un teléfono"""
-  worker_id = request.args.get('worker_id')
+  entity_type = request.args.get('entity_type', 'worker')
+  entity_id = request.args.get('worker_id') or request.args.get('representative_id') or request.args.get('student_id')
+  
+  if not entity_id:
+    flash("ID de entidad no proporcionado", "danger")
+    return redirect(get_entity_redirect(entity_type))
+  
+  service = get_entity_service(entity_type)
+  if not service:
+    flash("Tipo de entidad no válido", "danger")
+    return redirect('/admin/dashboard')
 
-  response = WorkerService.fetch_one(worker_id)
+  response = service.fetch_one(entity_id)
 
   if not response["success"]:
     flash(response["message"], "danger")
-    return redirect("/admin/workers")
+    return redirect(get_entity_redirect(entity_type))
 
   # Obtener datos del teléfono
   phone_result = PhoneService.fetch_one(phone_id)
 
   if not phone_result.get('success'):
     flash('Teléfono no encontrado', 'danger')
-    return redirect(f'/admin/workers/{worker_id}/edit' if worker_id else '/admin/workers')
+    return redirect(f'/admin/{entity_type}s/{entity_id}/edit')
   
   locals = {
     "phone": phone_result.get('data'),
-    "worker": response['data']
+    "entity": response['data'],
+    "entity_type": entity_type,
+    "entity_id": entity_id,
   }
 
   return render_template(
@@ -77,44 +151,56 @@ def edit_phone(phone_id):
 @only_logged
 def update_phone(phone_id):
   """Actualiza un teléfono"""
+  entity_type = request.form.get('entity_type', 'worker')
+  entity_id = request.form.get('worker_id') or request.form.get('representative_id') or request.form.get('student_id')
+  
+  if not entity_id:
+    flash("ID de entidad no proporcionado", "danger")
+    return redirect(get_entity_redirect(entity_type))
+  
   params = {
     'person_id': request.form.get('person_id'),
     'description': request.form.get('description'),
     'phone': request.form.get('phone')
   }
-  worker_id = request.form.get('worker_id')
 
   result = PhoneService.update(phone_id, params)
 
   if result.get('success'):
     flash('Teléfono actualizado exitosamente', 'success')
-    if worker_id:
-      return redirect(f'/admin/workers/{worker_id}/edit')
-    return redirect('/admin/workers')
+    return redirect(f'/admin/{entity_type}s/{entity_id}/edit')
   else:
     flash(f'Error al actualizar teléfono: {result.get("error", "Error desconocido")}', 'danger')
     # Volver al formulario con los datos
     phone_result = PhoneService.fetch_one(phone_id)
-    person_result = PersonService.fetch_one(params.get('person_id'))
+    service = get_entity_service(entity_type)
+    if service:
+      entity_result = service.fetch_one(entity_id)
+      entity_data = entity_result.get('data') if entity_result.get('success') else None
+    else:
+      entity_data = None
+      
     return render_template(
       'phones/edit.html',
-      phone=phone_result.get('data'),
-      person=person_result.get('data'),
-      worker_id=worker_id
+      locals={
+        'phone': phone_result.get('data'),
+        'entity': entity_data,
+        'entity_type': entity_type,
+        'entity_id': entity_id,
+      }
     )
 
 
 @views.route('/admin/phones/<int:phone_id>/delete', methods=["GET"])
 @only_logged
 def delete_phone(phone_id):
-  """Elimina un teléfono y redirige a la vista de edición del trabajador"""
+  """Elimina un teléfono y redirige a la vista de edición de la entidad correspondiente"""
+  entity_type = request.args.get('entity_type', 'worker')
+  entity_id = request.args.get('worker_id') or request.args.get('representative_id') or request.args.get('student_id')
 
-  # Obtener worker_id de los parámetros
-  worker_id = request.args.get('worker_id')
-
-  if not worker_id:
-    flash('No se pudo identificar el trabajador', 'warning')
-    return redirect('/admin/workers')
+  if not entity_id:
+    flash('No se pudo identificar la entidad', 'warning')
+    return redirect(get_entity_redirect(entity_type))
 
   # Eliminar el teléfono
   result = PhoneService.delete(phone_id)
@@ -124,6 +210,5 @@ def delete_phone(phone_id):
   else:
     flash(f'Error al eliminar teléfono: {result.get("error", "Error desconocido")}', 'danger')
 
-  # Redirigir a la edición del trabajador
-  return redirect(f'/admin/workers/{worker_id}/edit')
-  
+  # Redirigir a la edición de la entidad
+  return redirect(f'/admin/{entity_type}s/{entity_id}/edit')

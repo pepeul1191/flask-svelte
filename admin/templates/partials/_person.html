@@ -1,10 +1,9 @@
 {# admin/templates/partials/_person.html #}
-<form action="{% if locals.person %}/admin/workers/personal/{{ locals.person.id }}/edit{% else %}/admin/workers/personal{% endif %}" method="POST" class="card mb-4">
+<form
+  action="{% if locals.person %}/admin/{{locals.entity}}/personal/{{ locals.person.id }}/edit{% else %}/admin/{{locals.entity}}/personal{% endif %}"
+  method="POST" class="card mb-4">
 
-  <input
-    type="hidden"
-    name="csrf_token"
-    value="{{ csrf_token() }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
   {# Si estamos editando, enviamos el ID de la persona de forma oculta #}
   {% if locals.person %}
@@ -31,11 +30,9 @@
 
         <div class="text-center">
 
-          <img
-            id="imagePreview"
+          <img id="imagePreview"
             src="{{ config.URL_FILES_SERVICE }}/{{ locals.person.image_url if locals.person and locals.person.image_url else 'img/user.png' }}"
-            class="img-thumbnail mb-3"
-            style="width:220px;height:220px;object-fit:cover;">
+            class="img-thumbnail mb-3" style="width:220px;height:220px;object-fit:cover;">
 
         </div>
 
@@ -50,13 +47,8 @@
               Nombres
             </label>
 
-            <input
-              type="text"
-              name="names"
-              value="{{ locals.person.names if locals.person else '' }}"
-              class="form-control"
-              maxlength="45"
-              required>
+            <input type="text" name="names" value="{{ locals.person.names if locals.person else '' }}"
+              class="form-control" maxlength="45" required>
           </div>
 
           <div class="col-md-6">
@@ -64,13 +56,8 @@
               Apellidos
             </label>
 
-            <input
-              type="text"
-              name="last_names"
-              value="{{ locals.person.last_names if locals.person else '' }}"
-              class="form-control"
-              maxlength="45"
-              required>
+            <input type="text" name="last_names" value="{{ locals.person.last_names if locals.person else '' }}"
+              class="form-control" maxlength="45" required>
           </div>
 
           <div class="col-md-4">
@@ -78,15 +65,13 @@
               Tipo Documento
             </label>
 
-            <select
-              name="document_type_id"
-              class="form-select"
-              required>
+            <select name="document_type_id" class="form-select" required>
 
               <option value="">Seleccione...</option>
 
               {% for item in locals.document_types %}
-              <option value="{{ item.id }}" {{ 'selected' if locals.person and locals.person.document_type_id == item.id else '' }}>
+              <option value="{{ item.id }}" {{ 'selected' if locals.person and locals.person.document_type_id==item.id
+                else '' }}>
                 {{ item.name }}
               </option>
               {% endfor %}
@@ -100,12 +85,8 @@
               Número Documento
             </label>
 
-            <input
-              type="text"
-              name="document_number"
-              value="{{ locals.person.document_number if locals.person else '' }}"
-              class="form-control"
-              maxlength="12"
+            <input type="text" name="document_number"
+              value="{{ locals.person.document_number if locals.person else '' }}" class="form-control" maxlength="12"
               required>
           </div>
 
@@ -114,15 +95,12 @@
               Sexo
             </label>
 
-            <select
-              name="sex_id"
-              class="form-select"
-              required>
+            <select name="sex_id" class="form-select" required>
 
               <option value="">Seleccione...</option>
 
               {% for item in locals.sexes %}
-              <option value="{{ item.id }}" {{ 'selected' if locals.person and locals.person.sex_id == item.id else '' }}>
+              <option value="{{ item.id }}" {{ 'selected' if locals.person and locals.person.sex_id==item.id else '' }}>
                 {{ item.name }}
               </option>
               {% endfor %}
@@ -136,17 +114,15 @@
               Fecha de nacimiento
             </label>
 
-            <input
-              type="date"
-              name="birth_date"
-              value="{{ locals.person.birth_date if locals.person else '' }}"
+            <input type="date" name="birth_date" value="{{ locals.person.birth_date if locals.person else '' }}"
               class="form-control">
           </div>
 
           <div class="col-md-6">
             <div id="fileUploadContainer">
               <label class="form-label">Foto de Perfil</label>
-              <input type="hidden" name="image_url" id="uploadedImageUrl" value="{{ locals.person.image_url if locals.person and locals.person.image_url else 'img/user.png' }}">
+              <input type="hidden" name="image_url" id="uploadedImageUrl"
+                value="{{ locals.person.image_url if locals.person and locals.person.image_url else 'img/user.png' }}">
               <div class="d-flex gap-2 mb-2">
                 <button type="button" id="triggerFileButton" class="btn btn-outline-secondary flex-fill">
                   <i class="fa fa-folder-open me-1"></i> Buscar
@@ -186,7 +162,7 @@
 <input type="file" id="imageFile" name="image_file" style="display: none;">
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     if (typeof FileUpload === 'undefined') {
       console.error('FileUpload class not loaded!');
       return;
@@ -213,7 +189,7 @@
       extraParams: {
         folder: 'users'
       },
-      onSuccess: function(response) {
+      onSuccess: function (response) {
         document.getElementById('uploadedImageUrl').value = response.data.folder + '/' + response.data.filename;
         const previewImg = document.getElementById('imagePreview');
         if (previewImg && URLS.FILES + '/' + response.data.folder + '/' + response.data.filename) {
@@ -223,7 +199,7 @@
           document.getElementById('fileNameDisplay').dataset.imageUrl = URLS.FILES + '/' + response.data.folder + '/' + response.data.filename;
         }
       },
-      onViewClick: function(file, imageUrl) {
+      onViewClick: function (file, imageUrl) {
         const urlToView = imageUrl || document.getElementById('uploadedImageUrl').value;
         if (urlToView) {
           window.open(urlToView, '_blank');
@@ -236,7 +212,7 @@
         }
       }
     });
-    
+
     const existingImageUrl = document.getElementById('uploadedImageUrl')?.value;
     if (existingImageUrl && fileUpload.setExistingImageUrl) {
       fileUpload.setExistingImageUrl(existingImageUrl);

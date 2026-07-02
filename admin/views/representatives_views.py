@@ -1,38 +1,34 @@
-# admin/views/workers_view.py
+# admin/views/representative.py
 
 from flask import Blueprint, flash, render_template, request, redirect
 
 from admin.configs.middlewares import only_logged
 from admin.services.person_service import PersonService
-from admin.services.worker_service import WorkerService
+from admin.services.representative_service import RepresentativeService
 from admin.services.sex_service import SexService
 from admin.services.document_type_service import DocumentTypeService
-from admin.services.phone_service import PhoneService
-from admin.models.person import Person
 
 
 views = Blueprint(
-  "admin-workers-views",
+  "admin-representatives-views",
   __name__,
   template_folder="../templates"
 )
 
 
 # =====================
-# INDEX (LIST + SEARCH + PAGINATION)
+# INDEX
 # =====================
-@views.route("/admin/workers", methods=["GET"])
+@views.route("/admin/representatives", methods=["GET"])
 @only_logged
 def index():
 
   page = request.args.get("page", default=1, type=int)
   per_page = request.args.get("per_page", default=10, type=int)
 
-  # 🔥 NUEVOS FILTROS
   names = request.args.get("names", default="")
   last_names = request.args.get("last_names", default="")
   dni = request.args.get("dni", default="")
-  code = request.args.get("code", default="")
   email = request.args.get("email", default="")
 
   if page < 1:
@@ -41,48 +37,45 @@ def index():
   if per_page < 1:
     per_page = 10
 
-  response = WorkerService.fetch_all(
+  response = RepresentativeService.fetch_all(
     page=page,
     per_page=per_page,
     names=names,
     last_names=last_names,
     dni=dni,
-    code=code,
     email=email
   )
 
-  workers = []
+  representatives = []
 
   pagination = {
     "page": page,
     "per_page": per_page,
-    "total_workers": 0,
+    "total_representatives": 0,
     "total_pages": 0,
     "start_record": 0,
     "end_record": 0
   }
 
-  # 🔥 IMPORTANTE: enviamos filtros al template
   filters = {
     "names": names,
     "last_names": last_names,
     "dni": dni,
-    "code": code,
     "email": email
   }
 
   if response["success"]:
-    workers = response["data"]["workers"]
+    representatives = response["data"]["representatives"]
     pagination = response["data"]["pagination"]
   else:
     flash(response["message"], "danger")
 
   return render_template(
-    "workers/index.html",
+    "representatives/index.html",
     locals={
-      "title": "Trabajadores",
-      "nav_link": "worker-management",
-      "workers": workers,
+      "title": "Representantes",
+      "nav_link": "representative-management",
+      "representatives": representatives,
       "pagination": pagination,
       "filters": filters
     }
@@ -92,9 +85,10 @@ def index():
 # =====================
 # NEW
 # =====================
-@views.route("/admin/workers/new", methods=["GET"])
+@views.route("/admin/representatives/new", methods=["GET"])
 @only_logged
 def new():
+
   sexes_response = SexService.fetch_all()
   document_types_response = DocumentTypeService.fetch_all()
 
@@ -112,24 +106,23 @@ def new():
     flash(document_types_response["message"], "danger")
 
   return render_template(
-    "workers/new.html",
+    "representatives/new.html",
     locals={
-        "title": "Nuevo Trabajador",
-        "nav_link": "worker-management",
-        "sexes": sexes,
-        "document_types": document_types,
-      }
-    )
+      "title": "Nuevo Representante",
+      "nav_link": "representative-management",
+      "sexes": sexes,
+      "document_types": document_types
+    }
+  )
 
 
 # =====================
-# CREATE WORKER FROM PERSON
+# CREATE
 # =====================
-@views.route("/admin/workers/personal", methods=["POST"])
+@views.route("/admin/representatives/personal", methods=["POST"])
 @only_logged
 def create():
 
-  # 1. Crear la persona en PersonService
   person_response = PersonService.create({
     "names": request.form.get("names"),
     "last_names": request.form.get("last_names"),
@@ -142,41 +135,48 @@ def create():
 
   if not person_response["success"]:
     flash(person_response["message"], "danger")
-    return redirect("/admin/workers/new")
+    return redirect("/admin/representatives/new")
 
-  # 2. Con el id de la persona creada, se genera el registro del trabajador
   person_id = person_response["data"]["id"]
-  worker_response = WorkerService.create({
-    "code": request.form.get("document_number"),
+
+  representative_response = RepresentativeService.create({
     "email": request.form.get("email"),
+    "user_id": request.form.get("user_id"),
     "person_id": person_id
   })
 
-  if worker_response["success"]:
-    flash(worker_response["message"], "success")
-    worker_id = worker_response["data"]["id"]
-    return redirect(f"/admin/workers/{worker_id}/edit")
+  if representative_response["success"]:
+    flash(representative_response["message"], "success")
+    representative_id = representative_response["data"]["id"]
+    return redirect(
+      f"/admin/representatives/{representative_id}/edit"
+    )
 
-  flash(worker_response["message"], "danger")
-  return redirect("/admin/workers/new")
+  flash(representative_response["message"], "danger")
+  return redirect("/admin/representatives/new")
 
 
 # =====================
 # EDIT
 # =====================
-@views.route("/admin/workers/<int:worker_id>/edit", methods=["GET"])
+@views.route(
+  "/admin/representatives/<int:representative_id>/edit",
+  methods=["GET"]
+)
 @only_logged
-def edit(worker_id):
+def edit(representative_id):
 
-  response = WorkerService.fetch_one(worker_id)
+  response = RepresentativeService.fetch_one(
+    representative_id
+  )
 
   sexes_response = SexService.fetch_all()
   document_types_response = DocumentTypeService.fetch_all()
 
   if not response["success"]:
     flash(response["message"], "danger")
-    return redirect("/admin/workers")
-  
+    return redirect("/admin/representatives")
+
   sexes = []
   document_types = []
 
@@ -191,23 +191,26 @@ def edit(worker_id):
     flash(document_types_response["message"], "danger")
 
   return render_template(
-    "workers/edit.html",
+    "representatives/edit.html",
     locals={
-      "title": "Editar Trabajador",
-      "nav_link": "worker-management",
+      "title": "Editar Representante",
+      "nav_link": "representative-management",
       "record": response["data"],
       "person": response["data"]["person"],
       "sexes": sexes,
       "document_types": document_types,
-      "entity": "workers"
+      "entity": "representatives"
     }
   )
 
 
 # =====================
-# UPDATE
+# UPDATE PERSON
 # =====================
-@views.route("/admin/workers/personal/<int:person_id>/edit", methods=["POST"])
+@views.route(
+  "/admin/representatives/personal/<int:person_id>/edit",
+  methods=["POST"]
+)
 @only_logged
 def edit_personal(person_id):
 
@@ -222,55 +225,80 @@ def edit_personal(person_id):
   })
 
   if response["success"]:
-    # Buscamos el trabajador asociado a esa persona usando WorkerService
-    worker_response = WorkerService.fetch_by_person_id(person_id)
-    
-    if worker_response["success"]:
+
+    representative_response = (
+      RepresentativeService.fetch_by_person_id(
+        person_id
+      )
+    )
+
+    if representative_response["success"]:
       flash(response["message"], "success")
-      worker_id = worker_response["data"]["id"]
-      return redirect(f"/admin/workers/{worker_id}/edit")
-    
-    # En caso de que la persona se actualice pero no se encuentre su Worker
-    flash("Persona actualizada, pero no se encontró el trabajador asociado.", "warning")
+
+      representative_id = (
+        representative_response["data"]["id"]
+      )
+
+      return redirect(
+        f"/admin/representatives/{representative_id}/edit"
+      )
+
+    flash(
+      "Persona actualizada, pero no se encontró el representante asociado.",
+      "warning"
+    )
+
     return redirect(request.referrer)
 
   flash(response["message"], "danger")
   return redirect(request.referrer)
 
-@views.route("/admin/workers/<int:worker_id>/edit", methods=["POST"])
-@only_logged
-def edit_worker(worker_id):
 
-  response = WorkerService.update(worker_id, {
-    "code": request.form.get("code"),
-    "email": request.form.get("email"),
-    "user_id": request.form.get("user_id"),
-    "bio": request.form.get("bio"),
-  })
+# =====================
+# UPDATE REPRESENTATIVE
+# =====================
+@views.route(
+  "/admin/representatives/<int:representative_id>/edit",
+  methods=["POST"]
+)
+@only_logged
+def edit_representative(representative_id):
+
+  response = RepresentativeService.update(
+    representative_id,
+    {
+      "email": request.form.get("email"),
+      "user_id": request.form.get("user_id")
+    }
+  )
 
   if response["success"]:
-    # En caso de que la persona se actualice pero no se encuentre su Worker
-    flash("Trabajador actualizado.", "success")
-    return redirect(f"/admin/workers/{worker_id}/edit")
+    flash("Representante actualizado.", "success")
+    return redirect(
+      f"/admin/representatives/{representative_id}/edit"
+    )
 
   flash(response["message"], "danger")
   return redirect(request.referrer)
+
 
 # =====================
 # DELETE
 # =====================
 @views.route(
-  "/admin/workers/<int:worker_id>/delete",
+  "/admin/representatives/<int:representative_id>/delete",
   methods=["GET"]
 )
 @only_logged
-def delete(worker_id):
+def delete(representative_id):
 
-  response = WorkerService.delete(worker_id)
+  response = RepresentativeService.delete(
+    representative_id
+  )
 
   if response["success"]:
     flash(response["message"], "success")
   else:
     flash(response["message"], "danger")
 
-  return redirect("/admin/workers")
+  return redirect("/admin/representatives")

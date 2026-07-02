@@ -1,4 +1,4 @@
-{# admin/templates/workers/index.html #}
+{# admin/templates/representatives/index.html #}
 
 {% extends './layouts/admin_dashboard.html' %}
 
@@ -9,7 +9,7 @@
 
     <h3 class="mb-4">
       <i class="fa fa-users me-2"></i>
-      Gestión de Trabajadores
+      Gestión de Apoderadoes
     </h3>
 
     {% include 'partials/flash_messages.html' %}
@@ -26,7 +26,7 @@
 
       <div class="card-body">
 
-        <form method="GET" action="/admin/workers">
+        <form method="GET" action="/admin/representatives">
 
           <input type="hidden" name="per_page" value="{{ locals.pagination.per_page }}">
 
@@ -53,13 +53,6 @@
                 value="{{ locals.filters.dni or '' }}">
             </div>
 
-            <!-- CÓDIGO -->
-            <div class="col-md-4">
-              <label class="form-label">Código</label>
-              <input type="text" name="code" class="form-control" placeholder="Buscar por código..."
-                value="{{ locals.filters.code or '' }}">
-            </div>
-
             <!-- CORREO -->
             <div class="col-md-4">
               <label class="form-label">Correo</label>
@@ -75,7 +68,7 @@
                 Buscar
               </button>
 
-              <a href="/admin/workers" class="btn btn-outline-secondary">
+              <a href="/admin/representatives" class="btn btn-outline-secondary">
                 <i class="fa fa-refresh"></i>
                 Limpiar
               </a>
@@ -96,7 +89,7 @@
       <div class="card-header">
         <h6 class="mb-0">
           <i class="fa fa-users me-2"></i>
-          Lista de Trabajadores
+          Lista de Apoderadoes
         </h6>
       </div>
 
@@ -111,7 +104,7 @@
               Filas por página:
             </label>
 
-            <form method="GET" action="/admin/workers">
+            <form method="GET" action="/admin/representatives">
 
               <input type="hidden" name="search" value="{{ locals.search_query or '' }}">
 
@@ -139,20 +132,20 @@
 
           </div>
 
-          <a href="/admin/workers/new" class="btn btn-success">
+          <a href="/admin/representatives/new" class="btn btn-success">
 
             <i class="fa fa-plus"></i>
-            Agregar Trabajador
+            Agregar Apoderado
 
           </a>
 
         </div>
 
-        {% if locals.workers %}
+        {% if locals.representatives %}
 
         <div class="row g-3">
 
-          {% for worker in locals.workers %}
+          {% for representative in locals.representatives %}
 
           <div class="col-12 col-sm-6 col-lg-4 col-xl" style="min-width: 280px; max-width: 20%;">
 
@@ -165,11 +158,11 @@
                   <!-- FOTO -->
                   <div class="col-4 text-center">
 
-                    <img src="{% if worker.person.image_url %}
-                                {% if worker.person.image_url.startswith('http') %}
-                                {{ worker.person.image_url }}
+                    <img src="{% if representative.person.image_url %}
+                                {% if representative.person.image_url.startswith('http') %}
+                                {{ representative.person.image_url }}
                                 {% else %}
-                                {{ config.URL_FILES_SERVICE }}/{{ worker.person.image_url }}
+                                {{ config.URL_FILES_SERVICE }}/{{ representative.person.image_url }}
                                 {% endif %}
                             {% else %}
                                 {{ config.STATIC_URL }}/images/avatar.png
@@ -183,24 +176,19 @@
 
                     <h6 class="mb-2">
 
-                      {{ worker.person.names }}
-                      {{ worker.person.last_names }}
+                      {{ representative.person.names }}
+                      {{ representative.person.last_names }}
 
                     </h6>
 
                     <small class="d-block text-muted">
-                      <strong>Código:</strong>
-                      {{ worker.code }}
-                    </small>
-
-                    <small class="d-block text-muted">
                       <strong>Correo:</strong></br>
-                      {{ worker.email }}
+                      {{ representative.email }}
                     </small>
 
                     <small class="d-block text-muted">
-                      <strong>{{ worker.person.document_type.name }} :</strong>
-                      {{ worker.person.document_number }}
+                      <strong>{{ representative.person.document_type.name }} :</strong>
+                      {{ representative.person.document_number }}
                     </small>
 
                   </div>
@@ -213,15 +201,16 @@
 
                 <div class="d-grid gap-1">
 
-                  <a href="/admin/workers/{{ worker.id }}/edit" class="btn btn-outline-secondary btn-sm">
+                  <a href="/admin/representatives/{{ representative.id }}/edit"
+                    class="btn btn-outline-secondary btn-sm">
 
                     <i class="fa fa-edit"></i>
                     Editar
 
                   </a>
 
-                  <a href="/admin/workers/{{ worker.id }}/delete" class="btn btn-outline-danger btn-sm"
-                    onclick="return confirm('¿Eliminar trabajador?');">
+                  <a href="/admin/representatives/{{ representative.id }}/delete" class="btn btn-outline-danger btn-sm"
+                    onclick="return confirm('¿Eliminar Apoderado?');">
 
                     <i class="fa fa-trash"></i>
                     Eliminar
@@ -243,7 +232,7 @@
         {% else %}
 
         <div class="alert alert-info mb-0">
-          No se encontraron trabajadores.
+          No se encontraron Apoderadoes.
         </div>
 
         {% endif %}
@@ -269,7 +258,7 @@
             {{ locals.pagination.end_record }}
 
             de
-            {{ locals.pagination.total_workers }}
+            {{ locals.pagination.total_representatives }}
 
           </div>
 
@@ -278,28 +267,28 @@
 
               <li class="page-item {% if locals.pagination.page == 1 %}disabled{% endif %}">
                 <a class="page-link"
-                  href="/admin/workers?page=1&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
+                  href="/admin/representatives?page=1&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
                   Primero
                 </a>
               </li>
 
               <li class="page-item {% if locals.pagination.page == 1 %}disabled{% endif %}">
                 <a class="page-link"
-                  href="/admin/workers?page={{ locals.pagination.page - 1 }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
+                  href="/admin/representatives?page={{ locals.pagination.page - 1 }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
                   Anterior
                 </a>
               </li>
 
               <li class="page-item {% if locals.pagination.page == locals.pagination.total_pages %}disabled{% endif %}">
                 <a class="page-link"
-                  href="/admin/workers?page={{ locals.pagination.page + 1 }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
+                  href="/admin/representatives?page={{ locals.pagination.page + 1 }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
                   Siguiente
                 </a>
               </li>
 
               <li class="page-item {% if locals.pagination.page == locals.pagination.total_pages %}disabled{% endif %}">
                 <a class="page-link"
-                  href="/admin/workers?page={{ locals.pagination.total_pages }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
+                  href="/admin/representatives?page={{ locals.pagination.total_pages }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
                   Último
                 </a>
               </li>

@@ -17,13 +17,15 @@
   <div class="container-fluid">
 
     <h3 class="mb-4">
-      <a href="/admin/workers">
+      <a href="/admin/{{ locals.entity_type }}s">
         <i class="fa fa-users me-2"></i>
-        Gestión de Trabajadores
+        Gestión de {{ 'Trabajadores' if locals.entity_type == 'worker' else 'Apoderados' if locals.entity_type ==
+        'representative' else 'Estudiantes' if locals.entity_type == 'student' else 'Entidades' }}
       </a>
       /
-      <a href="/admin/workers/{{ worker_id }}/edit">
-        Editar Trabajador
+      <a href="/admin/{{ locals.entity_type }}s/{{ locals.entity_id }}/edit">
+        Editar {{ 'Trabajador' if locals.entity_type == 'worker' else 'Apoderado' if locals.entity_type ==
+        'representative' else 'Estudiante' if locals.entity_type == 'student' else 'Entidad' }}
       </a>
       /
       Editar Teléfono
@@ -36,19 +38,25 @@
       <div class="card-header">
         <h6 class="mb-0">
           <i class="fa fa-edit me-2"></i>
-          Editar Teléfono
+          Editar Teléfono de {{ 'Trabajador' if locals.entity_type == 'worker' else 'Apoderado' if locals.entity_type ==
+          'representative' else 'Estudiante' if locals.entity_type == 'student' else 'Entidad' }}
         </h6>
       </div>
 
       <div class="card-body">
 
-        <form action="/admin/phones/{{ locals.phone.id or ''}}/edit" method="POST" class="row g-3">
+        <form action="/admin/phones/{{ locals.phone.id or '' }}/edit" method="POST" class="row g-3">
 
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          
+
+          <!-- Entity Type (Hidden) -->
+          <input type="hidden" name="entity_type" value="{{ locals.entity_type or 'worker' }}">
+
+          <!-- Entity ID (Hidden) -->
+          <input type="hidden" name="{{ locals.entity_type }}_id" value="{{ locals.entity_id or '' }}">
+
           <!-- Person ID (Hidden) -->
-          <input type="hidden" name="person_id" value="{{ locals.worker.person_id }}">
-          <input type="hidden" name="worker_id" value="{{ locals.worker.id }}">
+          <input type="hidden" name="person_id" value="{{ locals.entity.person_id or '' }}">
 
           <!-- Description -->
           <div class="col-md-6">
@@ -56,13 +64,8 @@
               <i class="fa fa-tag me-1"></i>
               Descripción
             </label>
-            <input
-              type="text"
-              name="description"
-              class="form-control"
-              maxlength="40"
-              placeholder="Ej: Casa, Trabajo, Celular, etc."
-              value="{{ locals.phone.description or ''}}">
+            <input type="text" name="description" class="form-control" maxlength="40"
+              placeholder="Ej: Casa, Trabajo, Celular, etc." value="{{ locals.phone.description or '' }}">
             <small class="text-muted">Máximo 40 caracteres (opcional)</small>
           </div>
 
@@ -72,14 +75,8 @@
               <i class="fa fa-phone me-1"></i>
               Teléfono <span class="text-danger">*</span>
             </label>
-            <input
-              type="tel"
-              name="phone"
-              class="form-control"
-              maxlength="20"
-              placeholder="Ej: 999888777"
-              required
-              value="{{ locals.phone.phone }}">
+            <input type="tel" name="phone" class="form-control" maxlength="20" placeholder="Ej: 999888777" required
+              value="{{ locals.phone.phone or '' }}">
             <small class="text-muted">Máximo 20 caracteres (requerido)</small>
           </div>
 
@@ -91,7 +88,7 @@
               Actualizar
             </button>
 
-            <a href="/admin/workers/{{ locals.worker.id }}/edit" class="btn btn-warning ms-2">
+            <a href="/admin/{{ locals.entity_type }}s/{{ locals.entity_id }}/edit" class="btn btn-warning ms-2">
               <i class="fa fa-times me-2"></i>
               Cancelar
             </a>
