@@ -190,8 +190,8 @@
             <div class="input-group">
               <input type="hidden" id="user_id" name="user_id" value="{{ locals.record.user_id }}">
 
-              <input type="text" class="form-control" id="user_name" 
-                value="{% if locals.record.user_id %}Usuario ID: {{ locals.record.user_id }}{% else %}Sin usuario asociado{% endif %}" 
+              <input type="text" class="form-control" id="user_name"
+                value="{% if locals.record.user_id %}Usuario ID: {{ locals.record.user_id }}{% else %}Sin usuario asociado{% endif %}"
                 disabled>
 
               <button type="button" id="btn-link-user" class="btn btn-primary">
@@ -218,6 +218,12 @@
         <!-- BOTÓN GUARDAR DENTRO DEL BODY -->
         <!-- ========================= -->
         <div class="mt-4 text-end">
+          <a href="/admin/students/{{ locals.record.id }}/representatives" class="btn btn-warning">
+
+            <i class="fa fa-heart me-2"></i>
+            Apoderados
+
+          </a>
           <button class="btn btn-success">
             <i class="fa fa-save me-2"></i>
             Guardar

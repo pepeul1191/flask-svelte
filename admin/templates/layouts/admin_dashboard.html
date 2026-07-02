@@ -11,6 +11,8 @@
 
   <link rel="icon" type="image/x-icon" href="{{ config.STATIC_URL }}/favicon.ico">
 
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+
   <title>{{ locals.title if locals is defined and locals.title else "Bienvenido" }}</title>
 
   <link rel="stylesheet" href="{{ config.STATIC_URL }}/dist/simplemde.min.css">

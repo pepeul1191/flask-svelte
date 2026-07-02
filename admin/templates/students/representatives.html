@@ -1,0 +1,447 @@
+{# admin/templates/representatives/index.html #}
+
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_js %}
+<script>
+
+  async function associateRepresentative(studentId, representativeId, selectElement) {
+
+    const representativeRoleId = selectElement.value
+
+    const response = await fetch("/api/v1/student-representatives/associate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        student_id: studentId,
+        representative_id: representativeId,
+        representative_role_id: representativeRoleId
+      })
+    })
+
+    const result = await response.json()
+
+    showAlert(result)
+
+    if (result.success) {
+      location.reload()
+    }
+  }
+
+
+  async function unassociateRepresentative(relationId) {
+
+    const response = await fetch(
+      `/api/v1/student-representatives/${relationId}`,
+      {
+        method: "DELETE"
+      }
+    )
+
+    const result = await response.json()
+
+    showAlert(result)
+
+    if (result.success) {
+      location.reload()
+    }
+  }
+
+
+  async function updateRole(relationId, selectElement) {
+
+    const response = await fetch(
+      `/api/v1/student-representatives/${relationId}/role`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          representative_role_id: selectElement.value
+        })
+      }
+    )
+
+    const result = await response.json()
+
+    showAlert(result)
+  }
+
+  function showAlert(result) {
+
+    const type = result.success ? "success" : "danger"
+
+    const container = document.createElement("div")
+
+    container.className = `alert alert-${type} alert-dismissible fade show`
+
+    container.role = "alert"
+
+    container.innerHTML = `
+      ${result.message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `
+
+    document.body.prepend(container)
+  }
+
+</script>
+{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin/students">
+        <i class="fa fa-graduation-cap me-2"></i>
+        Gestión de Estudiantes
+      </a>
+      /
+      <a href="/admin/students/{{ locals.record.id }}/edit">
+        Editar Estudiante
+      </a>
+      /
+      Apoderados del Estudiante
+    </h3>
+
+    {% include 'partials/flash_messages.html' %}
+
+    <!-- FILTERS -->
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-filter me-2"></i>
+          Filtros de Búsqueda
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <form method="GET" action="/admin/students/{{ locals.record.id }}/representatives">
+
+          <input type="hidden" name="per_page" value="{{ locals.pagination.per_page }}">
+
+          <div class="row g-3 align-items-end">
+
+            <!-- NOMBRES -->
+            <div class="col-md-4">
+              <label class="form-label">Nombres</label>
+              <input type="text" name="names" class="form-control" placeholder="Buscar por nombres..."
+                value="{{ locals.filters.names or '' }}">
+            </div>
+
+            <!-- APELLIDOS -->
+            <div class="col-md-4">
+              <label class="form-label">Apellidos</label>
+              <input type="text" name="last_names" class="form-control" placeholder="Buscar por apellidos..."
+                value="{{ locals.filters.last_names or '' }}">
+            </div>
+
+            <!-- DNI -->
+            <div class="col-md-4">
+              <label class="form-label">DNI</label>
+              <input type="text" name="dni" class="form-control" placeholder="Buscar por DNI..."
+                value="{{ locals.filters.dni or '' }}">
+            </div>
+
+            <!-- CORREO -->
+            <div class="col-md-4">
+              <label class="form-label">Correo</label>
+              <input type="text" name="email" class="form-control" placeholder="Buscar por correo..."
+                value="{{ locals.filters.email or '' }}">
+            </div>
+
+            <!-- RELACIONADOS -->
+            <div class="col-md-4">
+              <label class="form-label">Relacionados</label>
+              <select name="related" class="form-select">
+                <option value="related" {% if locals.filters.related=='related' %}selected{% endif %}>Asociados
+                </option>
+                <option value="not_related" {% if locals.filters.related=='not_related' %}selected{% endif %}>No
+                  Asociados</option>
+                <option value="all" {% if locals.filters.related=='all' %}selected{% endif %}>Todos</option>
+              </select>
+            </div>
+
+
+            <!-- BOTONES -->
+            <div class="col-md-4 d-flex gap-2">
+
+              <button type="submit" class="btn btn-primary">
+                <i class="fa fa-search"></i>
+                Buscar
+              </button>
+
+              <a href="/admin/students/{{ locals.record.id }}/representatives" class="btn btn-outline-secondary">
+                <i class="fa fa-refresh"></i>
+                Limpiar
+              </a>
+
+            </div>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+    <!-- LIST -->
+    <div class="card">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-users me-2"></i>
+          Lista de Apoderadoes
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <!-- HEADER ACTIONS -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+          <div class="d-flex align-items-center">
+
+            <label class="form-label mb-0 me-2">
+              Filas por página:
+            </label>
+
+            <form method="GET" action="/admin/students/{{ locals.record.id }}/representative">
+
+              <input type="hidden" name="search" value="{{ locals.search_query or '' }}">
+
+              <select name="per_page" class="form-select" onchange="this.form.submit()">
+
+                <option value="5" {% if locals.pagination.per_page==5 %}selected{% endif %}>
+                  5
+                </option>
+
+                <option value="10" {% if locals.pagination.per_page==10 %}selected{% endif %}>
+                  10
+                </option>
+
+                <option value="25" {% if locals.pagination.per_page==25 %}selected{% endif %}>
+                  25
+                </option>
+
+                <option value="50" {% if locals.pagination.per_page==50 %}selected{% endif %}>
+                  50
+                </option>
+
+              </select>
+
+            </form>
+
+          </div>
+
+        </div>
+
+        {% if locals.representatives %}
+
+        <div class="row g-3">
+
+          {% for representative in locals.representatives %}
+
+          <div class="col-12 col-sm-6 col-lg-4 col-xl" style="min-width: 280px; max-width: 20%;">
+
+            <div class="card h-100 shadow-sm">
+
+              <div class="card-body">
+
+                <div class="row">
+
+                  <!-- FOTO -->
+                  <div class="col-4 text-center">
+
+                    <img src="{% if representative.person.image_url %}
+                                {% if representative.person.image_url.startswith('http') %}
+                                {{ representative.person.image_url }}
+                                {% else %}
+                                {{ config.URL_FILES_SERVICE }}/{{ representative.person.image_url }}
+                                {% endif %}
+                            {% else %}
+                                {{ config.STATIC_URL }}/images/avatar.png
+                            {% endif %}" alt="Foto" class="img-fluid rounded-circle border"
+                      style="width: 80px; height: 80px; object-fit: cover;">
+
+                  </div>
+
+                  <!-- DATOS -->
+                  <div class="col-8">
+
+                    <h6 class="mb-2">
+
+                      {{ representative.person.names }}
+                      {{ representative.person.last_names }}
+
+                    </h6>
+
+                    <small class="d-block text-muted">
+                      <strong>Correo:</strong></br>
+                      {{ representative.email }}
+                    </small>
+
+                    <small class="d-block text-muted">
+                      <strong>{{ representative.person.document_type.name }} :</strong>
+                      {{ representative.person.document_number }}
+                    </small>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div class="card-footer bg-white">
+
+                <div class="mb-2">
+
+                  <select class="form-select form-select-sm" onchange="
+        {% if representative.relation %}
+          updateRole({{ representative.relation.id }}, this)
+        {% endif %}
+      ">
+
+                    {% for role in locals.representative_roles %}
+
+                    <option value="{{ role.id }}" {% if representative.relation and
+                      representative.relation.representative_role.id==role.id %} selected {% endif %}>
+                      {{ role.name }}
+                    </option>
+
+                    {% endfor %}
+
+                  </select>
+
+                </div>
+
+                <div class="d-grid gap-1">
+
+                  {% if representative.relation %}
+
+                  <!-- EDITAR (confirmar cambio manual si quieres acción explícita) -->
+                  <button class="btn btn-outline-secondary btn-sm" onclick="updateRole(
+        {{ representative.relation.id }},
+        this.parentElement.previousElementSibling.querySelector('select')
+      )">
+                    Editar
+                  </button>
+
+                  <!-- QUITAR -->
+                  <button class="btn btn-outline-danger btn-sm"
+                    onclick="unassociateRepresentative({{ representative.relation.id }})">
+                    Quitar
+                  </button>
+
+                  {% else %}
+
+                  <!-- ASOCIAR -->
+                  <button class="btn btn-outline-primary btn-sm" onclick="associateRepresentative(
+        {{ locals.record.id }},
+        {{ representative.id }},
+        this.parentElement.previousElementSibling.querySelector('select')
+      )">
+                    Asociar
+                  </button>
+
+                  {% endif %}
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="alert alert-info mb-0">
+          No se encontraron Apoderadoes.
+        </div>
+
+        {% endif %}
+
+      </div>
+
+      {% if locals.pagination.total_pages > 1 %}
+
+      <div class="card-footer">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+          <div class="text-muted">
+
+            Página {{ locals.pagination.page }}
+            de {{ locals.pagination.total_pages }}
+
+            -
+
+            Mostrando registros
+            {{ locals.pagination.start_record }}
+            a
+            {{ locals.pagination.end_record }}
+
+            de
+            {{ locals.pagination.total_representatives }}
+
+          </div>
+
+          <nav>
+            <ul class="pagination mb-0">
+
+              <li class="page-item {% if locals.pagination.page == 1 %}disabled{% endif %}">
+                <a class="page-link"
+                  href="/admin/students/{{ locals.record.id }}/representative?page=1&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
+                  Primero
+                </a>
+              </li>
+
+              <li class="page-item {% if locals.pagination.page == 1 %}disabled{% endif %}">
+                <a class="page-link"
+                  href="/admin/students/{{ locals.record.id }}/representative?page={{ locals.pagination.page - 1 }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
+                  Anterior
+                </a>
+              </li>
+
+              <li class="page-item {% if locals.pagination.page == locals.pagination.total_pages %}disabled{% endif %}">
+                <a class="page-link"
+                  href="/admin/students/{{ locals.record.id }}/representative?page={{ locals.pagination.page + 1 }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
+                  Siguiente
+                </a>
+              </li>
+
+              <li class="page-item {% if locals.pagination.page == locals.pagination.total_pages %}disabled{% endif %}">
+                <a class="page-link"
+                  href="/admin/students/{{ locals.record.id }}/representative?page={{ locals.pagination.total_pages }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
+                  Último
+                </a>
+              </li>
+
+            </ul>
+          </nav>
+
+        </div>
+
+      </div>
+
+      {% endif %}
+
+    </div>
+
+
+  </div>
+</main>
+{% endblock %}

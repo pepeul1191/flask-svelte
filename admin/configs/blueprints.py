@@ -10,7 +10,8 @@ from admin.views.addresses_views import views as addresses_views
 from admin.views.representatives_views import views as representatives_views
 from admin.views.students_views import views as students_views
 # apis
-from admin.apis.district_apis import apis as district_apis
+from admin.apis.districts_apis import apis as district_apis
+from admin.apis.representative_student_role_apis import apis as representative_student_role_apis
 
 blueprints = [
   # views
@@ -25,4 +26,5 @@ blueprints = [
   students_views,
   # apis
   district_apis,
+  representative_student_role_apis,
 ]

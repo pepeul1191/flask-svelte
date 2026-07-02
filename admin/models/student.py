@@ -44,6 +44,12 @@ class Student(Base, ToString):
     back_populates="student"
   )
 
+  representative_roles = relationship(
+    "RepresentativeStudentRole",
+    back_populates="student",
+    cascade="all, delete-orphan"
+  )
+
   def to_dict(self):
     return {
       "id": self.id,

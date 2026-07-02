@@ -1,5 +1,6 @@
 # admin/views/students_views.py
 
+from admin.services.representative_student_role_service import RepresentativeStudentRoleService
 from flask import Blueprint, flash, render_template, request, redirect
 
 from admin.configs.middlewares import only_logged
@@ -7,8 +8,7 @@ from admin.services.person_service import PersonService
 from admin.services.student_service import StudentService
 from admin.services.sex_service import SexService
 from admin.services.document_type_service import DocumentTypeService
-from admin.services.phone_service import PhoneService
-from admin.models.person import Person
+from admin.services.representative_role_service import RepresentativeRoleService
 
 
 views = Blueprint(
@@ -279,3 +279,85 @@ def delete(student_id):
     flash(response["message"], "danger")
 
   return redirect("/admin/students")
+
+
+# =====================
+# SHOW STUDENT REPRESENTATIVES
+# =====================
+@views.route("/admin/students/<int:student_id>/representatives", methods=["GET"])
+@only_logged
+def show_representatives(student_id):
+  page = request.args.get("page", default=1, type=int)
+  per_page = request.args.get("per_page", default=10, type=int)
+
+  names = request.args.get("names", default="")
+  last_names = request.args.get("last_names", default="")
+  dni = request.args.get("dni", default="")
+  email = request.args.get("email", default="")
+  related = request.args.get("related", default="related")
+
+  student_response = StudentService.fetch_one(student_id)
+
+  representative_roles_response = RepresentativeRoleService.fetch_all()
+
+  if page < 1:
+    page = 1
+
+  if per_page < 1:
+    per_page = 10
+
+  response = RepresentativeStudentRoleService.fetch_by_student(
+    page=page,
+    per_page=per_page,
+    names=names,
+    last_names=last_names,
+    dni=dni,
+    email=email,
+    related=related,
+    student_id=student_id,
+  )
+
+  representatives = []
+
+  pagination = {
+    "page": page,
+    "per_page": per_page,
+    "total_representatives": 0,
+    "total_pages": 0,
+    "start_record": 0,
+    "end_record": 0
+  }
+
+  filters = {
+    "names": names,
+    "last_names": last_names,
+    "dni": dni,
+    "email": email,
+    "related": related
+  }
+
+  if response["success"]:
+    representatives = response["data"]["representatives"]
+    pagination = response["data"]["pagination"]
+  else:
+    flash(response["message"], "danger")
+
+  if not student_response["success"]:
+    flash(student_response["message"], "danger")
+    return redirect("/admin/students")
+
+  print(representatives)
+  print(representative_roles_response["data"])
+
+  return render_template(
+    "students/representatives.html",
+    locals={
+      "title": "Apoderados del Estudiante",
+      "nav_link": "student-management",
+      "representatives": representatives,
+      "pagination": pagination,
+      "representative_roles": representative_roles_response["data"],
+      "filters": filters,
+      "record": student_response["data"]
+    }
+  )

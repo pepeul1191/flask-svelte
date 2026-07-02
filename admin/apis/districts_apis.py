@@ -1,4 +1,4 @@
-# admin/apis/locations.py
+# admin/apis/districts_apis.py
 
 from flask import Blueprint, jsonify, request
 
