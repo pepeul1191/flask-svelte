@@ -31,6 +31,12 @@ ENTITY_NAMES = {
   'student': 'Estudiante',  # Comentado: entidad aún no disponible
 }
 
+ENTITY_ICONS = {
+  'worker': 'briefcase',
+  'representative': 'heart',
+  'student': 'graduation-cap',  # Comentado: entidad aún no disponible
+}
+
 
 def get_entity_service(entity_type):
   """Obtiene el servicio correspondiente al tipo de entidad"""
@@ -48,6 +54,10 @@ def get_entity_redirect(entity_type):
 def get_entity_name(entity_type):
   """Obtiene el nombre legible del tipo de entidad"""
   return ENTITY_NAMES.get(entity_type, 'Entidad')
+
+def get_entity_icon(entity_type):
+  """Obtiene el nombre legible del tipo de entidad"""
+  return ENTITY_ICONS.get(entity_type, 'Entidad')
 
 
 @views.route("/admin/phones/new", methods=["GET"])
@@ -80,6 +90,7 @@ def phone_new():
       "nav_link": f"{entity_type}-management",
       "entity_type": entity_type,
       "entity_id": entity_id,
+      "icon": get_entity_icon(entity_type),
       "person": response["data"]["person"],
     }
   )
@@ -139,6 +150,8 @@ def edit_phone(phone_id):
     "entity": response['data'],
     "entity_type": entity_type,
     "entity_id": entity_id,
+    "nav_link": f"{entity_type}-management",
+    "icon": get_entity_icon(entity_type),
   }
 
   return render_template(

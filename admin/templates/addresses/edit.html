@@ -73,7 +73,7 @@
 
       <div class="card-header">
         <h6 class="mb-0">
-          <i class="fa fa-edit me-2"></i>
+          <i class="fa fa-{{ locals.icon }} me-2"></i>
           Editar Dirección de {{ 'Trabajador' if locals.entity_type == 'worker' else 'Apoderado' if locals.entity_type
           == 'representative' else 'Estudiante' if locals.entity_type == 'student' else 'Entidad' }}
         </h6>

@@ -18,7 +18,7 @@
 
     <h3 class="mb-4">
       <a href="/admin/{{ locals.entity_type }}s">
-        <i class="fa fa-users me-2"></i>
+        <i class="fa fa-{{ locals.icon }} me-2"></i>
         Gestión de {{ 'Trabajadores' if locals.entity_type == 'worker' else 'Apoderados' if locals.entity_type ==
         'representative' else 'Estudiantes' if locals.entity_type == 'student' else 'Entidades' }}
       </a>
