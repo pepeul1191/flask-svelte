@@ -1,0 +1,47 @@
+{# admin/templates/students/new.html #}
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin/representatives">
+        <i class="fa fa-heart me-2"></i>
+        Gestión de Apoderados
+      </a>
+      /
+      Nuevo Apoderado
+    </h3>
+
+    {% include 'partials/flash_messages.html' %}
+
+    <!-- ========================= -->
+    <!-- DATOS PERSONALES -->
+    <!-- ========================= -->
+
+    {% include 'partials/_person.html' %}
+
+    <!-- ========================= -->
+    <!-- BOTÓN CANCELAR AL FINAL -->
+    <!-- ========================= -->
+    <div class="mt-3 text-end">
+
+      <a href="/admin/representatives" class="btn btn-warning">
+
+        <i class="fa fa-times me-2"></i>
+        Cancelar
+
+      </a>
+    </div>
+
+  </div>
+</main>
+{% endblock %}
