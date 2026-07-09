@@ -234,6 +234,114 @@
 
     </form>
 
+    <div class="card mb-4">
+
+      <div class="card-header d-flex justify-content-between align-items-center">
+
+        <h6 class="mb-0">
+          <i class="fa fa-heart me-2"></i>
+          Apoderados
+        </h6>
+
+        <a href="/admin/students/{{ locals.record.id }}/representatives" class="btn btn-success btn-sm">
+
+          <i class="fa fa-heart me-1"></i>
+          Administrar Apoderados
+
+        </a>
+
+      </div>
+
+      <div class="card-body">
+
+        {% if locals.representatives and locals.representatives|length > 0 %}
+
+        <div class="table-responsive">
+
+          <table class="table table-striped table-hover">
+
+            <thead>
+
+              <tr>
+
+                <th>Apoderado</th>
+                <th>Documento</th>
+                <th>Correo</th>
+                <th>Parentesco</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {% for representative in locals.representatives %}
+
+              <tr>
+
+                <td>
+
+                  {{ representative.person.names }}
+                  {{ representative.person.last_names }}
+
+                </td>
+
+                <td>
+
+                  {{ representative.person.document_type.name }}
+                  {{ representative.person.document_number }}
+
+                </td>
+
+                <td>
+
+                  {{ representative.email or "Sin correo" }}
+
+                </td>
+
+                <td>
+
+                  {{ representative.relation.representative_role.name }}
+
+                </td>
+
+              </tr>
+
+              {% endfor %}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="text-center py-3">
+
+          <i class="fa fa-users fa-2x text-muted mb-2 d-block"></i>
+
+          <p class="text-muted mb-0">
+
+            No hay apoderados registrados para este estudiante.
+
+          </p>
+
+          <a href="/admin/students/{{ locals.record.id }}/representatives" class="btn btn-primary btn-sm mt-2">
+
+            <i class="fa fa-heart me-1"></i>
+            Administrar Apoderados
+
+          </a>
+
+        </div>
+
+        {% endif %}
+
+      </div>
+
+    </div>
+
     <!-- ========================= -->
     <!-- DIRECCIONES -->
     <!-- ========================= -->

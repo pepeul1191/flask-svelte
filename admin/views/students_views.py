@@ -174,6 +174,7 @@ def edit(student_id):
 
   sexes_response = SexService.fetch_all()
   document_types_response = DocumentTypeService.fetch_all()
+  representative_roles_response = RepresentativeStudentRoleService.fetch_by_student(student_id=student_id, related="related")
 
   if not response["success"]:
     flash(response["message"], "danger")
@@ -201,7 +202,8 @@ def edit(student_id):
       "person": response["data"]["person"],
       "sexes": sexes,
       "document_types": document_types,
-      "entity": "students"
+      "entity": "students",
+      "representatives": representative_roles_response["data"]["representatives"]
     }
   )
 
