@@ -3,6 +3,7 @@
 from flask import Blueprint, request, jsonify
 
 from admin.configs.middlewares import only_logged
+from main.application import csrf
 from admin.services.representative_student_role_service import (
   RepresentativeStudentRoleService
 )
@@ -15,9 +16,8 @@ apis = Blueprint(
 
 
 @apis.route("/api/v1/student-representatives/associate", methods=["POST"])
-@only_logged
+@csrf.exempt
 def associate():
-
   data = request.get_json()
 
   result = RepresentativeStudentRoleService.create({
@@ -30,7 +30,7 @@ def associate():
 
 
 @apis.route("/api/v1/student-representatives/<int:relation_id>", methods=["DELETE"])
-@only_logged
+@csrf.exempt
 def unassociate(relation_id):
 
   result = RepresentativeStudentRoleService.delete(relation_id)
@@ -39,7 +39,7 @@ def unassociate(relation_id):
 
 
 @apis.route("/api/v1/student-representatives/<int:relation_id>/role", methods=["PUT"])
-@only_logged
+@csrf.exempt
 def update_role(relation_id):
 
   data = request.get_json()

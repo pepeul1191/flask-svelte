@@ -5,8 +5,7 @@
 {% block extra_js %}
 <script>
 
-  async function associateRepresentative(studentId, representativeId, selectElement) {
-
+  async function associateRepresentative(studentId, representativeId, selectElement, buttonElement) {
     const representativeRoleId = selectElement.value
 
     const response = await fetch("/api/v1/student-representatives/associate", {
@@ -26,12 +25,23 @@
     showAlert(result)
 
     if (result.success) {
-      location.reload()
+      buttonElement.classList.remove("btn-outline-primary")
+      buttonElement.classList.add("btn-outline-danger")
+
+      buttonElement.innerHTML = `
+      <i class="fa fa-user-times me-1"></i>
+      Quitar Apoderado
+    `
+
+      // Guardar el nuevo relationId que devuelve el backend
+      buttonElement.setAttribute(
+        "onclick",
+        `unassociateRepresentative(${result.data.id}, this)`
+      )
     }
   }
 
-
-  async function unassociateRepresentative(relationId) {
+  async function unassociateRepresentative(relationId, buttonElement) {
 
     const response = await fetch(
       `/api/v1/student-representatives/${relationId}`,
@@ -45,7 +55,23 @@
     showAlert(result)
 
     if (result.success) {
-      location.reload()
+      // Cambiar select al valor por defecto
+      const select = buttonElement.parentElement
+        .previousElementSibling
+        .querySelector("select")
+
+      if (select) {
+        select.value = ""
+      }
+
+      // Cambiar botón a Asociar
+      buttonElement.classList.remove("btn-outline-danger")
+      buttonElement.classList.add("btn-outline-primary")
+
+      buttonElement.innerHTML = `
+      <i class="fa fa-user-plus me-1"></i>
+      Asociar Apoderado
+    `
     }
   }
 
@@ -81,11 +107,19 @@
     container.role = "alert"
 
     container.innerHTML = `
-      ${result.message}
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `
+    ${result.message}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  `
 
-    document.body.prepend(container)
+    document.getElementById("alert-box").prepend(container)
+
+    setTimeout(() => {
+      container.classList.remove("show")
+
+      setTimeout(() => {
+        container.remove()
+      }, 150)
+    }, 5000)
   }
 
 </script>
@@ -193,13 +227,14 @@
 
     </div>
 
+    <div id="alert-box"></div>
     <!-- LIST -->
     <div class="card">
 
       <div class="card-header">
         <h6 class="mb-0">
           <i class="fa fa-users me-2"></i>
-          Lista de Apoderadoes
+          Lista de Apoderados
         </h6>
       </div>
 
@@ -214,7 +249,7 @@
               Filas por página:
             </label>
 
-            <form method="GET" action="/admin/students/{{ locals.record.id }}/representative">
+            <form method="GET" action="/admin/students/{{ locals.record.id }}/representatives">
 
               <input type="hidden" name="search" value="{{ locals.search_query or '' }}">
 
@@ -285,7 +320,7 @@
                     </h6>
 
                     <small class="d-block text-muted">
-                      <strong>Correo:</strong></br>
+                      <strong>Correo:</strong><br>
                       {{ representative.email }}
                     </small>
 
@@ -302,56 +337,48 @@
 
               <div class="card-footer bg-white">
 
+                <!-- SELECTOR DE ROL SIEMPRE VISIBLE -->
                 <div class="mb-2">
+                  <select class="form-select form-select-sm" {% if representative.relation %}
+                    onchange="updateRole({{ representative.relation.id }}, this)" {% endif %}>
 
-                  <select class="form-select form-select-sm" onchange="
-        {% if representative.relation %}
-          updateRole({{ representative.relation.id }}, this)
-        {% endif %}
-      ">
-
-                    {% for role in locals.representative_roles %}
-
-                    <option value="{{ role.id }}" {% if representative.relation and
-                      representative.relation.representative_role.id==role.id %} selected {% endif %}>
-                      {{ role.name }}
+                    <option value="" {% if not representative.relation %}selected{% endif %}>
+                      Seleccionar rol
                     </option>
 
+                    {% for role in locals.representative_roles %}
+                    <option value="{{ role.id }}" {% if representative.relation and
+                      representative.relation.representative_role.id==role.id %}selected{% endif %}>
+                      {{ role.name }}
+                    </option>
                     {% endfor %}
 
                   </select>
-
                 </div>
 
+                <!-- BOTONES SIEMPRE VISIBLES -->
                 <div class="d-grid gap-1">
 
-                  {% if representative.relation %}
-
-                  <!-- EDITAR (confirmar cambio manual si quieres acción explícita) -->
-                  <button class="btn btn-outline-secondary btn-sm" onclick="updateRole(
-        {{ representative.relation.id }},
-        this.parentElement.previousElementSibling.querySelector('select')
-      )">
-                    Editar
-                  </button>
-
+                  {% if representative.relation.id %}
                   <!-- QUITAR -->
                   <button class="btn btn-outline-danger btn-sm"
-                    onclick="unassociateRepresentative({{ representative.relation.id }})">
-                    Quitar
+                    onclick="unassociateRepresentative({{ representative.relation.id }}, this)">
+                    <i class="fa fa-user-times me-1"></i>
+                    Quitar Apoderado
                   </button>
+                  {% endif %}
 
-                  {% else %}
-
+                  {% if not representative.relation.id %}
                   <!-- ASOCIAR -->
                   <button class="btn btn-outline-primary btn-sm" onclick="associateRepresentative(
-        {{ locals.record.id }},
-        {{ representative.id }},
-        this.parentElement.previousElementSibling.querySelector('select')
-      )">
-                    Asociar
+                      {{ locals.record.id }},
+                      {{ representative.id }},
+                      this.parentElement.previousElementSibling.querySelector('select'),
+                      this
+                    )">
+                    <i class="fa fa-user-plus me-1"></i>
+                    Asociar Apoderado
                   </button>
-
                   {% endif %}
 
                 </div>
@@ -369,7 +396,7 @@
         {% else %}
 
         <div class="alert alert-info mb-0">
-          No se encontraron Apoderadoes.
+          No se encontraron Apoderados.
         </div>
 
         {% endif %}
@@ -404,28 +431,28 @@
 
               <li class="page-item {% if locals.pagination.page == 1 %}disabled{% endif %}">
                 <a class="page-link"
-                  href="/admin/students/{{ locals.record.id }}/representative?page=1&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
+                  href="/admin/students/{{ locals.record.id }}/representatives?page=1&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
                   Primero
                 </a>
               </li>
 
               <li class="page-item {% if locals.pagination.page == 1 %}disabled{% endif %}">
                 <a class="page-link"
-                  href="/admin/students/{{ locals.record.id }}/representative?page={{ locals.pagination.page - 1 }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
+                  href="/admin/students/{{ locals.record.id }}/representatives?page={{ locals.pagination.page - 1 }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
                   Anterior
                 </a>
               </li>
 
               <li class="page-item {% if locals.pagination.page == locals.pagination.total_pages %}disabled{% endif %}">
                 <a class="page-link"
-                  href="/admin/students/{{ locals.record.id }}/representative?page={{ locals.pagination.page + 1 }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
+                  href="/admin/students/{{ locals.record.id }}/representatives?page={{ locals.pagination.page + 1 }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
                   Siguiente
                 </a>
               </li>
 
               <li class="page-item {% if locals.pagination.page == locals.pagination.total_pages %}disabled{% endif %}">
                 <a class="page-link"
-                  href="/admin/students/{{ locals.record.id }}/representative?page={{ locals.pagination.total_pages }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
+                  href="/admin/students/{{ locals.record.id }}/representatives?page={{ locals.pagination.total_pages }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
                   Último
                 </a>
               </li>

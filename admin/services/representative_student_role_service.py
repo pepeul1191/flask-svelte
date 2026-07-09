@@ -479,6 +479,8 @@ class RepresentativeStudentRoleService(ApplicationService):
       )
 
     except SQLAlchemyError as e:
+      
+
       db.rollback()
 
       return cls.handle_error(

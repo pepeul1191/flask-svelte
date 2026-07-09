@@ -30,7 +30,6 @@ def logged_go_admin(fn):
 
 def not_found(e):
   path = request.path
-
   static_extensions = ('.css', '.js', '.woff', '.png', '.jpg', '.jpeg', '.svg', '.ico')
 
   # 1. ARCHIVOS ESTÁTICOS → cortar respuesta silenciosa

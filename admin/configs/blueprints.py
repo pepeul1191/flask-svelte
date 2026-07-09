@@ -26,5 +26,5 @@ blueprints = [
   students_views,
   # apis
   district_apis,
-  representative_student_role_apis,
+ representative_student_role_apis,
 ]

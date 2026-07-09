@@ -346,8 +346,8 @@ def show_representatives(student_id):
     flash(student_response["message"], "danger")
     return redirect("/admin/students")
 
-  print(representatives)
-  print(representative_roles_response["data"])
+  # print(representatives)
+  # print(representative_roles_response["data"])
 
   return render_template(
     "students/representatives.html",

@@ -1,0 +1,13 @@
+@baseUrl = http://localhost:3000/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczOTQ2OTgzMCwianRpIjoiZjZlMjA1NjctMzI3OS00NTQ2LTkyMDItZjRkYzhmYmVlMDI5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IlVTRVIxIiwibmJmIjoxNzM5NDY5ODMwLCJjc3JmIjoiNjFjNzRiMDAtMjE0Ni00MzgxLWEwNDktZDAyNWI2ZTZjNjJiIiwiZXhwIjoxNzM5NDcxNjMwfQ.1-w95tPfgIESwXENXrFp63zY1IhdQy31ouknPLtp--4
+
+### Asociar un apoderado a un estudiante
+POST {{baseUrl}}/v1/student-representatives/associate
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "student_id": 1,
+  "representative_id": 1,
+  "representative_role_id": 1
+}

@@ -70,3 +70,19 @@ def handle_csrf_error(e):
 
   flash("Error de validación CSRF.", "danger")
   return redirect(request.referrer or "/")
+
+@APP.route("/api/routes", methods=["GET"])
+def show_routes():
+  routes = []
+
+  for rule in APP.url_map.iter_rules():
+    routes.append({
+      "endpoint": rule.endpoint,
+      "route": str(rule),
+      "methods": list(rule.methods)
+    })
+
+  return jsonify({
+    "success": True,
+    "routes": routes
+  })
