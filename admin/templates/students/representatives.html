@@ -122,6 +122,112 @@
     }, 5000)
   }
 
+  async function showRepresentativeDetail(event, representativeId) {
+    event.preventDefault()
+
+    const modal = new bootstrap.Modal(
+      document.getElementById("representativeDetailModal")
+    )
+
+    const content = document.getElementById(
+      "representative-detail-content"
+    )
+
+    content.innerHTML = "Cargando..."
+
+    modal.show()
+
+    try {
+
+      const response = await fetch(
+        `/api/v1/representatives/${representativeId}`
+      )
+
+      const result = await response.json()
+
+      if (!result.success) {
+        content.innerHTML = `
+        <div class="alert alert-danger">
+          ${result.message}
+        </div>
+      `
+        return
+      }
+
+      const representative = result.data
+      const person = representative.person
+
+      content.innerHTML = `
+      <div class="row">
+
+        <div class="col-md-4 text-center">
+          <img 
+            src="${URLS.FILES}/${person.image_url}"
+            class="img-fluid rounded-circle border"
+            style="width:120px;height:120px;object-fit:cover;">
+        </div>
+
+        <div class="col-md-8">
+
+          <h5>
+            ${person.names} ${person.last_names}
+          </h5>
+
+          <p>
+            <strong>Documento:</strong>
+            ${person.document_type.name}
+            ${person.document_number}
+          </p>
+
+          <p>
+            <strong>Correo:</strong>
+            ${representative.email}
+          </p>
+
+          <p>
+            <strong>Fecha nacimiento:</strong>
+            ${person.birth_date}
+          </p>
+
+        </div>
+
+      </div>
+
+      <hr>
+
+      <h6>Teléfonos</h6>
+      <ul>
+        ${person.phones.map(phone => `
+          <li>
+            ${phone.phone}
+            ${phone.description ? `(${phone.description})` : ""}
+          </li>
+        `).join("")}
+      </ul>
+
+      <h6>Direcciones</h6>
+      <ul>
+        ${person.addresses.map(address => `
+          <li>
+            ${address.address}
+            - ${address.district.name}
+          </li>
+        `).join("")}
+      </ul>
+    `
+
+    } catch (error) {
+
+      content.innerHTML = `
+      <div class="alert alert-danger">
+        Error cargando información
+      </div>
+    `
+
+      console.error(error)
+    }
+  }
+
 </script>
 {% endblock %}
 
@@ -317,6 +423,13 @@
                       {{ representative.person.names }}
                       {{ representative.person.last_names }}
 
+                      <br>
+
+                      <a href="#" class="small text-primary"
+                        onclick="showRepresentativeDetail(event, {{ representative.id }})">
+                        Ver detalles
+                      </a>
+
                     </h6>
 
                     <small class="d-block text-muted">
@@ -471,4 +584,27 @@
 
   </div>
 </main>
+
+<div class="modal fade" id="representativeDetailModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">
+          Detalles del representante
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <div id="representative-detail-content">
+          Cargando...
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
 {% endblock %}

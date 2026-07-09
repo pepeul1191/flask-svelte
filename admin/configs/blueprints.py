@@ -12,6 +12,7 @@ from admin.views.students_views import views as students_views
 # apis
 from admin.apis.districts_apis import apis as district_apis
 from admin.apis.representative_student_role_apis import apis as representative_student_role_apis
+from admin.apis.representatives_apis import apis as representatives_apis
 
 blueprints = [
   # views
@@ -26,5 +27,6 @@ blueprints = [
   students_views,
   # apis
   district_apis,
- representative_student_role_apis,
+  representative_student_role_apis,
+  representatives_apis
 ]
