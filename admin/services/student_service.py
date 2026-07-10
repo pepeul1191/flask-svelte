@@ -191,22 +191,22 @@ class StudentService(ApplicationService):
     db = SessionLocal()
 
     try:
-      student = db.query(Student).filter(Student.id == student_id).first()
-      if not student:
-        return cls.handle_not_found("Estudiante no encontrado")
+        student = db.query(Student).filter(Student.id == student_id).first()
+        if not student:
+            return cls.handle_not_found("Estudiante no encontrado")
 
-      return cls.build_response(
-        data=student.to_dict(),
-        message="Estudiante encontrado"
-      )
+        return cls.build_response(
+            data=student.to_dict(),
+            message="Estudiante encontrado"
+        )
 
     except SQLAlchemyError as e:
-      return cls.handle_error(
-        f"Error al obtener estudiante: {str(e)}"
-      )
+        return cls.handle_error(
+            f"Error al obtener estudiante: {str(e)}"
+        )
 
     finally:
-      db.close()
+        db.close()
 
   @classmethod
   def fetch_by_person_id(cls, person_id):

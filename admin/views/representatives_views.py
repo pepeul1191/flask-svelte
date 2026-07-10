@@ -7,7 +7,8 @@ from admin.services.person_service import PersonService
 from admin.services.representative_service import RepresentativeService
 from admin.services.sex_service import SexService
 from admin.services.document_type_service import DocumentTypeService
-
+from admin.services.representative_student_role_service import RepresentativeStudentRoleService
+from admin.services.representative_role_service import RepresentativeRoleService
 
 views = Blueprint(
   "admin-representatives-views",
@@ -173,6 +174,7 @@ def edit(representative_id):
 
   sexes_response = SexService.fetch_all()
   document_types_response = DocumentTypeService.fetch_all()
+  representative_roles_response = RepresentativeStudentRoleService.fetch_by_representative(representative_id=representative_id, related="related")
 
   if not response["success"]:
     flash(response["message"], "danger")
@@ -191,6 +193,10 @@ def edit(representative_id):
   else:
     flash(document_types_response["message"], "danger")
 
+  print('1 +++++++++++++++++++++++++++++++')
+  print(representative_roles_response["data"])
+  print('2 +++++++++++++++++++++++++++++++')
+
   return render_template(
     "representatives/edit.html",
     locals={
@@ -198,6 +204,7 @@ def edit(representative_id):
       "nav_link": "representative-management",
       "record": response["data"],
       "person": response["data"]["person"],
+      "students": representative_roles_response["data"]["students"],
       "sexes": sexes,
       "document_types": document_types,
       "entity": "representatives"
@@ -303,3 +310,85 @@ def delete(representative_id):
     flash(response["message"], "danger")
 
   return redirect("/admin/representatives")
+
+# =====================
+# SHOW REPRESENTATIVE STUDENTS
+# =====================
+@views.route("/admin/representatives/<int:representative_id>/students", methods=["GET"])
+@only_logged
+def show_students(representative_id):
+    page = request.args.get("page", default=1, type=int)
+    per_page = request.args.get("per_page", default=10, type=int)
+
+    code = request.args.get("code", default="")
+    names = request.args.get("names", default="")
+    last_names = request.args.get("last_names", default="")
+    dni = request.args.get("dni", default="")
+    email = request.args.get("email", default="")
+    related = request.args.get("related", default="related")
+
+    representative_roles_response = RepresentativeRoleService.fetch_all()
+    representative_roles = representative_roles_response["data"] if representative_roles_response["success"] else []
+
+    representative_response = RepresentativeService.fetch_one(representative_id)
+
+    if page < 1:
+        page = 1
+
+    if per_page < 1:
+        per_page = 10
+
+    response = RepresentativeStudentRoleService.fetch_by_representative(
+        page=page,
+        per_page=per_page,
+        code=code,
+        names=names,
+        last_names=last_names,
+        dni=dni,
+        email=email,
+        related=related,
+        representative_id=representative_id,
+    )
+
+    students = []
+
+    pagination = {
+        "page": page,
+        "per_page": per_page,
+        "total_students": 0,
+        "total_pages": 0,
+        "start_record": 0,
+        "end_record": 0
+    }
+
+    filters = {
+        "code": code,
+        "names": names,
+        "last_names": last_names,
+        "dni": dni,
+        "email": email,
+        "related": related
+    }
+
+    if response["success"]:
+        students = response["data"]["students"]
+        pagination = response["data"]["pagination"]
+    else:
+        flash(response["message"], "danger")
+
+    if not representative_response["success"]:
+        flash(representative_response["message"], "danger")
+        return redirect("/admin/representatives")
+
+    return render_template(
+        "representatives/students.html",
+        locals={
+            "title": "Estudiantes del Representante",
+            "nav_link": "representative-management",
+            "representative_roles": representative_roles,  # Añadir esta línea
+            "students": students,
+            "pagination": pagination,
+            "filters": filters,
+            "record": representative_response["data"]
+        }
+    )
