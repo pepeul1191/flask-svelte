@@ -7,6 +7,205 @@
 {% endblock %}
 
 {% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const jwtToken = document.querySelector('meta[name="csrf-token"]')?.content ||
+      document.querySelector('meta[name="jwt-token"]')?.content;
+
+    try {
+      const workerAutocomplete = new AutoComplete({
+        inputId: 'worker-search',
+        suggestionsId: 'worker-suggestions',
+        hiddenInputId: 'worker-id',
+        apiUrl: '/api/v1/workers',
+        jwtToken: jwtToken,
+        minChars: 2,
+        displayKey: 'display',
+        valueKey: 'id',
+        dataWrapper: 'data',
+        emptyMessage: 'No se encontraron docentes',
+        debounceTime: 300
+      });
+
+      // Evento cuando se selecciona un worker
+      document.getElementById('worker-search').addEventListener('autocomplete-select', function (e) {
+        console.log('Docente seleccionado:', e.detail);
+        console.log('ID seleccionado:', document.getElementById('worker-id').value);
+      });
+
+      console.log('✅ AutoComplete para Workers inicializado correctamente');
+
+    } catch (error) {
+      console.error('❌ Error inicializando AutoComplete:', error);
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const jwtToken = document.querySelector('meta[name="csrf-token"]')?.content ||
+      document.querySelector('meta[name="jwt-token"]')?.content;
+
+    try {
+      const workerAutocomplete = new AutoComplete({
+        inputId: 'worker-search',
+        suggestionsId: 'worker-suggestions',
+        hiddenInputId: 'worker-id',
+        apiUrl: '/api/v1/workers',
+        jwtToken: jwtToken,
+        minChars: 2,
+        displayKey: 'display',
+        valueKey: 'id',
+        dataWrapper: 'data',
+        emptyMessage: 'No se encontraron docentes',
+        debounceTime: 300
+      });
+
+      // Evento cuando se selecciona un worker
+      document.getElementById('worker-search').addEventListener('autocomplete-select', function (e) {
+        console.log('Docente seleccionado:', e.detail);
+        console.log('ID seleccionado:', document.getElementById('worker-id').value);
+      });
+
+      console.log('✅ AutoComplete para Workers inicializado correctamente');
+
+    } catch (error) {
+      console.error('❌ Error inicializando AutoComplete:', error);
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const jwtToken = document.querySelector('meta[name="csrf-token"]')?.content ||
+      document.querySelector('meta[name="jwt-token"]')?.content;
+
+    try {
+      // FileUpload para el sílabo (PDF)
+      const sylabusUpload = new FileUpload({
+        containerId: 'sylabusUploadContainer',
+        fileInputId: 'sylabusFileInput',
+        triggerButtonId: 'triggerSylabusButton',
+        uploadButtonId: 'uploadSylabusButton',
+        viewButtonId: 'viewSylabusButton',
+        errorMessageId: 'sylabusErrorMessage',
+        successMessageId: 'sylabusSuccessMessage',
+        helpTextId: 'sylabusHelpText',
+        fileNameDisplayId: 'sylabusFileNameDisplay',
+
+        // Configuración específica para PDF
+        label: 'Seleccionar PDF del sílabo',
+        acceptedFormats: ['pdf'],
+        maxSizeMB: 10, // Tamaño máximo 10MB para PDF
+        baseURL: URLS.FILES,
+        url: '/api/v1/storage',
+        fileKey: 'file',
+        triggerButtonText: 'Seleccionar PDF',
+        triggerButtonIcon: 'fa-file-pdf-o',
+        extraParams: {
+          course_id: '{{ locals.course.id if locals.course else '' }}',
+          level_id: '{{ locals.level_id }}',
+          folder: 'sylabus'
+        },
+
+        jwt: localStorage.getItem('jwtFilesToken'),
+
+        onSuccess: function (response) {
+          console.log('PDF subido:', response);
+          // Actualizar el input hidden con la URL del PDF
+          const urlInput = document.getElementById('uploadedSylabusUrl');
+          console.log(response.data)
+          if (urlInput && response.data.filename) {
+            urlInput.value = response.data.filename;
+          }
+          console.log(urlInput)
+          // Mostrar el botón Ver
+          const viewBtn = document.getElementById('viewSylabusButton');
+          if (viewBtn) {
+            viewBtn.classList.remove('d-none');
+          }
+        },
+
+        onError: function (error) {
+          console.error('Error al subir PDF:', error);
+        },
+
+        onViewClick: function (file, imageUrl) {
+          const url = document.getElementById('uploadedSylabusUrl')?.value;
+          console.log('URL del PDF:', url);
+
+          if (!url) {
+            alert('No hay PDF disponible para visualizar');
+            return;
+          }
+
+          const jwtToken = localStorage.getItem('jwtFilesToken');
+
+          if (!jwtToken) {
+            alert('No se encontró el token de autenticación');
+            return;
+          }
+
+          // Extraer el nombre del archivo de la URL
+          const fileName = url.split('/').pop();
+          // Asegurar que tenga extensión .pdf
+          const fileNameWithExt = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
+
+          const viewUrl = URLS.FILES + `/api/v1/storage?folder=sylabus&file=${encodeURIComponent(fileName)}&filename=${encodeURIComponent(fileNameWithExt)}`;
+
+          fetch(viewUrl, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${jwtToken}`,
+              'Accept': 'application/pdf'
+            },
+            credentials: 'include'
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error(`Error al obtener el PDF: ${response.status} ${response.statusText}`);
+              }
+              return response.blob();
+            })
+            .then(blob => {
+              const blobUrl = URL.createObjectURL(blob);
+              // Crear un enlace temporal para descargar con el nombre correcto
+              const link = document.createElement('a');
+              link.href = blobUrl;
+              link.download = fileNameWithExt;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+            })
+            .catch(error => {
+              console.error('Error al cargar el PDF:', error);
+              alert('Error al cargar el PDF: ' + error.message);
+            });
+        }
+      });
+
+      // Si existe un PDF previamente cargado, establecer la URL
+      const existingSylabusUrl = document.getElementById('uploadedSylabusUrl')?.value;
+      if (existingSylabusUrl) {
+        sylabusUpload.setExistingImageUrl(existingSylabusUrl);
+        // Mostrar el botón Ver
+        const viewBtn = document.getElementById('viewSylabusButton');
+        if (viewBtn) {
+          viewBtn.classList.remove('d-none');
+        }
+        // Mostrar nombre del archivo
+        const fileNameDisplay = document.getElementById('sylabusFileNameDisplay');
+        if (fileNameDisplay) {
+          const fileName = existingSylabusUrl.split('/').pop();
+          fileNameDisplay.innerHTML = `<span class="text-success">📄 ${fileName}</span>`;
+        }
+      }
+
+      console.log('✅ FileUpload para sílabo inicializado correctamente');
+
+    } catch (error) {
+      console.error('❌ Error inicializando FileUpload:', error);
+    }
+  });
+
+</script>
 {% endblock %}
 
 {% block content %}
@@ -72,6 +271,8 @@
               <label class="form-label">Sílabo (PDF)</label>
               <input type="hidden" name="sylabus_url" id="uploadedSylabusUrl"
                 value="{{ locals.course.sylabus_url or '' }}">
+              <!-- Input file oculto - DEBE ESTAR DENTRO DEL CONTAINER -->
+              <input type="file" id="sylabusFileInput" style="display: none;" accept=".pdf">
 
               <div class="d-flex gap-2 mb-2">
                 <button type="button" id="triggerSylabusButton" class="btn btn-outline-secondary flex-fill">
@@ -100,10 +301,20 @@
 
           <div class="col-md-6">
             <label class="form-label">Docente (ID)</label>
-            <input type="number" name="worker_id" class="form-control" value="{{ locals.course.worker_id or '' }}"
-              min="1">
-            <small class="text-muted">Opcional</small>
+            <div class="position-relative">
+              <input type="text" id="worker-search" name="worker_search" class="form-control"
+                placeholder="Buscar docente por nombre..." autocomplete="off"
+                value="{{ locals.worker.person.last_names ~ ' ' ~ locals.worker.person.names ~ ' (' ~ locals.worker.code ~ ')' if locals.worker else '' }}">
+              <!-- Contenedor de sugerencias -->
+              <div id="worker-suggestions" class="list-group position-absolute w-100"
+                style="z-index: 1000; max-height: 300px; overflow-y: auto; display: none;">
+              </div>
+            </div>
           </div>
+          <!-- Input hidden para guardar el ID seleccionado -->
+          <input type="hidden" id="worker-id" name="worker_id" class="form-control"
+            value="{{ locals.course.worker_id or '' }}" min="1">
+          <small class="text-muted">Opcional - Busca por nombre del docente</small>
 
           <div class="col-12 mt-4">
 
@@ -118,12 +329,12 @@
             </a>
 
           </div>
-
-        </form>
-
       </div>
 
+      </form>
     </div>
+
+  </div>
 
   </div>
 </main>

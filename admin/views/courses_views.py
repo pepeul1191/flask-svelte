@@ -5,6 +5,7 @@ from flask import Blueprint, flash, render_template, request, redirect, url_for
 from admin.configs.middlewares import only_logged
 from admin.services.courses_service import CourseService
 from admin.services.level_service import LevelService
+from admin.services.worker_service import WorkerService
 
 views = Blueprint(
   "admin-courses-views",
@@ -141,6 +142,11 @@ def edit(level_id, course_id):
     flash(response["message"], "danger")
     return redirect(f"/admin/levels/{level_id}/courses")
 
+  worker = None
+  if(response["data"]["worker_id"]):
+    response_worker = WorkerService.fetch_one(response["data"]["worker_id"])
+    worker = response_worker["data"]
+
   return render_template(
     "courses/edit.html",
     locals={
@@ -148,7 +154,8 @@ def edit(level_id, course_id):
       "nav_link": "academic-management",
       "level_id": level_id,
       "level": level_response["data"],
-      "course": response["data"]
+      "course": response["data"],
+      "worker": worker
     }
   )
 
