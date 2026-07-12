@@ -42,12 +42,12 @@ CREATE TABLE `courses` (
   `description` text,
   `sylabus_url` varchar(100) DEFAULT NULL,
   `level_id` int unsigned NOT NULL,
-  `worker_id` int unsigned NOT NULL,
+  `worker_id` int unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_courses_level` (`level_id`),
   KEY `fk_courses_worker` (`worker_id`),
   CONSTRAINT `fk_courses_level` FOREIGN KEY (`level_id`) REFERENCES `levels` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `fk_courses_worker` FOREIGN KEY (`worker_id`) REFERENCES `workers` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT `fk_courses_worker` FOREIGN KEY (`worker_id`) REFERENCES `workers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -719,5 +719,6 @@ INSERT INTO `schema_migrations` (version) VALUES
   ('20260317045206'),
   ('20260628011714'),
   ('20260702000253'),
-  ('20260702012438');
+  ('20260702012438'),
+  ('20260711132041');
 UNLOCK TABLES;

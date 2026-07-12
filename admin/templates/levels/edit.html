@@ -1,23 +1,17 @@
-# admin/templates/levels/edit.html
+{# admin/templates/levels/edit.html #}
 
 {% extends './layouts/admin_dashboard.html' %}
 
-{% block extra_css %}
-
-{% endblock %}
-
-{% block extra_js %}
-{% endblock %}
+{% block extra_css %}{% endblock %}
+{% block extra_js %}{% endblock %}
 
 {% block content %}
-
 <main class="main-content">
   <div class="container-fluid">
-
     <h3 class="mb-4">
-      <a href="/admin/master-data">
-        <i class="fa fa-cc-mastercard me-2"></i>
-        Gestión de Datos Maestros
+      <a href="/admin/academic">
+        <i class="fa fa-book me-2"></i>
+        Gestión Académica
       </a>
       /
       <a href="/admin/levels">
@@ -30,57 +24,94 @@
     {% include 'partials/flash_messages.html' %}
 
     <div class="card mb-4">
-
       <div class="card-header">
         <h6 class="mb-0">
           <i class="fa fa-edit me-2"></i>
           Editar Nivel: {{ locals.level.name }}
         </h6>
       </div>
-
       <div class="card-body">
-
-        <form
-          action="/admin/levels/{{ locals.level.id }}/update"
-          method="POST"
-          class="row g-3">
-
+        <form action="/admin/levels/{{ locals.level.id }}/update" method="POST" class="row g-3">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
           <div class="col-md-4">
-
             <label class="form-label">Nombre</label>
-
-            <input
-              type="text"
-              name="name"
-              class="form-control"
-              maxlength="30"
-              value="{{ locals.level.name }}"
-              required>
-
+            <input type="text" name="name" class="form-control" maxlength="30" value="{{ locals.level.name }}" required>
           </div>
-
           <div class="col-12 mt-4">
-
             <button class="btn btn-success">
               <i class="fa fa-save me-2"></i>
               Guardar Cambios
             </button>
-
             <a href="/admin/levels" class="btn btn-warning ms-2">
               <i class="fa fa-times me-2"></i>
               Cancelar
             </a>
-
           </div>
-
         </form>
-
       </div>
-
     </div>
 
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">
+          <i class="fa fa-book me-2"></i>
+          Cursos
+        </h6>
+        <a href="/admin/levels/{{ locals.level.id }}/courses/new" class="btn btn-success btn-sm">
+          <i class="fa fa-plus me-1"></i>
+          Crear Curso
+        </a>
+      </div>
+      <div class="card-body">
+        {% if locals.courses and locals.courses|length > 0 %}
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Código</th>
+                <th>Sylabus</th>
+                <th>Coordinador</th>
+                <th>Opciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for course in locals.courses %}
+              <tr>
+                <td>{{ course.name }}</td>
+                <td>{{ course.code }}</td>
+                <td>{{ course.sylabus_url }}</td>
+                <td>{{ course.worker_id }}</td>
+                <td>
+                  <a href="/admin/levels/{{ locals.level.id }}/courses/{{ course.id }}/edit"
+                    class="btn btn-sm btn-outline-secondary">
+                    <i class="fa fa-edit"></i>Editar
+                  </a>
+                  <a href="/admin/levels/{{ locals.level.id }}/courses/{{ course.id }}/delete"
+                    class="btn btn-sm btn-outline-danger"
+                    onclick="return confirm('¿Estás seguro de eliminar este nivel académico?');">
+                    <i class="fa fa-trash"></i>Eliminar
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-3">
+          <i class="fa fa-users fa-2x text-muted mb-2 d-block"></i>
+          <p class="text-muted mb-0">
+            No hay cursos registrados para este nivel académico.
+          </p>
+          <a href="/admin/levels/{{ locals.level.id }}/courses/new" class="btn btn-primary btn-sm mt-2">
+            <i class="fa fa-plus me-1"></i>
+            Administrar Cursos
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
   </div>
 </main>
 {% endblock %}

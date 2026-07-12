@@ -1,3 +1,5 @@
+# admin/models/worker.py
+
 from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -38,6 +40,12 @@ class Worker(Base, ToString):
 
   person = relationship(
     "Person",
+    back_populates="worker"
+  )
+
+  # Agregar relación con courses
+  courses = relationship(
+    "Course",
     back_populates="worker"
   )
 

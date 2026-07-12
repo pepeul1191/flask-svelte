@@ -282,3 +282,47 @@ class WorkerService(ApplicationService):
 
     finally:
       db.close()
+
+  @classmethod
+  def search_by_name(cls, query):
+    db = SessionLocal()
+    
+    try:
+      # Buscar solo por nombre de persona
+      workers = (
+        db.query(Worker)
+        .join(Person, Worker.person_id == Person.id)  # Join explícito
+        .filter(
+          or_(
+            Person.names.ilike(f"%{query}%"),
+            Person.last_names.ilike(f"%{query}%")
+          )
+        )
+        .limit(10)
+        .all()
+      )
+      # Formatear respuesta para el autocomplete
+      data = []
+      for worker in workers:
+        data.append({
+          "id": worker.id,
+          "code": worker.code,
+          "email": worker.email,
+          "name": worker.person.last_names + ' ' + worker.person.names if worker.person else worker.code,
+          "display": f"{worker.person.last_names + ' ' + worker.person.names + ' (' + str(worker.code) + ')' if worker.person else worker.code}"
+        })
+      
+      return {
+        'data': data,
+        'message': 'Workers encontrados',
+        'total': len(data)
+      }
+      
+    except SQLAlchemyError as e:
+      return {
+        'data': [],
+        'message': f'Error al buscar workers: {str(e)}',
+        'total': 0
+      }
+    finally:
+      db.close()

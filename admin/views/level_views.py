@@ -4,6 +4,7 @@ from flask import Blueprint, flash, render_template, request, redirect
 
 from admin.configs.middlewares import only_logged
 from admin.services.level_service import LevelService
+from admin.services.courses_service import CourseService
 
 views = Blueprint(
   "admin-levels-views",
@@ -55,7 +56,7 @@ def index():
     "levels/index.html",
     locals={
       "title": "Niveles",
-      "nav_link": "master-data",
+      "nav_link": "academic-management",
       "levels": levels,
       "pagination": pagination,
       "search_query": search_query
@@ -74,7 +75,7 @@ def new():
     "levels/new.html",
     locals={
       "title": "Nuevo Nivel",
-      "nav_link": "master-data"
+      "nav_link": "academic-management"
     }
   )
 
@@ -106,6 +107,7 @@ def create():
 def edit(level_id):
 
   response = LevelService.fetch_one(level_id)
+  response_courses = CourseService.fetch_by_level(level_id=level_id)
 
   if not response["success"]:
     flash(response["message"], "danger")
@@ -115,8 +117,9 @@ def edit(level_id):
     "levels/edit.html",
     locals={
       "title": "Editar Nivel",
-      "nav_link": "master-data",
-      "level": response["data"]
+      "nav_link": "academic-management",
+      "level": response["data"],
+      "courses": response_courses["data"]["courses"]
     }
   )
 

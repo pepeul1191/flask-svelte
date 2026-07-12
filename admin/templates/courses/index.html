@@ -1,4 +1,4 @@
-{# admin/templates/levels/index.html #}
+{# admin/templates/courses/index.html #}
 
 {% extends './layouts/admin_dashboard.html' %}
 
@@ -11,7 +11,15 @@
         <i class="fa fa-book me-2"></i>
         Gestión Académica
       </a>
-      / Niveles
+      /
+      <a href="/admin/levels">
+        Niveles
+      </a>
+      /
+      <a href="/admin/levels/{{ locals.level_id }}/edit">
+        Editar Nivel
+      </a>
+      / Cursos
     </h3>
 
     {% include 'partials/flash_messages.html' %}
@@ -27,18 +35,18 @@
 
       <div class="card-body">
 
-        <form method="GET" action="/admin/levels">
+        <form method="GET" action="/admin/levels/{{ locals.level_id }}/courses">
 
           <input type="hidden" name="per_page" value="{{ locals.pagination.per_page }}">
 
           <div class="row mb-3 align-items-end">
 
             <div class="col-md-4">
-              <label for="nombre" class="form-label">Nombre</label>
+              <label for="search" class="form-label">Buscar</label>
 
               <div class="input-group">
-                <input type="text" id="nombre" name="name" class="form-control" placeholder="Buscar por nombre..."
-                  value="{{ locals.search_query or '' }}">
+                <input type="text" id="search" name="search" class="form-control"
+                  placeholder="Buscar por nombre o código..." value="{{ locals.search_query or '' }}">
               </div>
             </div>
 
@@ -49,7 +57,7 @@
                   <i class="fa fa-search"></i> Buscar
                 </button>
 
-                <a href="/admin/levels" class="btn btn-outline-secondary">
+                <a href="/admin/levels/{{ locals.level_id }}/courses" class="btn btn-outline-secondary">
                   <i class="fa fa-refresh"></i> Limpiar
                 </a>
 
@@ -69,7 +77,7 @@
       <div class="card-header">
         <h6 class="mb-0">
           <i class="fa fa-list me-2"></i>
-          Lista de Niveles
+          Lista de Cursos - {{ locals.level.name }}
         </h6>
       </div>
 
@@ -84,9 +92,9 @@
               Filas por página:
             </label>
 
-            <form method="GET" action="/admin/levels" id="per_page_form">
+            <form method="GET" action="/admin/levels/{{ locals.level_id }}/courses" id="per_page_form">
 
-              <input type="hidden" name="name" value="{{ locals.search_query or '' }}">
+              <input type="hidden" name="search" value="{{ locals.search_query or '' }}">
 
               <select name="per_page" class="form-select" style="width: 120px;" onchange="this.form.submit()">
 
@@ -103,8 +111,11 @@
           </div>
 
           <div class="d-flex gap-2">
-            <a href="/admin/levels/new" class="btn btn-success">
-              <i class="fa fa-plus"></i> Agregar Registro
+            <a href="/admin/levels/{{ locals.level_id }}/courses/new" class="btn btn-success">
+              <i class="fa fa-plus"></i> Agregar Curso
+            </a>
+            <a href="/admin/levels" class="btn btn-outline-secondary">
+              <i class="fa fa-arrow-left"></i> Volver
             </a>
           </div>
 
@@ -117,28 +128,33 @@
 
             <thead>
               <tr>
+                <th>Código</th>
                 <th>Nombre</th>
+                <th>Descripción</th>
                 <th class="text-end">Acciones</th>
               </tr>
             </thead>
 
             <tbody>
 
-              {% if locals.levels %}
+              {% if locals.courses %}
 
-              {% for level in locals.levels %}
+              {% for course in locals.courses %}
               <tr>
 
-                <td>{{ level.name }}</td>
+                <td><strong>{{ course.code }}</strong></td>
+                <td>{{ course.name }}</td>
+                <td>{{ course.description[:50] if course.description else '-' }}</td>
 
                 <td class="text-end btn-group-sm">
 
-                  <a href="/admin/levels/{{ level.id }}/edit" class="btn btn-outline-secondary me-1">
+                  <a href="/admin/levels/{{ locals.level_id }}/courses/{{ course.id }}/edit"
+                    class="btn btn-outline-secondary me-1">
                     <i class="fa fa-edit"></i> Editar
                   </a>
 
-                  <a href="/admin/levels/{{ level.id }}/delete" class="btn btn-outline-danger"
-                    onclick="return confirm('¿Estás seguro de eliminar este nivel?');">
+                  <a href="/admin/levels/{{ locals.level_id }}/courses/{{ course.id }}/delete"
+                    class="btn btn-outline-danger" onclick="return confirm('¿Estás seguro de eliminar este curso?');">
                     <i class="fa fa-trash"></i> Eliminar
                   </a>
 
@@ -150,8 +166,8 @@
               {% else %}
 
               <tr>
-                <td colspan="2" class="text-center">
-                  No se encontraron niveles.
+                <td colspan="4" class="text-center">
+                  No se encontraron cursos para este nivel.
                 </td>
               </tr>
 
@@ -163,7 +179,7 @@
             {% if locals.pagination.total_pages > 1 %}
             <tfoot>
               <tr>
-                <td colspan="2">
+                <td colspan="4">
 
                   <div class="d-flex justify-content-between align-items-center mt-3">
 
@@ -171,7 +187,7 @@
                       Página {{ locals.pagination.page }} de {{ locals.pagination.total_pages }} -
                       Mostrando registros {{ locals.pagination.start_record }} -
                       {{ locals.pagination.end_record }}
-                      de un total de {{ locals.pagination.total_levels }}
+                      de un total de {{ locals.pagination.total_courses }}
                     </div>
 
                     <nav aria-label="Page navigation">
@@ -179,14 +195,14 @@
 
                         <li class="page-item {% if locals.pagination.page == 1 %}disabled{% endif %}">
                           <a class="page-link"
-                            href="/admin/levels?page=1&per_page={{ locals.pagination.per_page }}&name={{ locals.search_query }}">
+                            href="/admin/levels/{{ locals.level_id }}/courses?page=1&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
                             <i class="fa fa-angle-double-left"></i> Primero
                           </a>
                         </li>
 
                         <li class="page-item {% if locals.pagination.page == 1 %}disabled{% endif %}">
                           <a class="page-link"
-                            href="/admin/levels?page={{ locals.pagination.page - 1 }}&per_page={{ locals.pagination.per_page }}&name={{ locals.search_query }}">
+                            href="/admin/levels/{{ locals.level_id }}/courses?page={{ locals.pagination.page - 1 }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
                             <i class="fa fa-angle-left"></i> Anterior
                           </a>
                         </li>
@@ -194,7 +210,7 @@
                         <li
                           class="page-item {% if locals.pagination.page == locals.pagination.total_pages %}disabled{% endif %}">
                           <a class="page-link"
-                            href="/admin/levels?page={{ locals.pagination.page + 1 }}&per_page={{ locals.pagination.per_page }}&name={{ locals.search_query }}">
+                            href="/admin/levels/{{ locals.level_id }}/courses?page={{ locals.pagination.page + 1 }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
                             Siguiente <i class="fa fa-angle-right"></i>
                           </a>
                         </li>
@@ -202,7 +218,7 @@
                         <li
                           class="page-item {% if locals.pagination.page == locals.pagination.total_pages %}disabled{% endif %}">
                           <a class="page-link"
-                            href="/admin/levels?page={{ locals.pagination.total_pages }}&per_page={{ locals.pagination.per_page }}&name={{ locals.search_query }}">
+                            href="/admin/levels/{{ locals.level_id }}/courses?page={{ locals.pagination.total_pages }}&per_page={{ locals.pagination.per_page }}&search={{ locals.search_query }}">
                             Último <i class="fa fa-angle-double-right"></i>
                           </a>
                         </li>

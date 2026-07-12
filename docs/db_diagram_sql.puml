@@ -1,349 +1,361 @@
 @startuml
-
-top to bottom direction
+!define table(x) entity x << (T,#FFAAAA) >>
+!define primary_key(x) <b><color:red>x</color></b>
+!define foreign_key(x) <color:blue>x</color>
 
 skinparam linetype ortho
 skinparam packageStyle rectangle
 skinparam shadowing false
-skinparam ranksep 120
-skinparam nodesep 80
+skinparam ranksep 80
+skinparam nodesep 60
+skinparam entityFontSize 10
+skinparam entityFontStyle bold
+skinparam entityBackgroundColor #FEFECE
+skinparam entityBorderColor #A80036
 
-' -------------------------
-' Entidades principales
-' -------------------------
-entity sexs {
-  * id : INT <<PK>>
+' ============================================
+' TABLAS PRINCIPALES (Core)
+' ============================================
+entity "sexs" as sexs {
+  * id : INT
   --
   name : VARCHAR(45)
 }
 
-entity departments {
-  * id : INT <<PK>>
-  --
-  name : VARCHAR(45)
-}
-
-entity provinces {
-  * id : INT <<PK>>
-  --
-  name : VARCHAR(45)
-  department_id : INT <<FK>>
-}
-
-entity districts {
-  * id : INT <<PK>>
-  --
-  name : VARCHAR(45)
-  province_id : INT <<FK>>
-}
-
-entity document_types {
-  * id : INT <<PK>>
+entity "document_types" as doc_types {
+  * id : INT
   --
   name : VARCHAR(20)
 }
 
-entity representative_roles {
-  * id : INT <<PK>>
+entity "departments" as depts {
+  * id : INT
   --
-  name : VARCHAR(20)
+  name : VARCHAR(45)
 }
 
-entity persons {
-  * id : INT <<PK>>
+entity "provinces" as provs {
+  * id : INT
+  --
+  name : VARCHAR(45)
+  department_id : INT
+}
+
+entity "districts" as dists {
+  * id : INT
+  --
+  name : VARCHAR(45)
+  province_id : INT
+}
+
+entity "persons" as persons {
+  * id : INT
   --
   names : VARCHAR(45)
   lastNames : VARCHAR(45)
   documentNumber : VARCHAR(12)
-  imageUrl: VARCHAR(70)
+  imageUrl : VARCHAR(70)
   birthDate : DATE
   created : DATETIME
   updated : DATETIME
-  sex_id: INT
-  document_type_id: INT
+  sex_id : INT
+  document_type_id : INT
 }
 
-entity workers {
-  * id : INT <<PK>>
+entity "phones" as phones {
+  * id : INT
   --
-  code: INT
-  bio: TEXT
-  person_id : INT <<FK>>
-  email: VARCHAR(100)
-  user_id: INT
-}
-
-entity representatives {
-  * id : INT <<PK>>
-  --
-  email: VARCHAR(100)
-  user_id: INT
-  person_id : INT <<FK>>
-}
-
-entity students {
-  * id : INT <<PK>>
-  --
-  code: INT
-  email: VARCHAR(100)
-  user_id: INT
-  person_id : INT <<FK>>
-}
-
-entity addresses {
-  * id : INT <<PK>>
-  --
-  person_id : INT <<FK>>
-  district_id : INT <<FK>>
-  description : VARCHAR(40)
-  address : VARCHAR(255)
-}
-
-entity phones {
-  * id : INT <<PK>>
-  --
-  person_id : INT <<FK>>
+  person_id : INT
   description : VARCHAR(40)
   phone : VARCHAR(20)
 }
 
-entity representatites_students_roles {
-  * id : INT <<PK>>
+entity "addresses" as addresses {
+  * id : INT
   --
-  representative_id : INT <<FK>>
-  student_id : INT <<FK>>
-  representative_role_id : INT <<FK>>
-  created: DATETIME
-  updated: DATETIME
+  person_id : INT
+  district_id : INT
+  description : VARCHAR(40)
+  address : VARCHAR(255)
 }
 
-entity worker_roles {
-  * id : INT <<PK>>
+' ============================================
+' ROLES DE PERSONAS
+' ============================================
+entity "workers" as workers {
+  * id : INT
+  --
+  code : INT
+  bio : TEXT
+  email : VARCHAR(100)
+  user_id : INT
+  person_id : INT
+}
+
+entity "students" as students {
+  * id : INT
+  --
+  code : INT
+  email : VARCHAR(100)
+  user_id : INT
+  person_id : INT
+}
+
+entity "representatives" as reps {
+  * id : INT
+  --
+  email : VARCHAR(100)
+  user_id : INT
+  person_id : INT
+}
+
+entity "representative_roles" as rep_roles {
+  * id : INT
   --
   name : VARCHAR(20)
 }
 
-entity levels {
-  * id : INT <<PK>>
+entity "representatives_students_roles" as rep_stud_roles {
+  * id : INT
+  --
+  representative_id : INT
+  student_id : INT
+  representative_role_id : INT
+  created : DATETIME
+  updated : DATETIME
+}
+
+' ============================================
+' ACADÉMICO
+' ============================================
+entity "levels" as levels {
+  * id : INT
   --
   name : VARCHAR(30)
 }
 
-entity courses {
-  * id : INT <<PK>>
+entity "courses" as courses {
+  * id : INT
   --
   name : VARCHAR(45)
-  code: VARCHAR(10)
+  code : VARCHAR(10)
   description : TEXT
-  sylabus_url: VARCHAR(100)
-  level_id: INT <<FK>>
-  worker_id: INT <<FK>>
+  sylabus_url : VARCHAR(100)
+  level_id : INT
+  worker_id : INT
 }
 
-entity sections {
-  * id : INT <<PK>>
+entity "sections" as sections {
+  * id : INT
   --
   name : VARCHAR(45)
   description : TEXT
-  image_url: VARCHAR(100)
-  course_id: INT <<FK>>
+  image_url : VARCHAR(100)
+  course_id : INT
 }
 
-entity sections_workers_roles {
-  * id : INT <<PK>>
+entity "worker_roles" as worker_roles {
+  * id : INT
   --
-  section_id : INT <<FK>>
-  worker_id : INT <<FK>>
-  worker_role_id : INT <<FK>>
+  name : VARCHAR(20)
 }
 
-entity sections_students {
-  * id : INT <<PK>>
+entity "sections_workers_roles" as sec_workers_roles {
+  * id : INT
   --
-  section_id : INT <<FK>>
-  student_id : INT <<FK>>
+  section_id : INT
+  worker_id : INT
+  worker_role_id : INT
 }
 
-entity adverts {
-  * id : INT <<PK>>
+entity "sections_students" as sec_students {
+  * id : INT
   --
-  header : VARCHAR(45)
-  description : TEXT
-  created: DATETIME
-  updated: DATETIME
-  published_from: DATETIME
-  published_to: DATETIME
-  section_id: INT <<FK>>
-  worker_id: INT <<FK>>
+  section_id : INT
+  student_id : INT
 }
 
-entity folders {
-  + id : INT <<PK>>
+' ============================================
+' MATERIALES Y DOCUMENTOS
+' ============================================
+entity "folders" as folders {
+  + id : INT
   --
-  parent_id : INT <<FK, nullable>>
+  parent_id : INT
   title : VARCHAR(100)
   description : TEXT
   created : DATETIME
   updated : DATETIME
 }
 
-entity folder_common_materials {
-  + id : INT <<PK, FK>>
+entity "folder_common_materials" as folder_common {
+  + id : INT
   --
-  course_id : INT <<FK>>
+  course_id : INT
 }
 
-entity folder_seccion_materiales {
-  + id : INT <<PK, FK>>
+entity "folder_section_materials" as folder_section {
+  + id : INT
   --
-  section_id : INT <<FK>>
+  section_id : INT
 }
 
-entity documents {
-  + id : INT <<PK>>
+entity "documents" as documents {
+  + id : INT
   --
-  folder_id : INT <<FK>>
+  folder_id : INT
   title : VARCHAR(100)
   autogenerated_title : TEXT
   url : VARCHAR(255)
-  uploaded_by : INT <<FK>>
+  uploaded_by : INT
   created : DATETIME
   updated : DATETIME
 }
 
-entity evaluation_types {
-  * id : INT <<PK>>
+entity "material_documents" as mat_docs {
+  * id : INT
+  --
+  material_id : INT
+  document_id : INT
+}
+
+' ============================================
+' EVALUACIONES
+' ============================================
+entity "evaluation_types" as eval_types {
+  * id : INT
   --
   name : VARCHAR(50)
   icon : VARCHAR(15)
 }
 
-entity section_evaluations {
-  * id : INT <<PK>>
+entity "section_evaluations" as sec_evals {
+  * id : INT
   --
-  section_id : INT <<FK>>
-  worker_id : INT <<FK>>
-  evaluation_type_id : INT <<FK>>
+  section_id : INT
+  worker_id : INT
+  evaluation_type_id : INT
   title : VARCHAR(100)
   description : TEXT
-  published_from: DATETIME
-  published_to: DATETIME
+  published_from : DATETIME
+  published_to : DATETIME
   created : DATETIME
   updated : DATETIME
 }
 
-entity material_documents {
-  * id : INT <<PK>>
+entity "evaluation_documents" as eval_docs {
+  * id : INT
   --
-  material_id : INT <<FK>>
-  document_id : INT <<FK>>
+  section_evaluation_id : INT
+  document_id : INT
 }
 
-entity evaluation_documents {
-  * id : INT <<PK>>
+entity "section_evaluation_grades" as eval_grades {
+  * id : INT
   --
-  section_evaluation_id : INT <<FK>>
-  document_id : INT <<FK>>
-}
-
-entity section_evaluation_grades {
-  * id : INT <<PK>>
-  --
-  section_evaluation_id : INT <<FK>>
-  student_id : INT <<FK>>
+  section_evaluation_id : INT
+  student_id : INT
   grade : DECIMAL(5,2)
   feedback : TEXT
   created : DATETIME
   updated : DATETIME
 }
 
-entity section_evaluation_submissions {
-  * id : INT <<PK>>
+entity "section_evaluation_submissions" as eval_submissions {
+  * id : INT
   --
-  section_evaluation_id : INT <<FK>>
-  student_id : INT <<FK>>
+  section_evaluation_id : INT
+  student_id : INT
   created : DATETIME
   updated : DATETIME
 }
 
-entity submission_documents {
-  * id : INT <<PK>>
+entity "submission_documents" as sub_docs {
+  * id : INT
   --
-  comment: TEXT
-  submission_id : INT <<FK>>
-  document_id : INT <<FK>>
+  comment : TEXT
+  submission_id : INT
+  document_id : INT
 }
 
-' -------------------------
-' Relaciones existentes
-' -------------------------
-sexs   ||--o{ persons : has
+' ============================================
+' PUBLICIDAD
+' ============================================
+entity "adverts" as adverts {
+  * id : INT
+  --
+  header : VARCHAR(45)
+  description : TEXT
+  created : DATETIME
+  updated : DATETIME
+  published_from : DATETIME
+  published_to : DATETIME
+  section_id : INT
+  worker_id : INT
+}
 
-document_types   ||--o{ persons : has
+' ============================================
+' RELACIONES (Agrupadas por contexto)
+' ============================================
 
-persons ||--o{ addresses : has
-persons ||--o{ phones : has
-persons ||--|| workers : is_a
-persons ||--|| students : is_a
-persons ||--|| representatives : is_a
+' --- Personas ---
+sexs ||--o{ persons
+doc_types ||--o{ persons
+persons ||--o{ phones
+persons ||--o{ addresses
+persons ||--|| workers
+persons ||--|| students
+persons ||--|| reps
 
-departments ||--o{ provinces : has
-provinces   ||--o{ districts : has
+' --- Ubicación ---
+depts ||--o{ provs
+provs ||--o{ dists
+dists ||--o{ addresses
 
-districts ||--o{ addresses : live
+' --- Representantes ---
+reps ||--o{ rep_stud_roles
+rep_roles ||--o{ rep_stud_roles
+students ||--o{ rep_stud_roles
 
-representatives ||--o{ representatites_students_roles : has
-representative_roles ||--o{ representatites_students_roles : has
-students ||--o{ representatites_students_roles : has
+' --- Académico ---
+levels ||--o{ courses
+workers ||--o{ courses
+courses ||--o{ sections
 
-' -------------------------
-' Nuevas relaciones añadidas
-' -------------------------
+sections ||--o{ sec_workers_roles
+workers ||--o{ sec_workers_roles
+worker_roles ||--o{ sec_workers_roles
 
-levels ||--o{ courses : has
-courses ||--o{ sections : has
-workers ||--o{ courses : has
+sections ||--o{ sec_students
+students ||--o{ sec_students
 
-sections ||--o{ sections_workers_roles : has
-workers  ||--o{ sections_workers_roles : has
-worker_roles ||--o{ sections_workers_roles : has
-
-sections ||--o{ sections_students : has
-students ||--o{ sections_students : has
-
-sections ||--o{ adverts : has
-workers ||--o{ adverts : has
-
-courses ||--o{ folders : contains
-sections ||--o{ folders : contains
-
-workers ||--o{ section_evaluations : creates
-sections ||--o{ section_evaluations : receives
-evaluation_types ||--o{ section_evaluations : categorizes
-
-persons ||--o{ documents : uploads
-
-section_evaluations ||--o{ evaluation_documents : contains
-documents ||--o{ evaluation_documents : belongs_to
-
-section_evaluations ||--o{ section_evaluation_grades : contains
-students ||--o{ section_evaluation_grades : receives
-
-section_evaluations ||--o{ section_evaluation_submissions : receives
-students ||--o{ section_evaluation_submissions : submits
-
-section_evaluation_submissions ||--o{ submission_documents : contains
-documents ||--o{ submission_documents : belongs_to
-
-' -------------------------
-' Relaciones añadidas
-' -------------------------
-
+' --- Folders y Documentos ---
 folders ||--o{ folders : parent_id
-folders ||--o{ documents : contains
-folder_common_materials -|> folders
-folder_seccion_materiales -|> folders
-folder_common_materials }o--|| courses : belongs_to
-folder_seccion_materiales }o--|| sections : belongs_to
+folders ||--o{ documents
+folder_common -|> folders
+folder_section -|> folders
+folder_common }o--|| courses
+folder_section }o--|| sections
+
+' --- Evaluaciones ---
+sections ||--o{ sec_evals
+workers ||--o{ sec_evals
+eval_types ||--o{ sec_evals
+
+sec_evals ||--o{ eval_docs
+documents ||--o{ eval_docs
+
+sec_evals ||--o{ eval_grades
+students ||--o{ eval_grades
+
+sec_evals ||--o{ eval_submissions
+students ||--o{ eval_submissions
+
+eval_submissions ||--o{ sub_docs
+documents ||--o{ sub_docs
+
+' --- Publicidad ---
+sections ||--o{ adverts
+workers ||--o{ adverts
 
 @enduml

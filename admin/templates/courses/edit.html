@@ -1,0 +1,130 @@
+{# admin/templates/courses/edit.html #}
+
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin/academic">
+        <i class="fa fa-book me-2"></i>
+        Gestión Académica
+      </a>
+      /
+      <a href="/admin/levels">
+        Niveles
+      </a>
+      /
+      <a href="/admin/levels/{{ locals.level_id }}/courses">
+        Cursos
+      </a>
+      /
+      Editar Curso
+    </h3>
+
+    {% include 'partials/flash_messages.html' %}
+
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-edit me-2"></i>
+          Editar Curso: {{ locals.course.code }} - {{ locals.course.name }}
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <form action="/admin/levels/{{ locals.level_id }}/courses/{{ locals.course.id }}/update" method="POST"
+          class="row g-3">
+
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="col-md-4">
+            <label class="form-label">Código <span class="text-danger">*</span></label>
+            <input type="text" name="code" class="form-control" maxlength="20" value="{{ locals.course.code }}"
+              required>
+            <small class="text-muted">El código debe ser único para este nivel</small>
+          </div>
+
+          <div class="col-md-8">
+            <label class="form-label">Nombre <span class="text-danger">*</span></label>
+            <input type="text" name="name" class="form-control" maxlength="45" value="{{ locals.course.name }}"
+              required>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Descripción</label>
+            <textarea name="description" class="form-control" rows="3">{{ locals.course.description or '' }}</textarea>
+          </div>
+
+          <div class="col-md-6">
+            <div id="sylabusUploadContainer">
+              <label class="form-label">Sílabo (PDF)</label>
+              <input type="hidden" name="sylabus_url" id="uploadedSylabusUrl"
+                value="{{ locals.course.sylabus_url or '' }}">
+
+              <div class="d-flex gap-2 mb-2">
+                <button type="button" id="triggerSylabusButton" class="btn btn-outline-secondary flex-fill">
+                  <i class="fa fa-folder-open me-1"></i> Buscar PDF
+                </button>
+                <button type="button" id="uploadSylabusButton" class="btn btn-primary flex-fill">
+                  <i class="fa fa-cloud-upload me-1"></i> Subir
+                </button>
+                <button type="button" id="viewSylabusButton"
+                  class="btn btn-info flex-fill {% if not locals.course.sylabus_url %}d-none{% endif %}">
+                  <i class="fa fa-external-link me-1"></i> Ver
+                </button>
+              </div>
+
+              <div id="sylabusFileNameDisplay" class="small text-muted">
+                {% if locals.course.sylabus_url %}
+                <span class="text-success">📄 {{ locals.course.sylabus_url.split('/')[-1] if locals.course.sylabus_url
+                  else 'PDF existente' }}</span>
+                {% endif %}
+              </div>
+              <div id="sylabusHelpText" class="small text-muted"></div>
+              <div id="sylabusErrorMessage" class="small text-danger"></div>
+              <div id="sylabusSuccessMessage" class="small text-success"></div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Docente (ID)</label>
+            <input type="number" name="worker_id" class="form-control" value="{{ locals.course.worker_id or '' }}"
+              min="1">
+            <small class="text-muted">Opcional</small>
+          </div>
+
+          <div class="col-12 mt-4">
+
+            <button class="btn btn-success">
+              <i class="fa fa-save me-2"></i>
+              Guardar Cambios
+            </button>
+
+            <a href="/admin/levels/{{ locals.level_id }}/courses" class="btn btn-warning ms-2">
+              <i class="fa fa-times me-2"></i>
+              Cancelar
+            </a>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+</main>
+{% endblock %}
