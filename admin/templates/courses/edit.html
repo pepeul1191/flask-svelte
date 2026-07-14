@@ -8,6 +8,23 @@
 
 {% block extra_js %}
 <script>
+
+  const clearWorkerBtn = document.getElementById('clear-worker');
+
+  if (clearWorkerBtn) {
+    clearWorkerBtn.addEventListener('click', function () {
+      document.getElementById('worker-search').value = '';
+      document.getElementById('worker-id').value = '';
+
+      // Ocultar sugerencias si están visibles
+      const suggestions = document.getElementById('worker-suggestions');
+      if (suggestions) {
+        suggestions.style.display = 'none';
+        suggestions.innerHTML = '';
+      }
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     const jwtToken = document.querySelector('meta[name="csrf-token"]')?.content ||
       document.querySelector('meta[name="jwt-token"]')?.content;
@@ -267,6 +284,30 @@
           </div>
 
           <div class="col-md-6">
+            <label class="form-label">Coordinador del Curso</label>
+
+            <div class="position-relative">
+              <div class="input-group">
+                <input type="text" id="worker-search" name="worker_search" class="form-control"
+                  placeholder="Buscar docente por nombre..." autocomplete="off"
+                  value="{{ locals.worker.person.last_names ~ ' ' ~ locals.worker.person.names ~ ' (' ~ locals.worker.code ~ ')' if locals.worker else '' }}">
+
+                <button type="button" id="clear-worker" class="btn btn-outline-danger" title="Quitar coordinador">
+                  <i class="fa fa-times"></i> Retirar Coordinador
+                </button>
+              </div>
+
+              <div id="worker-suggestions" class="list-group position-absolute w-100"
+                style="z-index:1000; max-height:300px; overflow-y:auto; display:none;">
+              </div>
+            </div>
+
+            <small class="text-muted">
+              Si no desea asignar un coordinador, presione <i class="fa fa-times"></i>.
+            </small>
+          </div>
+
+          <div class="col-md-6">
             <div id="sylabusUploadContainer">
               <label class="form-label">Sílabo (PDF)</label>
               <input type="hidden" name="sylabus_url" id="uploadedSylabusUrl"
@@ -275,14 +316,14 @@
               <input type="file" id="sylabusFileInput" style="display: none;" accept=".pdf">
 
               <div class="d-flex gap-2 mb-2">
-                <button type="button" id="triggerSylabusButton" class="btn btn-outline-secondary flex-fill">
+                <button type="button" id="triggerSylabusButton" class="btn btn-outline-secondary">
                   <i class="fa fa-folder-open me-1"></i> Buscar PDF
                 </button>
-                <button type="button" id="uploadSylabusButton" class="btn btn-primary flex-fill">
+                <button type="button" id="uploadSylabusButton" class="btn btn-primary">
                   <i class="fa fa-cloud-upload me-1"></i> Subir
                 </button>
                 <button type="button" id="viewSylabusButton"
-                  class="btn btn-info flex-fill {% if not locals.course.sylabus_url %}d-none{% endif %}">
+                  class="btn btn-info {% if not locals.course.sylabus_url %}d-none{% endif %}">
                   <i class="fa fa-external-link me-1"></i> Ver
                 </button>
               </div>
@@ -298,23 +339,9 @@
               <div id="sylabusSuccessMessage" class="small text-success"></div>
             </div>
           </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Docente (ID)</label>
-            <div class="position-relative">
-              <input type="text" id="worker-search" name="worker_search" class="form-control"
-                placeholder="Buscar docente por nombre..." autocomplete="off"
-                value="{{ locals.worker.person.last_names ~ ' ' ~ locals.worker.person.names ~ ' (' ~ locals.worker.code ~ ')' if locals.worker else '' }}">
-              <!-- Contenedor de sugerencias -->
-              <div id="worker-suggestions" class="list-group position-absolute w-100"
-                style="z-index: 1000; max-height: 300px; overflow-y: auto; display: none;">
-              </div>
-            </div>
-          </div>
           <!-- Input hidden para guardar el ID seleccionado -->
           <input type="hidden" id="worker-id" name="worker_id" class="form-control"
             value="{{ locals.course.worker_id or '' }}" min="1">
-          <small class="text-muted">Opcional - Busca por nombre del docente</small>
 
           <div class="col-12 mt-4">
 

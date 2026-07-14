@@ -234,35 +234,8 @@
 
           {# admin/templates/courses/new.html #}
 
-          <!-- Upload de Sílabo PDF -->
           <div class="col-md-6">
-            <div id="sylabusUploadContainer">
-              <label class="form-label">Sílabo (PDF)</label>
-              <input type="hidden" name="sylabus_url" id="uploadedSylabusUrl" value="">
-              <!-- Input file oculto - DEBE ESTAR DENTRO DEL CONTAINER -->
-              <input type="file" id="sylabusFileInput" style="display: none;" accept=".pdf">
-
-              <div class="d-flex gap-2 mb-2">
-                <button type="button" id="triggerSylabusButton" class="btn btn-outline-secondary flex-fill">
-                  <i class="fa fa-folder-open me-1"></i> Buscar PDF
-                </button>
-                <button type="button" id="uploadSylabusButton" class="btn btn-primary flex-fill">
-                  <i class="fa fa-cloud-upload me-1"></i> Subir
-                </button>
-                <button type="button" id="viewSylabusButton" class="btn btn-info flex-fill d-none">
-                  <i class="fa fa-external-link me-1"></i> Ver
-                </button>
-              </div>
-
-              <div id="sylabusFileNameDisplay" class="small text-muted"></div>
-              <div id="sylabusHelpText" class="small text-muted"></div>
-              <div id="sylabusErrorMessage" class="small text-danger"></div>
-              <div id="sylabusSuccessMessage" class="small text-success"></div>
-            </div>
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Docente</label>
+            <label class="form-label">Coordinador del Curso</label>
             <div class="position-relative">
               <input type="text" id="worker-search" name="worker_search" class="form-control"
                 placeholder="Buscar docente por nombre..." autocomplete="off">
@@ -275,6 +248,33 @@
             <!-- Input hidden para guardar el ID seleccionado -->
             <input type="hidden" id="worker-id" name="worker_id" value="">
             <small class="text-muted">Opcional - Busca por nombre del docente</small>
+          </div>
+
+          <!-- Upload de Sílabo PDF -->
+          <div class="col-md-6">
+            <div id="sylabusUploadContainer">
+              <label class="form-label">Sílabo (PDF)</label>
+              <input type="hidden" name="sylabus_url" id="uploadedSylabusUrl" value="">
+              <!-- Input file oculto - DEBE ESTAR DENTRO DEL CONTAINER -->
+              <input type="file" id="sylabusFileInput" style="display: none;" accept=".pdf">
+
+              <div class="d-flex gap-2 mb-2">
+                <button type="button" id="triggerSylabusButton" class="btn btn-outline-secondary">
+                  <i class="fa fa-folder-open me-1"></i> Buscar PDF
+                </button>
+                <button type="button" id="uploadSylabusButton" class="btn btn-primary">
+                  <i class="fa fa-cloud-upload me-1"></i> Subir
+                </button>
+                <button type="button" id="viewSylabusButton" class="btn btn-info d-none">
+                  <i class="fa fa-external-link me-1"></i> Ver
+                </button>
+              </div>
+
+              <div id="sylabusFileNameDisplay" class="small text-muted"></div>
+              <div id="sylabusHelpText" class="small text-muted"></div>
+              <div id="sylabusErrorMessage" class="small text-danger"></div>
+              <div id="sylabusSuccessMessage" class="small text-success"></div>
+            </div>
           </div>
 
           <div class="col-12 mt-4">

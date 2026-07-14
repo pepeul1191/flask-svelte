@@ -2,6 +2,7 @@
 
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import or_
+from sqlalchemy.orm import joinedload
 
 from admin.models.course import Course
 from admin.models.level import Level
@@ -10,6 +11,85 @@ from main.services import ApplicationService
 
 
 class CourseService(ApplicationService):
+
+  @classmethod
+  def fetch_by_level_with_worker(
+      cls,
+      level_id,
+      page=1,
+      per_page=30,
+      search_query=''
+  ):
+    db = SessionLocal()
+
+    try:
+        # Verificar que el nivel existe
+        level = db.query(Level).filter(Level.id == level_id).first()
+        if not level:
+            return cls.handle_not_found("Nivel no encontrado")
+
+        # Query base con worker
+        query = (
+            db.query(Course)
+            .options(joinedload(Course.worker))
+            .filter(Course.level_id == level_id)
+        )
+
+        # Aplicar búsqueda
+        if search_query:
+            query = query.filter(
+                or_(
+                    Course.name.ilike(f"%{search_query}%"),
+                    Course.code.ilike(f"%{search_query}%")
+                )
+            )
+
+        total_courses = query.count()
+
+        offset = (page - 1) * per_page
+
+        courses = (
+            query
+            .order_by(Course.name.asc())
+            .offset(offset)
+            .limit(per_page)
+            .all()
+        )
+
+        total_pages = (total_courses + per_page - 1) // per_page
+
+        start_record = offset + 1 if total_courses > 0 else 0
+        end_record = min(offset + per_page, total_courses)
+
+        return cls.build_response(
+            data={
+                "courses": [
+                    {
+                        **course.to_dict(),
+                        "worker": course.worker.to_dict() if course.worker else None
+                    }
+                    for course in courses
+                ],
+                "pagination": {
+                    "page": page,
+                    "per_page": per_page,
+                    "total_courses": total_courses,
+                    "total_pages": total_pages,
+                    "start_record": start_record,
+                    "end_record": end_record
+                },
+                "level": level.to_dict()
+            },
+            message="Cursos obtenidos correctamente"
+        )
+
+    except SQLAlchemyError as e:
+        return cls.handle_error(
+            f"Error al obtener cursos: {str(e)}"
+        )
+
+    finally:
+        db.close()
 
   @classmethod
   def fetch_by_level(cls, level_id, page=1, per_page=30, search_query=''):
