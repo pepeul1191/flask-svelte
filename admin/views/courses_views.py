@@ -106,18 +106,19 @@ def new(level_id):
 @views.route("/admin/levels/<int:level_id>/courses", methods=["POST"])
 @only_logged
 def create(level_id):
+  worker_id = request.form.get("worker_id")
 
   response = CourseService.create(level_id, {
     "name": request.form.get("name"),
     "code": request.form.get("code"),
     "description": request.form.get("description"),
     "sylabus_url": request.form.get("sylabus_url"),
-    "worker_id": request.form.get("worker_id")
+    "worker_id": int(worker_id) if worker_id else None,
   })
 
   if response["success"]:
     flash(response["message"], "success")
-    return redirect(f"/admin/levels/{level_id}/courses")
+    return redirect(f"/admin/levels/{level_id}/courses/{response['data']['id']}/edit")
 
   flash(response["message"], "danger")
   return redirect(f"/admin/levels/{level_id}/courses/new")
