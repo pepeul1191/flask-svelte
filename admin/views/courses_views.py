@@ -167,6 +167,8 @@ def edit(level_id, course_id):
 @only_logged
 def update(level_id, course_id):
 
+  worker_id = request.form.get("worker_id")
+
   response = CourseService.update(
     level_id,
     course_id,
@@ -175,7 +177,7 @@ def update(level_id, course_id):
       "code": request.form.get("code"),
       "description": request.form.get("description"),
       "sylabus_url": request.form.get("sylabus_url"),
-      "worker_id": request.form.get("worker_id")
+      "worker_id": int(worker_id) if worker_id else None,
     }
   )
 
