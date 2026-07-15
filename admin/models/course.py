@@ -58,6 +58,12 @@ class Course(Base, ToString):
     back_populates="courses"
   )
 
+  sections = relationship(
+    "Section",
+    back_populates="course",
+    cascade="all, delete-orphan"
+  )
+
   def __init__(self, name, code, level_id, description=None, sylabus_url=None, worker_id=None):
     self.name = name
     self.code = code

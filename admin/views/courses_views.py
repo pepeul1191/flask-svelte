@@ -6,6 +6,7 @@ from admin.configs.middlewares import only_logged
 from admin.services.courses_service import CourseService
 from admin.services.level_service import LevelService
 from admin.services.worker_service import WorkerService
+from admin.services.sections_service import SectionService
 
 views = Blueprint(
   "admin-courses-views",
@@ -129,15 +130,15 @@ def create(level_id):
 # =====================
 @views.route("/admin/levels/<int:level_id>/courses/<int:course_id>/edit", methods=["GET"])
 @only_logged
-def edit(level_id, course_id):
-
+def edit(level_id, course_id):  
   # Verificar que el nivel existe
   level_response = LevelService.fetch_one(level_id)
   if not level_response["success"]:
     flash(level_response["message"], "danger")
-    return redirect("/admin/levels")
+    return redirect("/admin/levels/" + str(level_id) + "/courses/")
 
   response = CourseService.fetch_one(level_id, course_id)
+  response_sections = SectionService.fetch_by_course(course_id)
 
   if not response["success"]:
     flash(response["message"], "danger")
@@ -156,7 +157,8 @@ def edit(level_id, course_id):
       "level_id": level_id,
       "level": level_response["data"],
       "course": response["data"],
-      "worker": worker
+      "worker": worker,
+      "sections": response_sections["data"]["sections"]
     }
   )
 
