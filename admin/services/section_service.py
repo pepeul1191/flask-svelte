@@ -1,4 +1,4 @@
-# admin/services/section_service.py
+# admin/services/sections_service.py
 
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import or_

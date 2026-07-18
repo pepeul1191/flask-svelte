@@ -98,7 +98,7 @@ def index(level_id, course_id, section_id):
 
 
   return render_template(
-    "adverts/index.html",
+    "sections/adverts.html",
     locals={
       "title": "Anuncios",
       "nav_link": "academic-management",
