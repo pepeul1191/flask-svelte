@@ -41,6 +41,13 @@ class Course(Base, ToString):
     nullable=False
   )
 
+  # NUEVO: Agregar branch_id
+  branch_id = Column(
+    Integer,
+    ForeignKey("branches.id"),
+    nullable=True
+  )
+
   worker_id = Column(
     Integer,
     ForeignKey("workers.id"),
@@ -50,6 +57,12 @@ class Course(Base, ToString):
   # Relationships
   level = relationship(
     "Level",
+    back_populates="courses"
+  )
+
+  # NUEVO: Relación con Branch
+  branch = relationship(
+    "Branch",
     back_populates="courses"
   )
 
@@ -64,12 +77,22 @@ class Course(Base, ToString):
     cascade="all, delete-orphan"
   )
 
-  def __init__(self, name, code, level_id, description=None, sylabus_url=None, worker_id=None):
+  def __init__(
+    self,
+    name,
+    code,
+    level_id,
+    description=None,
+    sylabus_url=None,
+    branch_id=None,  # NUEVO parámetro
+    worker_id=None
+  ):
     self.name = name
     self.code = code
     self.level_id = level_id
     self.description = description
     self.sylabus_url = sylabus_url
+    self.branch_id = branch_id  # NUEVO
     self.worker_id = worker_id
 
   def to_dict(self):
@@ -80,5 +103,10 @@ class Course(Base, ToString):
       "description": self.description,
       "sylabus_url": self.sylabus_url,
       "level_id": self.level_id,
-      "worker_id": self.worker_id
+      "branch_id": self.branch_id,  # NUEVO
+      "worker_id": self.worker_id,
+      "branch": (  # NUEVO: Incluir datos de la sucursal
+        self.branch.to_dict()
+        if self.branch else None
+      )
     }

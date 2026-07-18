@@ -134,6 +134,12 @@ entity "levels" as levels {
   name : VARCHAR(30)
 }
 
+entity "branches" as branches {
+  * id : INT
+  --
+  name : VARCHAR(30)
+}
+
 entity "courses" as courses {
   * id : INT
   --
@@ -142,6 +148,7 @@ entity "courses" as courses {
   description : TEXT
   sylabus_url : VARCHAR(100)
   level_id : INT
+  branch_id : INT
   worker_id : INT
 }
 
@@ -320,6 +327,7 @@ students ||--o{ rep_stud_roles
 
 ' --- Académico ---
 levels ||--o{ courses
+branches ||--o{ courses
 workers ||--o{ courses
 courses ||--o{ sections
 
