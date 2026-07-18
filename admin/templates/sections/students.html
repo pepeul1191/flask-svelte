@@ -1,0 +1,283 @@
+{# admin/templates/sections/students.html #}
+
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_js %}
+<script>
+  async function associateStudent(sectionId, studentId, buttonElement) {
+    const response = await fetch("/api/v1/section-students/associate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        section_id: sectionId,
+        student_id: studentId
+      })
+    });
+
+    const result = await response.json();
+    showAlert(result);
+
+    if (result.success) {
+      buttonElement.classList.remove("btn-outline-primary");
+      buttonElement.classList.add("btn-outline-danger");
+      buttonElement.innerHTML = `
+        <i class="fa fa-user-times me-1"></i>
+        Quitar Estudiante
+      `;
+      buttonElement.setAttribute("onclick", `unassociateStudent(${result.data.id}, this)`);
+    }
+  }
+
+  async function unassociateStudent(relationId, buttonElement) {
+    const response = await fetch(`/api/v1/section-students/${relationId}`, {
+      method: "DELETE"
+    });
+
+    const result = await response.json();
+    showAlert(result);
+
+    if (result.success) {
+      buttonElement.classList.remove("btn-outline-danger");
+      buttonElement.classList.add("btn-outline-primary");
+      buttonElement.innerHTML = `
+        <i class="fa fa-user-plus me-1"></i>
+        Asociar Estudiante
+      `;
+    }
+  }
+
+  function showAlert(result) {
+    const type = result.success ? "success" : "danger";
+    const container = document.createElement("div");
+    container.className = `alert alert-${type} alert-dismissible fade show`;
+    container.innerHTML = `
+      ${result.message}
+      <button 
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert">
+      </button>
+    `;
+    document.getElementById("alert-box").prepend(container);
+
+    setTimeout(() => {
+      container.remove();
+    }, 5000);
+  }
+</script>
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+  <div class="container-fluid">
+    <h3 class="mb-4">
+      <a href="/admin/academic">
+        <i class="fa fa-book me-2"></i>
+        Gestión Académica
+      </a>
+      /
+      <a href="/admin/levels">
+        Niveles
+      </a>
+      /
+      <a href="/admin/levels/{{ locals.level_id }}/courses">
+        Cursos
+      </a>
+      /
+      <a href="/admin/levels/{{ locals.level_id }}/courses/{{ locals.course_id }}/edit">
+        Secciones
+      </a>
+      /
+      <a
+        href="/admin/levels/{{ locals.level_id }}/courses/{{ locals.course_id }}/sections/{{ locals.section_id }}/edit">
+        Editar Sección
+      </a>
+      /
+      Estudiantes Asignados
+    </h3>
+
+    {% include 'partials/flash_messages.html' %}
+
+    <!-- FILTROS -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-filter me-2"></i>
+          Filtros de Búsqueda
+        </h6>
+      </div>
+      <div class="card-body">
+        <form method="GET"
+          action="/admin/levels/{{ locals.level_id }}/courses/{{ locals.course_id }}/sections/{{ locals.section_id }}/students">
+          <input type="hidden" name="per_page" value="{{ locals.pagination.per_page }}">
+
+          <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+              <label class="form-label">Nombres</label>
+              <input type="text" name="names" class="form-control" placeholder="Buscar nombres..."
+                value="{{ locals.filters.names or '' }}">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Apellidos</label>
+              <input type="text" name="last_names" class="form-control" placeholder="Buscar apellidos..."
+                value="{{ locals.filters.last_names or '' }}">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Código</label>
+              <input type="text" name="code" class="form-control" placeholder="Buscar código..."
+                value="{{ locals.filters.code or '' }}">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Correo</label>
+              <input type="text" name="email" class="form-control" placeholder="Buscar correo..."
+                value="{{ locals.filters.email or '' }}">
+            </div>
+
+            <!-- RELACIONADOS -->
+            <div class="col-md-4">
+              <label class="form-label">Relacionados</label>
+              <select name="related" class="form-select">
+                <option value="related" {% if locals.filters.related=='related' %}selected{% endif %}>Asociados
+                </option>
+                <option value="not_related" {% if locals.filters.related=='not_related' %}selected{% endif %}>No
+                  Asociados</option>
+                <option value="all" {% if locals.filters.related=='all' %}selected{% endif %}>Todos</option>
+              </select>
+            </div>
+
+            <div class="col-md-4 d-flex gap-2">
+              <button class="btn btn-primary" type="submit">
+                <i class="fa fa-search"></i>
+                Buscar
+              </button>
+              <a class="btn btn-outline-secondary"
+                href="/admin/levels/{{ locals.level_id }}/courses/{{ locals.course_id }}/sections/{{ locals.section_id }}/students?related=related">
+                <i class="fa fa-refresh"></i>
+                Limpiar
+              </a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="alert-box"></div>
+
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-users me-2"></i>
+          Estudiantes
+        </h6>
+      </div>
+
+      <div class="card-body">
+        {% if locals.students %}
+        <div class="row g-3">
+          {% for student in locals.students %}
+          <div class="col-12 col-sm-6 col-lg-4 col-xl" style="min-width:280px;max-width:20%">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-4 text-center">
+                    <img src="
+                      {%- if student.person.image_url -%}
+                        {%- if student.person.image_url.startswith('http') -%}
+                          {{ student.person.image_url }}
+                        {%- else -%}
+                          {{ config.URL_FILES_SERVICE }}/{{ student.person.image_url }}
+                        {%- endif -%}
+                      {%- else -%}
+                        {{ config.STATIC_URL }}/images/avatar.png
+                      {%- endif -%}
+                    " class="img-fluid rounded-circle border" style="width:80px;height:80px;object-fit:cover">
+                  </div>
+                  <div class="col-8">
+                    <h6>{{ student.person.names }} {{ student.person.last_names }}</h6>
+                    <small class="text-muted d-block">
+                      <strong>Código:</strong> {{ student.code }}
+                    </small>
+                    <small class="text-muted d-block">
+                      <strong>Correo:</strong> {{ student.email }}
+                    </small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-footer bg-white">
+                <div class="d-grid gap-1">
+                  {% if student.relation %}
+                  <button class="btn btn-outline-danger btn-sm"
+                    onclick="unassociateStudent({{ student.relation.id }}, this)">
+                    <i class="fa fa-user-times me-1"></i>
+                    Quitar Estudiante
+                  </button>
+                  {% else %}
+                  <button class="btn btn-outline-primary btn-sm"
+                    onclick="associateStudent({{ locals.section_id }}, {{ student.id }}, this)">
+                    <i class="fa fa-user-plus me-1"></i>
+                    Asociar Estudiante
+                  </button>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+          No se encontraron estudiantes.
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- PAGINACIÓN -->
+      {% if locals.pagination.total_pages > 1 %}
+      <div class="card-footer">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="text-muted">
+            Página {{ locals.pagination.page }} de {{ locals.pagination.total_pages }}
+            - Mostrando registros {{ locals.pagination.start_record }} a {{ locals.pagination.end_record }}
+            de {{ locals.pagination.total_students }}
+          </div>
+          <nav>
+            <ul class="pagination mb-0">
+              <li class="page-item {% if locals.pagination.page == 1 %}disabled{% endif %}">
+                <a class="page-link"
+                  href="/admin/levels/{{ locals.level_id }}/courses/{{ locals.course_id }}/sections/{{ locals.section_id }}/students?page=1&per_page={{ locals.pagination.per_page }}&names={{ locals.filters.names }}&last_names={{ locals.filters.last_names }}&code={{ locals.filters.code }}&email={{ locals.filters.email }}">
+                  Primero
+                </a>
+              </li>
+              <li class="page-item {% if locals.pagination.page == 1 %}disabled{% endif %}">
+                <a class="page-link"
+                  href="/admin/levels/{{ locals.level_id }}/courses/{{ locals.course_id }}/sections/{{ locals.section_id }}/students?page={{ locals.pagination.page - 1 }}&per_page={{ locals.pagination.per_page }}&names={{ locals.filters.names }}&last_names={{ locals.filters.last_names }}&code={{ locals.filters.code }}&email={{ locals.filters.email }}">
+                  Anterior
+                </a>
+              </li>
+              <li class="page-item {% if locals.pagination.page == locals.pagination.total_pages %}disabled{% endif %}">
+                <a class="page-link"
+                  href="/admin/levels/{{ locals.level_id }}/courses/{{ locals.course_id }}/sections/{{ locals.section_id }}/students?page={{ locals.pagination.page + 1 }}&per_page={{ locals.pagination.per_page }}&names={{ locals.filters.names }}&last_names={{ locals.filters.last_names }}&code={{ locals.filters.code }}&email={{ locals.filters.email }}">
+                  Siguiente
+                </a>
+              </li>
+              <li class="page-item {% if locals.pagination.page == locals.pagination.total_pages %}disabled{% endif %}">
+                <a class="page-link"
+                  href="/admin/levels/{{ locals.level_id }}/courses/{{ locals.course_id }}/sections/{{ locals.section_id }}/students?page={{ locals.pagination.total_pages }}&per_page={{ locals.pagination.per_page }}&names={{ locals.filters.names }}&last_names={{ locals.filters.last_names }}&code={{ locals.filters.code }}&email={{ locals.filters.email }}">
+                  Último
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</main>
+{% endblock %}

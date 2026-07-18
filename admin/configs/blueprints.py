@@ -14,6 +14,7 @@ from admin.views.sections_views import views as sections_views
 from admin.views.adverts_views import views as adverts_views
 from admin.views.section_worker_role_view import views as section_worker_role_views
 from admin.views.worker_role_view import views as worker_role_views
+from admin.views.section_student_view import views as section_student_views
 
 # apis
 from admin.apis.districts_apis import apis as district_apis
@@ -22,6 +23,7 @@ from admin.apis.representatives_apis import apis as representatives_apis
 from admin.apis.students_apis import apis as students_apis
 from admin.apis.workers_apis import apis as worker_apis
 from admin.apis.section_worker_role_apis import apis as section_worker_role_apis
+from admin.apis.section_student_apis import apis as section_student_apis
 
 blueprints = [
   # views
@@ -39,6 +41,7 @@ blueprints = [
   adverts_views,
   section_worker_role_views,
   worker_role_views,
+  section_student_views,
   # apis
   district_apis,
   representative_student_role_apis,
@@ -46,4 +49,5 @@ blueprints = [
   students_apis, 
   worker_apis,
   section_worker_role_apis,
+  section_student_apis,
 ]

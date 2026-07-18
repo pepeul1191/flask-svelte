@@ -50,6 +50,11 @@ class Student(Base, ToString):
     cascade="all, delete-orphan"
   )
 
+  sections = relationship(
+    "SectionStudent", 
+    back_populates="student"
+  )
+
   def to_dict(self):
     return {
       "id": self.id,

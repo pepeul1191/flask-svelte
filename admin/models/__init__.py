@@ -14,3 +14,4 @@ from admin.models.level import Level
 from admin.models.advert import Advert
 from admin.models.worker_role import WorkerRole
 from admin.models.section_worker_role import SectionWorkerRole
+from admin.models.section_student import SectionStudent
