@@ -81,7 +81,13 @@
                 <td>{{ course.name }}</td>
                 <td>{{ course.code }}</td>
                 <td>{{ course.sylabus_url }}</td>
-                <td>{{ course.worker.person.last_names + " " + course.worker.person.names }}</td>
+                <td>
+                  {% if course.worker and course.worker.person %}
+                  {{ course.worker.person.last_names }} {{ course.worker.person.names }}
+                  {% else %}
+                  -
+                  {% endif %}
+                </td>
                 <td>
                   <a href="/admin/levels/{{ locals.level.id }}/courses/{{ course.id }}/edit"
                     class="btn btn-sm btn-outline-secondary">

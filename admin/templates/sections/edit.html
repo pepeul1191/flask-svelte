@@ -1,0 +1,278 @@
+{# admin/templates/sections/edit.html #}
+
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const jwtToken = document.querySelector('meta[name="csrf-token"]')?.content ||
+      document.querySelector('meta[name="jwt-token"]')?.content;
+
+    try {
+      // FileUpload para la imagen de la sección
+      const imageUpload = new FileUpload({
+        containerId: 'imageUploadContainer',
+        fileInputId: 'imageFileInput',
+        triggerButtonId: 'triggerImageButton',
+        uploadButtonId: 'uploadImageButton',
+        viewButtonId: 'viewImageButton',
+        errorMessageId: 'imageErrorMessage',
+        successMessageId: 'imageSuccessMessage',
+        helpTextId: 'imageHelpText',
+        fileNameDisplayId: 'imageFileNameDisplay',
+
+        // Configuración específica para imágenes
+        label: 'Seleccionar imagen',
+        acceptedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+        maxSizeMB: 5, // Tamaño máximo 5MB para imágenes
+        baseURL: URLS.FILES,
+        url: '/api/v1/storage',
+        fileKey: 'file',
+        triggerButtonText: 'Seleccionar imagen',
+        triggerButtonIcon: 'fa-image',
+        extraParams: {
+          section_id: '{{ locals.section.id if locals.section else '' }}',
+          course_id: '{{ locals.course_id }}',
+          level_id: '{{ locals.level_id }}',
+          folder: 'sections'
+        },
+
+        jwt: localStorage.getItem('jwtFilesToken'),
+
+        onSuccess: function (response) {
+          console.log('Imagen subida:', response);
+          // Actualizar el input hidden con la URL de la imagen
+          const urlInput = document.getElementById('uploadedImageUrl');
+          if (urlInput && response.data.filename) {
+            urlInput.value = response.data.filename;
+          }
+          // Mostrar el botón Ver
+          const viewBtn = document.getElementById('viewImageButton');
+          if (viewBtn) {
+            viewBtn.classList.remove('d-none');
+          }
+        },
+
+        onError: function (error) {
+          console.error('Error al subir imagen:', error);
+        },
+
+        onViewClick: function (file, imageUrl) {
+          const url = document.getElementById('uploadedImageUrl')?.value;
+          console.log('URL de la imagen:', url);
+
+          if (!url) {
+            alert('No hay imagen disponible para visualizar');
+            return;
+          }
+
+          const jwtToken = localStorage.getItem('jwtFilesToken');
+
+          if (!jwtToken) {
+            alert('No se encontró el token de autenticación');
+            return;
+          }
+
+          // Extraer el nombre del archivo de la URL
+          const fileName = url.split('/').pop();
+          const viewUrl = URLS.FILES + `/api/v1/storage?folder=sections&file=${encodeURIComponent(fileName)}`;
+
+          fetch(viewUrl, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${jwtToken}`,
+              'Accept': 'image/*'
+            },
+            credentials: 'include'
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error(`Error al obtener la imagen: ${response.status} ${response.statusText}`);
+              }
+              return response.blob();
+            })
+            .then(blob => {
+              const blobUrl = URL.createObjectURL(blob);
+              // Abrir en una nueva ventana
+              const newWindow = window.open(blobUrl, '_blank');
+              if (!newWindow) {
+                // Si no se puede abrir nueva ventana, mostrar en un modal o alert
+                alert('Por favor, permite ventanas emergentes para ver la imagen');
+              }
+              setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+            })
+            .catch(error => {
+              console.error('Error al cargar la imagen:', error);
+              alert('Error al cargar la imagen: ' + error.message);
+            });
+        }
+      });
+
+      // Si existe una imagen previamente cargada, establecer la URL
+      const existingImageUrl = document.getElementById('uploadedImageUrl')?.value;
+      if (existingImageUrl) {
+        imageUpload.setExistingImageUrl(existingImageUrl);
+        // Mostrar el botón Ver
+        const viewBtn = document.getElementById('viewImageButton');
+        if (viewBtn) {
+          viewBtn.classList.remove('d-none');
+        }
+        // Mostrar nombre del archivo
+        const fileNameDisplay = document.getElementById('imageFileNameDisplay');
+        if (fileNameDisplay) {
+          const fileName = existingImageUrl.split('/').pop();
+          fileNameDisplay.innerHTML = `<span class="text-success">🖼️ ${fileName}</span>`;
+        }
+      }
+
+      console.log('✅ FileUpload para imagen de sección inicializado correctamente');
+
+    } catch (error) {
+      console.error('❌ Error inicializando FileUpload:', error);
+    }
+  });
+</script>
+{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin/academic">
+        <i class="fa fa-book me-2"></i>
+        Gestión Académica
+      </a>
+      /
+      <a href="/admin/levels">
+        Niveles
+      </a>
+      /
+      <a href="/admin/levels/{{ locals.level_id }}/courses">
+        Cursos
+      </a>
+      /
+      <a href="/admin/levels/{{ locals.level_id }}/courses/{{ locals.course_id }}/edit">
+        Secciones
+      </a>
+      /
+      Editar Sección
+    </h3>
+
+    {% include 'partials/flash_messages.html' %}
+
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-edit me-2"></i>
+          Editar Sección: {{ locals.section.code }} - {{ locals.section.name }}
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <form
+          action="/admin/levels/{{ locals.level_id }}/courses/{{ locals.course_id }}/sections/{{ locals.section.id }}/update"
+          method="POST" class="row g-3">
+
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="col-md-4">
+            <label class="form-label">Código</label>
+            <input type="text" name="code" class="form-control" maxlength="20" value="{{ locals.section.code or '' }}">
+            <small class="text-muted">El código debe ser único para este curso</small>
+          </div>
+
+          <div class="col-md-8">
+            <label class="form-label">Nombre <span class="text-danger">*</span></label>
+            <input type="text" name="name" class="form-control" maxlength="45" value="{{ locals.section.name }}"
+              required>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Descripción</label>
+            <textarea name="description" class="form-control" rows="3">{{ locals.section.description or '' }}</textarea>
+          </div>
+
+          <div class="col-12">
+            <div id="imageUploadContainer">
+              <label class="form-label">Imagen de la Sección</label>
+              <input type="hidden" name="image_url" id="uploadedImageUrl" value="{{ locals.section.image_url or '' }}">
+              <!-- Input file oculto -->
+              <input type="file" id="imageFileInput" style="display: none;" accept="image/*">
+
+              <div class="d-flex gap-2 mb-2">
+                <button type="button" id="triggerImageButton" class="btn btn-outline-secondary">
+                  <i class="fa fa-folder-open me-1"></i> Buscar imagen
+                </button>
+                <button type="button" id="uploadImageButton" class="btn btn-primary">
+                  <i class="fa fa-cloud-upload me-1"></i> Subir
+                </button>
+                <button type="button" id="viewImageButton"
+                  class="btn btn-info {% if not locals.section.image_url %}d-none{% endif %}">
+                  <i class="fa fa-external-link me-1"></i> Ver
+                </button>
+              </div>
+
+              <div id="imageFileNameDisplay" class="small text-muted">
+                {% if locals.section.image_url %}
+                <span class="text-success">🖼️ {{ locals.section.image_url.split('/')[-1] if locals.section.image_url
+                  else 'Imagen existente' }}</span>
+                {% endif %}
+              </div>
+              <div id="imageHelpText" class="small text-muted"></div>
+              <div id="imageErrorMessage" class="small text-danger"></div>
+              <div id="imageSuccessMessage" class="small text-success"></div>
+            </div>
+          </div>
+
+          <div class="col-12 mt-4">
+            <button class="btn btn-success">
+              <i class="fa fa-save me-2"></i>
+              Guardar Cambios
+            </button>
+
+            <a href="/admin/levels/{{ locals.level_id }}/courses/{{ locals.course_id }}/files"
+              class="btn btn-secondary ms-2">
+              <i class="fa fa-file-o me-2"></i>
+              Gestionar Material Común
+            </a>
+
+            <a href="/admin/levels/{{ locals.level_id }}/courses/{{ locals.course_id }}/sections/{{ locals.section_id }}/adverts"
+              class="btn btn-secondary ms-2">
+              <i class="fa fa-bullhorn me-2"></i>
+              Ver Anuncios
+            </a>
+
+            <a href="/admin/levels/{{ locals.level_id }}/courses/{{ locals.course_id }}/workers"
+              class="btn btn-secondary ms-2">
+              <i class="fa fa-briefcase me-2"></i>
+              Gestionar Trabajadores
+            </a>
+
+            <a href="/admin/levels/{{ locals.level_id }}/courses/{{ locals.course_id }}/students"
+              class="btn btn-secondary ms-2">
+              <i class="fa fa-graduation-cap me-2"></i>
+              Alumnos Matriculados
+            </a>
+
+            <a href="/admin/levels/{{ locals.level_id }}/courses/{{ locals.course_id }}/edit"
+              class="btn btn-warning ms-2">
+              <i class="fa fa-times me-2"></i>
+              Cancelar
+            </a>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+{% endblock %}

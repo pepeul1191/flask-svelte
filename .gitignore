@@ -33,3 +33,5 @@ static/dist
 .zip
 flask_session
 static/fonts
+
+tmp

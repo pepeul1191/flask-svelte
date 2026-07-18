@@ -46,6 +46,11 @@ class Section(Base, ToString):
     back_populates="sections"
   )
 
+  adverts = relationship(
+    "Advert",
+    back_populates="section"
+  )
+
   def __init__(
     self,
     name,

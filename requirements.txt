@@ -5,3 +5,5 @@ flask-jwt-extended
 dotenv
 flask-wtf
 pymysql
+# development
+faker

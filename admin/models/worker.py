@@ -49,6 +49,11 @@ class Worker(Base, ToString):
     back_populates="worker"
   )
 
+  adverts = relationship(
+    "Advert",
+    back_populates="worker"
+  )
+
   def to_dict(self):
     return {
       "id": self.id,

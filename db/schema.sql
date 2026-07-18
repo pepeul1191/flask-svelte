@@ -30,6 +30,31 @@ CREATE TABLE `addresses` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `adverts`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `adverts` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `header` varchar(100) NOT NULL,
+  `description` text,
+  `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `published_from` datetime DEFAULT NULL,
+  `published_to` datetime DEFAULT NULL,
+  `visible` tinyint(1) NOT NULL DEFAULT '1',
+  `section_id` int unsigned NOT NULL,
+  `worker_id` int unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_adverts_section_id` (`section_id`),
+  KEY `idx_adverts_worker_id` (`worker_id`),
+  CONSTRAINT `fk_adverts_section` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `fk_adverts_worker` FOREIGN KEY (`worker_id`) REFERENCES `workers` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `courses`
 --
 
@@ -46,7 +71,8 @@ CREATE TABLE `courses` (
   PRIMARY KEY (`id`),
   KEY `fk_courses_level` (`level_id`),
   KEY `fk_courses_worker` (`worker_id`),
-  CONSTRAINT `fk_courses_level` FOREIGN KEY (`level_id`) REFERENCES `levels` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT `fk_courses_level` FOREIGN KEY (`level_id`) REFERENCES `levels` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `fk_courses_worker` FOREIGN KEY (`worker_id`) REFERENCES `workers` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -719,5 +745,7 @@ INSERT INTO `schema_migrations` (version) VALUES
   ('20260628011714'),
   ('20260702000253'),
   ('20260702012438'),
-  ('20260711132041');
+  ('20260711132041'),
+  ('20260718004638'),
+  ('20260718010023');
 UNLOCK TABLES;

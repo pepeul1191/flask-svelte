@@ -290,6 +290,7 @@ entity "adverts" as adverts {
   updated : DATETIME
   published_from : DATETIME
   published_to : DATETIME
+  visible : BOOLEAN
   section_id : INT
   worker_id : INT
 }
