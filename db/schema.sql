@@ -55,12 +55,12 @@ CREATE TABLE `adverts` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `branches`
+-- Table structure for table `course_branches`
 --
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `branches` (
+CREATE TABLE `course_branches` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
   PRIMARY KEY (`id`)
@@ -80,13 +80,13 @@ CREATE TABLE `courses` (
   `description` text,
   `sylabus_url` varchar(100) DEFAULT NULL,
   `level_id` int unsigned NOT NULL,
-  `branch_id` int unsigned DEFAULT NULL,
+  `course_branch_id` int unsigned DEFAULT NULL,
   `worker_id` int unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_courses_level` (`level_id`),
   KEY `fk_courses_worker` (`worker_id`),
-  KEY `idx_courses_branch_id` (`branch_id`),
-  CONSTRAINT `fk_courses_branch` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE SET NULL,
+  KEY `idx_courses_course_branch_id` (`course_branch_id`),
+  CONSTRAINT `fk_courses_branch` FOREIGN KEY (`course_branch_id`) REFERENCES `course_branches` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_courses_level` FOREIGN KEY (`level_id`) REFERENCES `levels` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_courses_worker` FOREIGN KEY (`worker_id`) REFERENCES `workers` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

@@ -32,7 +32,7 @@
 
       <div class="card-body">
         <div class="d-flex justify-content-end mb-3">
-          <a href="/admin/branches/new" class="btn btn-success">
+          <a href="/admin/course_branches/new" class="btn btn-success">
             <i class="fa fa-plus"></i>
             Agregar Registro
           </a>
@@ -49,17 +49,17 @@
             </thead>
 
             <tbody>
-              {% if locals.branches %}
-              {% for branch in locals.branches %}
+              {% if locals.course_branches %}
+              {% for course_branch in locals.course_branches %}
               <tr>
-                <td>{{ branch.id }}</td>
-                <td>{{ branch.name }}</td>
+                <td>{{ course_branch.id }}</td>
+                <td>{{ course_branch.name }}</td>
                 <td class="text-end btn-group-sm">
-                  <a href="/admin/branches/{{ branch.id }}/edit" class="btn btn-outline-secondary me-1">
+                  <a href="/admin/course_branches/{{ course_branch.id }}/edit" class="btn btn-outline-secondary me-1">
                     <i class="fa fa-edit"></i>
                     Editar
                   </a>
-                  <a href="/admin/branches/{{ branch.id }}/delete" class="btn btn-outline-danger"
+                  <a href="/admin/course_branches/{{ course_branch.id }}/delete" class="btn btn-outline-danger"
                     onclick="return confirm('¿Está seguro de eliminar este registro?');">
                     <i class="fa fa-trash"></i>
                     Eliminar

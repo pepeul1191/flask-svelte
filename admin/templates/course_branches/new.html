@@ -1,4 +1,4 @@
-{# admin/templates/branches/edit.html #}
+{# admin/templates/course_course_branches/new.html #}
 
 {% extends './layouts/admin_dashboard.html' %}
 
@@ -17,11 +17,11 @@
         Gestión de Datos Maestros
       </a>
       /
-      <a href="/admin/branches">
-        Sucursales
+      <a href="/admin/course_branches">
+        Ramas Académicas
       </a>
       /
-      Editar Rama Académica
+      Nueva Rama Académica
     </h3>
 
     {# Flash messages #}
@@ -30,29 +30,28 @@
     <div class="card mb-4">
       <div class="card-header">
         <h6 class="mb-0">
-          <i class="fa fa-edit me-2"></i>
-          Editar Sucursal: {{ locals.branch.name }}
+          <i class="fa fa-plus me-2"></i>
+          Nueva Rama Académica
         </h6>
       </div>
 
       <div class="card-body">
-        <form action="/admin/branches/{{ locals.branch.id }}/update" method="POST" class="row g-3">
+        <form action="/admin/course_branches" method="POST" class="row g-3">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
           <div class="col-md-6">
             <label for="name" class="form-label">
               Nombre <span class="text-danger">*</span>
             </label>
-            <input type="text" id="name" name="name" class="form-control" maxlength="30"
-              value="{{ locals.branch.name }}" required>
+            <input type="text" id="name" name="name" class="form-control" maxlength="30" required>
           </div>
 
           <div class="col-12 mt-4">
             <button type="submit" class="btn btn-success">
               <i class="fa fa-save me-2"></i>
-              Guardar Cambios
+              Guardar
             </button>
-            <a href="/admin/branches" class="btn btn-warning ms-2">
+            <a href="/admin/course_branches" class="btn btn-warning ms-2">
               <i class="fa fa-times me-2"></i>
               Cancelar
             </a>

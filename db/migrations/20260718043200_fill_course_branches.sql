@@ -1,6 +1,6 @@
 -- migrate:up
 
-INSERT INTO branches (id, name) VALUES
+INSERT INTO course_branches (id, name) VALUES
 (1, 'Matemáticas'),
 (2, 'Ciencias Sociales'),
 (3, 'Letras'),
@@ -10,4 +10,4 @@ INSERT INTO branches (id, name) VALUES
 
 -- migrate:down
 
-DELETE FROM branches;
+DELETE FROM course_branches;

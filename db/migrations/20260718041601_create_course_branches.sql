@@ -1,10 +1,10 @@
 -- migrate:up
 
-CREATE TABLE branches (
+CREATE TABLE course_branches (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(30) NOT NULL
 );
 
 -- migrate:down
 
-DROP TABLE branches;
+DROP TABLE course_branches;

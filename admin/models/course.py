@@ -41,10 +41,9 @@ class Course(Base, ToString):
     nullable=False
   )
 
-  # NUEVO: Agregar branch_id
-  branch_id = Column(
+  course_branch_id = Column(
     Integer,
-    ForeignKey("branches.id"),
+    ForeignKey("course_branches.id"),
     nullable=True
   )
 
@@ -60,9 +59,9 @@ class Course(Base, ToString):
     back_populates="courses"
   )
 
-  # NUEVO: Relación con Branch
-  branch = relationship(
-    "Branch",
+  # NUEVO: Relación con CourseBranch  
+  course_branch = relationship(
+    "CourseBranch",
     back_populates="courses"
   )
 
@@ -105,8 +104,8 @@ class Course(Base, ToString):
       "level_id": self.level_id,
       "branch_id": self.branch_id,  # NUEVO
       "worker_id": self.worker_id,
-      "branch": (  # NUEVO: Incluir datos de la sucursal
-        self.branch.to_dict()
-        if self.branch else None
+      "course_branch": (  # NUEVO: Incluir datos de la sucursal
+        self.course_branch.to_dict()
+        if self.course_branch else None
       )
     }
