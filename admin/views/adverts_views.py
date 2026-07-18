@@ -3,7 +3,7 @@ from flask import Blueprint, flash, render_template, request, redirect
 from admin.configs.middlewares import only_logged
 from admin.services.level_service import LevelService
 from admin.services.courses_service import CourseService
-from admin.services.sections_service import SectionService
+from admin.services.section_service import SectionService
 from admin.services.advert_service import AdvertService
 
 

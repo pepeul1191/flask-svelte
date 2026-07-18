@@ -6,7 +6,7 @@ from admin.configs.middlewares import only_logged
 from admin.services.courses_service import CourseService
 from admin.services.level_service import LevelService
 from admin.services.worker_service import WorkerService
-from admin.services.sections_service import SectionService
+from admin.services.section_service import SectionService
 
 views = Blueprint(
   "admin-courses-views",

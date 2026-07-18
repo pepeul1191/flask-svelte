@@ -12,12 +12,15 @@ from admin.views.students_views import views as students_views
 from admin.views.courses_views import views as courses_views
 from admin.views.sections_views import views as sections_views
 from admin.views.adverts_views import views as adverts_views
+from admin.views.section_worker_role_view import views as section_worker_role_views
+
 # apis
 from admin.apis.districts_apis import apis as district_apis
 from admin.apis.representative_student_role_apis import apis as representative_student_role_apis
 from admin.apis.representatives_apis import apis as representatives_apis
 from admin.apis.students_apis import apis as students_apis
 from admin.apis.workers_apis import apis as worker_apis
+from admin.apis.section_worker_role_apis import apis as section_worker_role_apis
 
 blueprints = [
   # views
@@ -33,10 +36,12 @@ blueprints = [
   courses_views,
   sections_views,
   adverts_views,
+  section_worker_role_views,
   # apis
   district_apis,
   representative_student_role_apis,
   representatives_apis,
   students_apis, 
   worker_apis,
+  section_worker_role_apis,
 ]
