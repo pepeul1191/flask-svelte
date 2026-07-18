@@ -13,6 +13,7 @@ from admin.views.courses_views import views as courses_views
 from admin.views.sections_views import views as sections_views
 from admin.views.adverts_views import views as adverts_views
 from admin.views.section_worker_role_view import views as section_worker_role_views
+from admin.views.worker_role_view import views as worker_role_views
 
 # apis
 from admin.apis.districts_apis import apis as district_apis
@@ -37,6 +38,7 @@ blueprints = [
   sections_views,
   adverts_views,
   section_worker_role_views,
+  worker_role_views,
   # apis
   district_apis,
   representative_student_role_apis,
