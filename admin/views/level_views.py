@@ -109,10 +109,6 @@ def edit(level_id):
   response = LevelService.fetch_one(level_id)
   response_courses = CourseService.fetch_by_level_with_worker(level_id=level_id)
 
-  print('1 +++++++++++++++++++++++++++++++')
-  print(response_courses)
-  print('2 +++++++++++++++++++++++++++++++')
-
   if not response["success"]:
     flash(response["message"], "danger")
     return redirect("/admin/levels")
