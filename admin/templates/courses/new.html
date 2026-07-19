@@ -215,16 +215,30 @@
 
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-          <div class="col-md-4">
+          <div class="col-md-2">
             <label class="form-label">Código <span class="text-danger">*</span></label>
             <input type="text" name="code" class="form-control" maxlength="20" placeholder="Ej: MAT101" required>
             <small class="text-muted">El código debe ser único para este nivel</small>
           </div>
 
-          <div class="col-md-8">
+          <div class="col-md-6">
             <label class="form-label">Nombre <span class="text-danger">*</span></label>
             <input type="text" name="name" class="form-control" maxlength="45" placeholder="Ej: Matemática Básica"
               required>
+          </div>
+
+          <div class="col-md-4">
+            <label for="courseBranch">Rama Académica <span class="text-danger">*</span></label>
+            <select name="course_branch_id" id="courseBranch" class="form-select" required>
+              {% if locals.course_branches %}
+              <option value="">Seleccione...</option>
+              {% for cb in locals.course_branches %}
+              <option value="{{ cb.id }}">{{ cb.name }}</option>
+              {% endfor %}
+              {% else %}
+              <option value="">No hay ramas académicas</option>
+              {% endif %}
+            </select>
           </div>
 
           <div class="col-12">

@@ -92,7 +92,7 @@ class CourseService(ApplicationService):
         db.close()
 
   @classmethod
-  def fetch_by_level(cls, level_id, page=1, per_page=30, search_query=''):
+  def fetch_by_level(cls, level_id, page=1, per_page=30, search_query='', course_branch_id=''):
     db = SessionLocal()
 
     try:
@@ -112,6 +112,10 @@ class CourseService(ApplicationService):
             Course.code.ilike(f"%{search_query}%")
           )
         )
+      
+      # Aplicar filtro por rama académica si existe
+      if course_branch_id:
+        query = query.filter(Course.course_branch_id == course_branch_id)
 
       # Obtener total de registros
       total_courses = query.count()
@@ -181,8 +185,7 @@ class CourseService(ApplicationService):
 
       if existing_course:
         return cls.handle_error(
-          "Ya existe un curso con este código en este nivel",
-          status_code=400
+          "Ya existe un curso con este código en este nivel"
         )
 
       course = Course(
@@ -191,6 +194,7 @@ class CourseService(ApplicationService):
         level_id=level_id,
         description=params.get("description"),
         sylabus_url=params.get("sylabus_url"),
+        course_branch_id=params.get("course_branch_id"),
         worker_id=params.get("worker_id")
       )
 
@@ -299,6 +303,9 @@ class CourseService(ApplicationService):
 
       if "worker_id" in params:
         course.worker_id = params["worker_id"]
+
+      if "course_branch_id" in params:
+        course.course_branch_id = params["course_branch_id"]
 
       db.commit()
       db.refresh(course)

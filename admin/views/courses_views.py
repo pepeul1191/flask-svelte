@@ -7,6 +7,7 @@ from admin.services.courses_service import CourseService
 from admin.services.level_service import LevelService
 from admin.services.worker_service import WorkerService
 from admin.services.section_service import SectionService
+from admin.services.course_branch_service import CourseBranchService
 
 views = Blueprint(
   "admin-courses-views",
@@ -21,7 +22,6 @@ views = Blueprint(
 @views.route("/admin/levels/<int:level_id>/courses", methods=["GET"])
 @only_logged
 def index(level_id):
-
   # Verificar que el nivel existe
   level_response = LevelService.fetch_one(level_id)
   if not level_response["success"]:
@@ -31,6 +31,9 @@ def index(level_id):
   page = request.args.get("page", default=1, type=int)
   per_page = request.args.get("per_page", default=10, type=int)
   search_query = request.args.get("search", default='')
+  course_branch_id = request.args.get("course_branch_id")
+  if course_branch_id:
+    course_branch_id = int(course_branch_id)
 
   if page < 1:
     page = 1
@@ -42,7 +45,8 @@ def index(level_id):
     level_id=level_id,
     page=page,
     per_page=per_page,
-    search_query=search_query
+    search_query=search_query,
+    course_branch_id=course_branch_id
   )
 
   courses = []
@@ -63,6 +67,8 @@ def index(level_id):
   else:
     flash(response["message"], "danger")
 
+  course_branches = CourseBranchService.fetch_all()
+
   return render_template(
     "courses/index.html",
     locals={
@@ -72,7 +78,9 @@ def index(level_id):
       "level": level,
       "courses": courses,
       "pagination": pagination,
-      "search_query": search_query
+      "search_query": search_query,
+      "course_branch_id": course_branch_id,
+      "course_branches": course_branches["data"]
     }
   )
 
@@ -90,13 +98,16 @@ def new(level_id):
     flash(level_response["message"], "danger")
     return redirect("/admin/levels")
 
+  course_branches = CourseBranchService.fetch_all()
+
   return render_template(
     "courses/new.html",
     locals={
       "title": "Nuevo Curso",
       "nav_link": "academic-management",
       "level_id": level_id,
-      "level": level_response["data"]
+      "level": level_response["data"],
+      "course_branches": course_branches["data"]
     }
   )
 
@@ -108,15 +119,14 @@ def new(level_id):
 @only_logged
 def create(level_id):
   worker_id = request.form.get("worker_id")
-
   response = CourseService.create(level_id, {
     "name": request.form.get("name"),
     "code": request.form.get("code"),
     "description": request.form.get("description"),
     "sylabus_url": request.form.get("sylabus_url"),
+    "course_branch_id": int(request.form.get("course_branch_id")) if request.form.get("course_branch_id") else None,
     "worker_id": int(worker_id) if worker_id else None,
   })
-
   if response["success"]:
     flash(response["message"], "success")
     return redirect(f"/admin/levels/{level_id}/courses/{response['data']['id']}/edit")
@@ -140,6 +150,8 @@ def edit(level_id, course_id):
   response = CourseService.fetch_one(level_id, course_id)
   response_sections = SectionService.fetch_by_course(course_id)
 
+  course_branches = CourseBranchService.fetch_all()
+
   if not response["success"]:
     flash(response["message"], "danger")
     return redirect(f"/admin/levels/{level_id}/courses")
@@ -158,7 +170,8 @@ def edit(level_id, course_id):
       "level": level_response["data"],
       "course": response["data"],
       "worker": worker,
-      "sections": response_sections["data"]["sections"]
+      "sections": response_sections["data"]["sections"],
+      "course_branches": course_branches["data"]
     }
   )
 
@@ -181,6 +194,7 @@ def update(level_id, course_id):
       "description": request.form.get("description"),
       "sylabus_url": request.form.get("sylabus_url"),
       "worker_id": int(worker_id) if worker_id else None,
+      "course_branch_id": int(request.form.get("course_branch_id")) if request.form.get("course_branch_id") else None,
     }
   )
 

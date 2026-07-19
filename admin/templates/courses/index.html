@@ -51,6 +51,23 @@
             </div>
 
             <div class="col-md-4">
+              <label for="courseBranch">Rama Académica <span class="text-danger">*</span></label>
+              <select name="course_branch_id" id="courseBranch" class="form-select">
+                <option value="">Seleccione...</option>
+
+                {% if locals.course_branches %}
+                {% for cb in locals.course_branches %}
+                <option value="{{ cb.id }}" {% if cb.id==locals.course_branch_id %}selected{% endif %}>
+                  {{ cb.name }}
+                </option>
+                {% endfor %}
+                {% else %}
+                <option value="">No hay ramas académicas</option>
+                {% endif %}
+              </select>
+            </div>
+
+            <div class="col-md-4">
               <div class="input-group" style="padding-top: 8px;">
 
                 <button type="submit" class="btn btn-primary me-2">
@@ -131,6 +148,7 @@
                 <th>Código</th>
                 <th>Nombre</th>
                 <th>Descripción</th>
+                <th>Rama Académica</th>
                 <th class="text-end">Acciones</th>
               </tr>
             </thead>
@@ -145,6 +163,11 @@
                 <td><strong>{{ course.code }}</strong></td>
                 <td>{{ course.name }}</td>
                 <td>{{ course.description[:50] if course.description else '-' }}</td>
+                {% if course.course_branch %}
+                <td>{{ course.course_branch.name }}</td>
+                {% else %}
+                <td>-</td>
+                {% endif %}
 
                 <td class="text-end btn-group-sm">
 

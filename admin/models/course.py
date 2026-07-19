@@ -83,7 +83,7 @@ class Course(Base, ToString):
     level_id,
     description=None,
     sylabus_url=None,
-    branch_id=None,  # NUEVO parámetro
+    course_branch_id=None,  # NUEVO parámetro
     worker_id=None
   ):
     self.name = name
@@ -91,7 +91,7 @@ class Course(Base, ToString):
     self.level_id = level_id
     self.description = description
     self.sylabus_url = sylabus_url
-    self.branch_id = branch_id  # NUEVO
+    self.course_branch_id = course_branch_id  # NUEVO
     self.worker_id = worker_id
 
   def to_dict(self):
@@ -102,7 +102,7 @@ class Course(Base, ToString):
       "description": self.description,
       "sylabus_url": self.sylabus_url,
       "level_id": self.level_id,
-      "branch_id": self.branch_id,  # NUEVO
+      "course_branch_id": self.course_branch_id,  # NUEVO
       "worker_id": self.worker_id,
       "course_branch": (  # NUEVO: Incluir datos de la sucursal
         self.course_branch.to_dict()
