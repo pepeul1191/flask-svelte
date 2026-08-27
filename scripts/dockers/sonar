@@ -1,0 +1,56 @@
+version: "3.8"
+
+services:
+  # Servicio de base de datos PostgreSQL
+  # nueva contraseña site-packages/_pytest/fixtures.PY1
+  db:
+    image: postgres:16-alpine  # Usa una versión ligera de PostgreSQL
+    container_name: sonarqube_db
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+      - POSTGRES_DB=sonar
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persiste los datos de la DB
+    networks:
+      - sonarnet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sonar -d sonar"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Servicio de SonarQube
+  sonarqube:
+    image: sonarqube:community  # Usa la versión Community (gratuita)
+    container_name: sonarqube
+    depends_on:
+      db:
+        condition: service_healthy  # Espera a que la DB esté lista
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://db:5432/sonar
+      - SONAR_JDBC_USERNAME=sonar
+      - SONAR_JDBC_PASSWORD=sonar
+      # Opcional: Configurar memoria para entornos con recursos limitados
+      # - SONAR_WEB_JAVAOPTS=-Xmx512m
+      # - SONAR_CE_JAVAOPTS=-Xmx512m
+    ports:
+      - "9000:9000"  # Expone el puerto 9000 para acceder a la interfaz web
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_extensions:/opt/sonarqube/extensions  # Para plugins
+    networks:
+      - sonarnet
+
+# Definición de volúmenes para persistencia de datos
+volumes:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:
+  postgres_data:
+
+# Red para la comunicación entre contenedores
+networks:
+  sonarnet:
+    driver: bridge
