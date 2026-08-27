@@ -1,0 +1,42 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0 -- /home/pepe/Documentos/unmsm/2026-2/Gestión de la Calidad de Software/aula/venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/pepe/Documentos/unmsm/2026-2/Gestión de la Calidad de Software/aula/tests/db
+plugins: Faker-40.37.0
+collecting ... collected 6 items
+
+test_mysql_connection_env.py::TestMySQLConnectionEnv::test_env_variables_loaded PASSED [ 16%]
+test_mysql_connection_env.py::TestMySQLConnectionEnv::test_db_connection PASSED [ 33%]
+test_mysql_connection_env.py::TestMySQLConnectionEnv::test_database_exists PASSED [ 50%]
+test_mysql_connection_env.py::TestMySQLConnectionEnv::test_tables_count PASSED [ 66%]
+test_mysql_connection_env.py::TestMySQLConnectionEnv::test_dbmate_status FAILED [ 83%]
+test_mysql_connection_env.py::TestMySQLConnectionEnv::test_dbmate_migrations_applied PASSED [100%]
+
+=================================== FAILURES ===================================
+__________________ TestMySQLConnectionEnv.test_dbmate_status ___________________
+test_mysql_connection_env.py:92: in test_dbmate_status
+    assert 'migrations' in result.stdout.lower() or 'pending' in result.stdout.lower() or 'applied' in result.stdout.lower(), \
+E   AssertionError: Salida inesperada: 
+E   assert ('migrations' in '' or 'pending' in '' or 'applied' in '')
+E    +  where '' = <built-in method lower of str object at 0xb3d3f0>()
+E    +    where <built-in method lower of str object at 0xb3d3f0> = ''.lower
+E    +      where '' = CompletedProcess(args=['npx', 'dbmate', 'status'], returncode=0, stdout='', stderr='').stdout
+E    +  and   '' = <built-in method lower of str object at 0xb3d3f0>()
+E    +    where <built-in method lower of str object at 0xb3d3f0> = ''.lower
+E    +      where '' = CompletedProcess(args=['npx', 'dbmate', 'status'], returncode=0, stdout='', stderr='').stdout
+E    +  and   '' = <built-in method lower of str object at 0xb3d3f0>()
+E    +    where <built-in method lower of str object at 0xb3d3f0> = ''.lower
+E    +      where '' = CompletedProcess(args=['npx', 'dbmate', 'status'], returncode=0, stdout='', stderr='').stdout
+=============================== warnings summary ===============================
+test_mysql_connection_env.py::TestMySQLConnectionEnv::test_env_variables_loaded
+  /home/pepe/Documentos/unmsm/2026-2/Gestión de la Calidad de Software/aula/venv/lib/python3.12/site-packages/_pytest/fixtures.py:1313: PytestRemovedIn10Warning: Class-scoped fixture defined as instance method is deprecated.
+  Instance attributes set in this fixture will NOT be visible to test methods,
+  as each test gets a new instance while the fixture runs only once per class.
+  Use @classmethod decorator and set attributes on cls instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#class-scoped-fixture-as-instance-method
+    fixturefunc = resolve_fixture_function(fixturedef, request)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED test_mysql_connection_env.py::TestMySQLConnectionEnv::test_dbmate_status
+==================== 1 failed, 5 passed, 1 warning in 1.09s ====================

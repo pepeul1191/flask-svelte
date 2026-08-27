@@ -7,3 +7,6 @@ flask-wtf
 pymysql
 # development
 faker
+# testing
+pytest
+mysql-connector-python

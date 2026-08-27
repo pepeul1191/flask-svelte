@@ -1,0 +1,10 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0 -- /home/pepe/Documentos/unmsm/2026-2/Gestión de la Calidad de Software/aula/venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/pepe/Documentos/unmsm/2026-2/Gestión de la Calidad de Software/aula/tests/db
+plugins: Faker-40.37.0
+collecting ... ERROR: file or directory not found: teststest_mysql_connection_env.py
+
+collected 0 items
+
+============================ no tests ran in 0.00s =============================

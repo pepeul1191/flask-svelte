@@ -93,3 +93,8 @@ Ejecutar
 Deshacer
 
     $ npm run db:rollback
+
+
+Pruebas:
+
+    $ pytest tests/db/test_mysql_connection_env.py -v --tb=short
