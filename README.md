@@ -55,6 +55,9 @@ Este es un proyecto base que integra un backend en **Flask** con un frontend en 
     # PATHS
     ACCESS_PATH=/home/pepe/Documentos/node/access
     FILES_PATH=/home/pepe/Documentos/node/files
+    #### SONARQUBE
+    SONAR_HOST_URL=http://localhost:9000
+    SONAR_TOKEN=sqp_72702e5d1aa6da636648490ae6cefe7960aa2f04
 
 Ejemplos de código en Sqlite3
 

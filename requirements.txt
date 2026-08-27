@@ -10,3 +10,5 @@ faker
 # testing
 pytest
 mysql-connector-python
+pytest-cov 
+coverage
