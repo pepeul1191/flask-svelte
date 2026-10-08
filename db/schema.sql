@@ -114,6 +114,30 @@ CREATE TABLE `schema_migrations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `workers`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `workers` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `names` varchar(150) NOT NULL,
+  `last_names` varchar(150) NOT NULL,
+  `email` varchar(150) NOT NULL,
+  `document` varchar(50) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `certification` varchar(255) DEFAULT NULL,
+  `position` varchar(100) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Dumping routines for database 'terpel'
 --
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -143,5 +167,7 @@ INSERT INTO `schema_migrations` (version) VALUES
   ('20261008195317'),
   ('20261008195550'),
   ('20261008200925'),
-  ('20261008201047');
+  ('20261008201047'),
+  ('20261008204846'),
+  ('20261008204853');
 UNLOCK TABLES;

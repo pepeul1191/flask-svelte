@@ -1,0 +1,245 @@
+{# admin/templates/workers/new.html #}
+
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_css %}{% endblock %}
+{% block extra_js %}{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin">
+        <i class="fa fa-cc-mastercard me-2"></i>
+        Datos Maestros
+      </a>
+      /
+      <a href="/admin/workers">
+        Gestión de Trabajadores
+      </a>
+      /
+      Nuevo Trabajador
+    </h3>
+
+    {% include 'partials/flash_messages.html' %}
+
+    <!-- CARD 1: INFORMACIÓN PRINCIPAL -->
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-user-plus me-2"></i>
+          Información del Trabajador
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <form
+          action="/admin/workers"
+          method="POST"
+          class="row g-3">
+
+          <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}">
+
+          <!-- Nombres -->
+          <div class="col-md-6">
+            <label class="form-label">
+              Nombres <span class="text-danger">*</span>
+            </label>
+
+            <input
+              type="text"
+              name="names"
+              class="form-control"
+              maxlength="150"
+              placeholder="Ej. Carlos Alberto"
+              required>
+          </div>
+
+          <!-- Apellidos -->
+          <div class="col-md-6">
+            <label class="form-label">
+              Apellidos <span class="text-danger">*</span>
+            </label>
+
+            <input
+              type="text"
+              name="last_names"
+              class="form-control"
+              maxlength="150"
+              placeholder="Ej. Gutiérrez Mendoza"
+              required>
+          </div>
+
+          <!-- Correo Electrónico -->
+          <div class="col-md-6">
+            <label class="form-label">
+              Correo Electrónico <span class="text-danger">*</span>
+            </label>
+
+            <input
+              type="email"
+              name="email"
+              class="form-control"
+              maxlength="150"
+              placeholder="correo@system.local"
+              required>
+          </div>
+
+          <!-- Documento de Identidad -->
+          <div class="col-md-6">
+            <label class="form-label">
+              Documento de Identidad
+            </label>
+
+            <input
+              type="text"
+              name="document"
+              class="form-control"
+              maxlength="50"
+              placeholder="DNI, Cédula o Pasaporte">
+          </div>
+
+          <!-- Teléfono -->
+          <div class="col-md-6">
+            <label class="form-label">
+              Teléfono
+            </label>
+
+            <input
+              type="text"
+              name="phone"
+              class="form-control"
+              maxlength="50"
+              placeholder="+51987654321">
+          </div>
+
+          <!-- Cargo / Posición -->
+          <div class="col-md-6">
+            <label class="form-label">
+              Cargo / Posición
+            </label>
+
+            <input
+              type="text"
+              name="position"
+              class="form-control"
+              maxlength="100"
+              placeholder="Ej. Técnico Mecánico Senior">
+          </div>
+
+          <!-- Certificación -->
+          <div class="col-md-12">
+            <label class="form-label">
+              Certificación
+            </label>
+
+            <input
+              type="text"
+              name="certification"
+              class="form-control"
+              maxlength="255"
+              placeholder="Ej. ISO 18436-2 Categoría II (Vibraciones)">
+          </div>
+
+          <!-- ACTIONS -->
+          <div class="col-12 mt-4">
+
+            <button
+              type="submit"
+              class="btn btn-success">
+
+              <i class="fa fa-save me-2"></i>
+              Guardar
+
+            </button>
+
+            <a
+              href="/admin/workers"
+              class="btn btn-warning ms-2">
+
+              <i class="fa fa-times me-2"></i>
+              Cancelar
+
+            </a>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+
+    <!-- CARD 2: VINCULACIÓN CON EL SISTEMA -->
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-link me-2"></i>
+          Vinculación de Cuenta de Usuario
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <form
+          action="/admin/workers/link-user"
+          method="POST"
+          class="row g-3">
+
+          <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}">
+
+          <div class="col-md-6">
+
+            <label class="form-label">
+              ID de Usuario del Sistema
+            </label>
+
+            <input
+              type="number"
+              name="user_id"
+              class="form-control"
+              placeholder="ID de la tabla users">
+
+            <div class="form-text text-muted">
+              Puede dejarse vacío si el trabajador no tiene una
+              cuenta de acceso al sistema.
+            </div>
+
+          </div>
+
+          <!-- ACTIONS -->
+          <div class="col-12 mt-4">
+
+            <button
+              type="submit"
+              class="btn btn-primary">
+
+              <i class="fa fa-link me-2"></i>
+              Vincular Usuario
+
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+{% endblock %}

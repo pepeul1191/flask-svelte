@@ -18,38 +18,41 @@ entity "clients" as clients {
   * id : bigint <<PK>>
   --
   name : string
-  tax_id : string <<unique>>
   contact_name : string
-  email : string
-  phone : string
-  address : text
-  notes : text
+  email : string <<nullable>>
+  phone : string <<nullable>>
+  address : text <<nullable>>
+  notes : text <<nullable>>
   created_at : datetime
   updated_at : datetime
 }
 
-entity "client_operators" as client_operators {
+entity "client_workers" as client_workers {
   * id : bigint <<PK>>
   --
-  user_id : bigint <<unique>>
-  client_id : bigint <<FK>>
-  name : string
-  document_id : string
-  phone : string
-  position : string
+  user_id : bigint <<unique>> <<nullable>>
+  names : string
+  last_names : string
+  email: string
+  document : string <<nullable>>
+  phone : string <<nullable>>
+  certification : string <<nullable>>
+  position : string <<nullable>>
   created_at : datetime
   updated_at : datetime
 }
 
-entity "provider_operators" as provider_operators {
+entity "workers" as workers {
   * id : bigint <<PK>>
   --
-  user_id : bigint <<unique>>
-  name : string
-  document_id : string
-  phone : string
-  certification : string
-  position : string
+  user_id : bigint <<unique>> <<nullable>>
+  names : string
+  last_names : string
+  email: string
+  document : string <<nullable>>
+  phone : string <<nullable>>
+  certification : string <<nullable>>
+  position : string <<nullable>>
   created_at : datetime
   updated_at : datetime
 }
@@ -189,7 +192,7 @@ entity "analyses" as analyses {
 
 ' ---------- Relaciones ----------
 
-clients ||--o{ client_operators : "1:N"
+clients ||--o{ client_workers : "1:N"
 clients ||--o{ machines : "1:N"
 
 brands ||--o{ brand_models : "1:N"
@@ -204,9 +207,9 @@ oils ||--o{ machine_oils : "1:N"
 machines ||--o{ machine_documents : "1:N"
 machines ||--o{ samples : "1:N"
 
-client_operators ||--o{ samples : "1:N"
-provider_operators ||--o{ samples : "1:N"
-provider_operators ||--o{ analyses : "1:N"
+client_workers ||--o{ samples : "1:N"
+workers ||--o{ samples : "1:N"
+workers ||--o{ analyses : "1:N"
 
 samples ||--o| analyses : "1:0..1"
 
