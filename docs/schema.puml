@@ -63,7 +63,7 @@ entity "brands" as brands {
   updated_at : datetime
 }
 
-entity "models" as models {
+entity "brand_models" as brand_models {
   * id : bigint <<PK>>
   --
   brand_id : bigint <<FK>>
@@ -192,8 +192,8 @@ entity "analyses" as analyses {
 clients ||--o{ client_operators : "1:N"
 clients ||--o{ machines : "1:N"
 
-brands ||--o{ models : "1:N"
-models ||--o{ machines : "1:N"
+brands ||--o{ brand_models : "1:N"
+brand_models ||--o{ machines : "1:N"
 
 oil_brands ||--o{ oils : "1:N"
 oil_types ||--o{ oils : "1:N"
