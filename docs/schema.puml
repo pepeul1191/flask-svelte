@@ -15,7 +15,7 @@ skinparam arrow {
 }
  
 entity "clients" as clients {
-  * id : bigint <<PK>>
+  * id : int <<PK>>
   --
   name : string
   contact_name : string
@@ -28,9 +28,9 @@ entity "clients" as clients {
 }
 
 entity "client_workers" as client_workers {
-  * id : bigint <<PK>>
+  * id : int <<PK>>
   --
-  user_id : bigint <<unique>> <<nullable>>
+  user_id : int <<unique>> <<nullable>>
   names : string
   last_names : string
   email: string
@@ -43,9 +43,9 @@ entity "client_workers" as client_workers {
 }
 
 entity "workers" as workers {
-  * id : bigint <<PK>>
+  * id : int <<PK>>
   --
-  user_id : bigint <<unique>> <<nullable>>
+  user_id : int <<unique>> <<nullable>>
   names : string
   last_names : string
   email: string
@@ -58,7 +58,7 @@ entity "workers" as workers {
 }
 
 entity "brands" as brands {
-  * id : bigint <<PK>>
+  * id : int <<PK>>
   --
   name : string <<unique>>
   description : text
@@ -67,9 +67,9 @@ entity "brands" as brands {
 }
 
 entity "brand_models" as brand_models {
-  * id : bigint <<PK>>
+  * id : int <<PK>>
   --
-  brand_id : bigint <<FK>>
+  brand_id : int <<FK>>
   name : string
   description : text
   created_at : datetime
@@ -77,10 +77,10 @@ entity "brand_models" as brand_models {
 }
 
 entity "machines" as machines {
-  * id : bigint <<PK>>
+  * id : int <<PK>>
   --
-  client_id : bigint <<FK>>
-  model_id : bigint <<FK>>
+  client_id : int <<FK>>
+  model_id : int <<FK>>
   name : string
   code : string
   serial_number : string
@@ -93,7 +93,7 @@ entity "machines" as machines {
 }
 
 entity "oil_brands" as oil_brands {
-  * id : bigint <<PK>>
+  * id : int <<PK>>
   --
   name : string <<unique>>
   description : text
@@ -102,7 +102,7 @@ entity "oil_brands" as oil_brands {
 }
 
 entity "oil_types" as oil_types {
-  * id : bigint <<PK>>
+  * id : int <<PK>>
   --
   name : string <<unique>>
   description : text
@@ -111,10 +111,10 @@ entity "oil_types" as oil_types {
 }
 
 entity "oils" as oils {
-  * id : bigint <<PK>>
+  * id : int <<PK>>
   --
-  oil_brand_id : bigint <<FK>>
-  oil_type_id : bigint <<FK>>
+  oil_brand_id : int <<FK>>
+  oil_type_id : int <<FK>>
   name : string
   description : text
   created_at : datetime
@@ -122,18 +122,18 @@ entity "oils" as oils {
 }
 
 entity "machine_oils" as machine_oils {
-  * id : bigint <<PK>>
+  * id : int <<PK>>
   --
-  machine_id : bigint <<FK>>
-  oil_id : bigint <<FK>>
+  machine_id : int <<FK>>
+  oil_id : int <<FK>>
   created_at : datetime
   updated_at : datetime
 }
 
 entity "machine_documents" as machine_documents {
-  * id : bigint <<PK>>
+  * id : int <<PK>>
   --
-  machine_id : bigint <<FK>>
+  machine_id : int <<FK>>
   name : string
   description : text
   url : string
@@ -143,11 +143,11 @@ entity "machine_documents" as machine_documents {
 }
 
 entity "samples" as samples {
-  * id : bigint <<PK>>
+  * id : int <<PK>>
   --
-  machine_id : bigint <<FK>>
-  client_operator_id : bigint <<FK>> <<nullable>>
-  provider_operator_id : bigint <<FK>> <<nullable>>
+  machine_id : int <<FK>>
+  client_operator_id : int <<FK>> <<nullable>>
+  provider_operator_id : int <<FK>> <<nullable>>
   sampled_at : datetime
   sample_type : integer
   compartment : string
@@ -163,10 +163,10 @@ entity "samples" as samples {
 }
 
 entity "analyses" as analyses {
-  * id : bigint <<PK>>
+  * id : int <<PK>>
   --
-  sample_id : bigint <<FK>>
-  provider_operator_id : bigint <<FK>>
+  sample_id : int <<FK>>
+  provider_operator_id : int <<FK>>
   lab_name : string
   report_number : string
   received_at : datetime

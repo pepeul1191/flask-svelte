@@ -1,0 +1,173 @@
+{# admin/templates/clients/new.html #}
+
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_css %}{% endblock %}
+{% block extra_js %}{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin">
+        <i class="fa fa-cc-mastercard me-2"></i>
+        Datos Maestros
+      </a>
+      /
+      <a href="/admin/clients">
+        Gestión de Clientes
+      </a>
+      /
+      Nuevo Cliente
+    </h3>
+
+    {% include 'partials/flash_messages.html' %}
+
+    <!-- CARD 1: INFORMACIÓN PRINCIPAL -->
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-user-plus me-2"></i>
+          Información del Cliente
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <form
+          action="/admin/clients"
+          method="POST"
+          class="row g-3">
+
+          <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}">
+
+          <!-- Nombre de la Empresa / Cliente -->
+          <div class="col-md-6">
+            <label class="form-label">
+              Nombre o Empresa <span class="text-danger">*</span>
+            </label>
+
+            <input
+              type="text"
+              name="name"
+              class="form-control"
+              maxlength="150"
+              placeholder="Ej. Industrias ABC S.A.C."
+              required>
+          </div>
+
+          <!-- Persona de Contacto -->
+          <div class="col-md-6">
+            <label class="form-label">
+              Persona de Contacto <span class="text-danger">*</span>
+            </label>
+
+            <input
+              type="text"
+              name="contact_name"
+              class="form-control"
+              maxlength="150"
+              placeholder="Ej. Juan Pérez"
+              required>
+          </div>
+
+          <!-- Correo Electrónico -->
+          <div class="col-md-6">
+            <label class="form-label">
+              Correo Electrónico
+            </label>
+
+            <input
+              type="email"
+              name="email"
+              class="form-control"
+              maxlength="150"
+              placeholder="contacto@empresa.com">
+          </div>
+
+          <!-- Teléfono -->
+          <div class="col-md-6">
+            <label class="form-label">
+              Teléfono
+            </label>
+
+            <input
+              type="text"
+              name="phone"
+              class="form-control"
+              maxlength="50"
+              placeholder="+51987654321">
+          </div>
+
+          <!-- Dirección -->
+          <div class="col-md-12">
+            <label class="form-label">
+              Dirección
+            </label>
+
+            <input
+              type="text"
+              name="address"
+              class="form-control"
+              maxlength="255"
+              placeholder="Ej. Av. Industrial 123, Lima">
+          </div>
+
+          <!-- ACTIONS -->
+          <div class="col-12 mt-4">
+
+            <button
+              type="submit"
+              class="btn btn-success">
+
+              <i class="fa fa-save me-2"></i>
+              Guardar
+
+            </button>
+
+            <a
+              href="/admin/clients"
+              class="btn btn-warning ms-2">
+
+              <i class="fa fa-times me-2"></i>
+              Cancelar
+
+            </a>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+
+    <!-- CARD 2: NOTAS Y OBSERVACIONES -->
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-sticky-note me-2"></i>
+          Notas Adicionales
+        </h6>
+      </div>
+
+      <div class="card-body">
+        <div class="text-muted">
+          <p class="mb-0">Las notas u observaciones internas del cliente se pueden registrar una vez creado el registro o mediante su panel de edición.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+{% endblock %}

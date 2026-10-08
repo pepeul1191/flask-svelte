@@ -7,6 +7,7 @@ from admin.views.oil_view import views as oil_view
 from admin.views.brand_view import views as brand_view
 from admin.views.brand_model_view import views as brand_model_view
 from admin.views.worker_view import views as worker_view
+from admin.views.client_view import views as client_view
 # apis
 
 blueprints = [
@@ -18,5 +19,6 @@ blueprints = [
   brand_view,
   brand_model_view,
   worker_view,
+  client_view,
   # apis
 ]

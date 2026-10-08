@@ -1,0 +1,191 @@
+{# admin/templates/clients/edit.html #}
+
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_css %}{% endblock %}
+{% block extra_js %}{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin">
+        <i class="fa fa-cc-mastercard me-2"></i>
+        Datos Maestros
+      </a>
+      /
+      <a href="/admin/clients">
+        Gestión de Clientes
+      </a>
+      /
+      Editar Cliente
+    </h3>
+
+    {% include 'partials/flash_messages.html' %}
+
+    <form
+      action="/admin/clients/{{ locals.client.id }}/update"
+      method="POST">
+
+      <input
+        type="hidden"
+        name="csrf_token"
+        value="{{ csrf_token() }}">
+
+      <!-- CARD 1: INFORMACIÓN PRINCIPAL -->
+      <div class="card mb-4">
+
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="fa fa-user-edit me-2"></i>
+            Editar Información del Cliente: {{ locals.client.name }}
+          </h6>
+        </div>
+
+        <div class="card-body">
+
+          <div class="row g-3">
+
+            <!-- Nombre de la Empresa / Cliente -->
+            <div class="col-md-6">
+              <label class="form-label">
+                Nombre o Empresa <span class="text-danger">*</span>
+              </label>
+
+              <input
+                type="text"
+                name="name"
+                class="form-control"
+                maxlength="150"
+                placeholder="Ej. Industrias ABC S.A.C."
+                value="{{ locals.client.name }}"
+                required>
+            </div>
+
+            <!-- Persona de Contacto -->
+            <div class="col-md-6">
+              <label class="form-label">
+                Persona de Contacto <span class="text-danger">*</span>
+              </label>
+
+              <input
+                type="text"
+                name="contact_name"
+                class="form-control"
+                maxlength="150"
+                placeholder="Ej. Juan Pérez"
+                value="{{ locals.client.contact_name }}"
+                required>
+            </div>
+
+            <!-- Correo Electrónico -->
+            <div class="col-md-6">
+              <label class="form-label">
+                Correo Electrónico
+              </label>
+
+              <input
+                type="email"
+                name="email"
+                class="form-control"
+                maxlength="150"
+                placeholder="contacto@empresa.com"
+                value="{{ locals.client.email or '' }}">
+            </div>
+
+            <!-- Teléfono -->
+            <div class="col-md-6">
+              <label class="form-label">
+                Teléfono
+              </label>
+
+              <input
+                type="text"
+                name="phone"
+                class="form-control"
+                maxlength="50"
+                placeholder="+51987654321"
+                value="{{ locals.client.phone or '' }}">
+            </div>
+
+            <!-- Dirección -->
+            <div class="col-md-12">
+              <label class="form-label">
+                Dirección
+              </label>
+
+              <input
+                type="text"
+                name="address"
+                class="form-control"
+                maxlength="255"
+                placeholder="Ej. Av. Industrial 123, Lima"
+                value="{{ locals.client.address or '' }}">
+            </div>
+
+          </div>
+
+          <!-- ACTIONS -->
+          <div class="col-12 mt-4">
+
+            <button
+              type="submit"
+              class="btn btn-success">
+
+              <i class="fa fa-save me-2"></i>
+              Actualizar
+
+            </button>
+
+            <a
+              href="/admin/clients"
+              class="btn btn-warning ms-2">
+
+              <i class="fa fa-times me-2"></i>
+              Cancelar
+
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- CARD 2: NOTAS Y OBSERVACIONES -->
+      <div class="card mb-4">
+
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="fa fa-sticky-note me-2"></i>
+            Notas Adicionales
+          </h6>
+        </div>
+
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-12">
+              <label class="form-label">
+                Notas Internas del Cliente
+              </label>
+
+              <textarea
+                name="notes"
+                class="form-control"
+                rows="4"
+                placeholder="Comentarios u observaciones internas...">{{ locals.client.notes or '' }}</textarea>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </form>
+
+  </div>
+</main>
+
+{% endblock %}
