@@ -44,6 +44,28 @@ CREATE TABLE `oil_types` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `oils`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `oils` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `oil_brand_id` int unsigned NOT NULL,
+  `oil_type_id` int unsigned NOT NULL,
+  `name` varchar(150) NOT NULL,
+  `description` text,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_oils_oil_brand_id` (`oil_brand_id`),
+  KEY `idx_oils_oil_type_id` (`oil_type_id`),
+  CONSTRAINT `fk_oils_oil_brand` FOREIGN KEY (`oil_brand_id`) REFERENCES `oil_brands` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_oils_oil_type` FOREIGN KEY (`oil_type_id`) REFERENCES `oil_types` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `schema_migrations`
 --
 
@@ -79,5 +101,7 @@ INSERT INTO `schema_migrations` (version) VALUES
   ('20261008185818'),
   ('20261008190048'),
   ('20261008191251'),
-  ('20261008191258');
+  ('20261008191258'),
+  ('20261008193046'),
+  ('20261008193049');
 UNLOCK TABLES;

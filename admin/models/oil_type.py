@@ -39,15 +39,12 @@ class OilType(Base, ToString):
     nullable=False
   )
 
-  # Si en el futuro necesitas relacionarlo con otra entidad (ej. aceites), 
-  # puedes descomentar y ajustar algo similar a esto:
-  """
+  # Relación con oils activada
   oils = relationship(
     "Oil",
     back_populates="oil_type",
     cascade="all, delete-orphan"
   )
-  """
 
   def __init__(self, name, description=None):
     self.name = name

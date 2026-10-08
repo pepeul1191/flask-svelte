@@ -113,7 +113,6 @@ entity "oils" as oils {
   oil_brand_id : bigint <<FK>>
   oil_type_id : bigint <<FK>>
   name : string
-  viscosity_grade : string
   description : text
   created_at : datetime
   updated_at : datetime

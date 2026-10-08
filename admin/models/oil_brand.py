@@ -25,14 +25,12 @@ class OilBrand(Base, ToString):
     nullable=True
   )
 
-  # Relación con oils
-  """
+  # Relación con oils activada
   oils = relationship(
     "Oil",
     back_populates="oil_brand",
     cascade="all, delete-orphan"
   )
-  """
 
   def __init__(self, name, description=None):
     self.name = name

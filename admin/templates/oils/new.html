@@ -1,0 +1,128 @@
+{# admin/templates/oils/new.html #}
+
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block extra_js %}
+
+{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin">
+        <i class="fa fa-cc-mastercard me-2"></i>
+        Datos Maestros
+      </a>
+      /
+      <a href="/admin/oils">
+        Aceites
+      </a>
+      /
+      Crear Aceite
+    </h3>
+
+    {% include 'partials/flash_messages.html' %}
+
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-plus me-2"></i>
+          Nuevo Aceite
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <form action="/admin/oils" method="POST" class="row g-3">
+
+          <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}">
+
+          <!-- Marca de Aceite -->
+          <div class="col-md-6">
+            <label for="oil_brand_id" class="form-label">
+              Marca de Aceite <span class="text-danger">*</span>
+            </label>
+            <select name="oil_brand_id" id="oil_brand_id" class="form-select" required>
+              <option value="">-- Seleccione una marca --</option>
+              {% for brand in locals.oil_brands %}
+              <option value="{{ brand.id }}">{{ brand.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Tipo de Aceite -->
+          <div class="col-md-6">
+            <label for="oil_type_id" class="form-label">
+              Tipo de Aceite <span class="text-danger">*</span>
+            </label>
+            <select name="oil_type_id" id="oil_type_id" class="form-select" required>
+              <option value="">-- Seleccione un tipo --</option>
+              {% for type_item in locals.oil_types %}
+              <option value="{{ type_item.id }}">{{ type_item.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Nombre -->
+          <div class="col-md-12">
+            <label class="form-label">
+              Nombre <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              name="name"
+              class="form-control"
+              maxlength="150"
+              required>
+          </div>
+
+          <!-- Descripción -->
+          <div class="col-md-12">
+            <label class="form-label">
+              Descripción
+            </label>
+            <textarea
+              name="description"
+              class="form-control"
+              rows="3"
+              placeholder="Descripción del aceite..."></textarea>
+          </div>
+
+          <!-- Botones -->
+          <div class="col-12 mt-4">
+            <button
+              type="submit"
+              class="btn btn-success">
+              <i class="fa fa-save me-2"></i>
+              Guardar
+            </button>
+
+            <a
+              href="/admin/oils"
+              class="btn btn-warning ms-2">
+              <i class="fa fa-times me-2"></i>
+              Cancelar
+            </a>
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+{% endblock %}
