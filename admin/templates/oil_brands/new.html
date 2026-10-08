@@ -1,0 +1,111 @@
+{# admin/templates/oil_brands/new.html #}
+
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block extra_js %}
+
+{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin">
+        <i class="fa fa-cc-mastercard me-2"></i>
+        Datos Maestros
+      </a>
+      /
+      <a href="/admin/oil-brands">
+        Marcas de Aceite
+      </a>
+      /
+      Crear Marca de Aceite
+    </h3>
+
+    {% include 'partials/flash_messages.html' %}
+
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-plus me-2"></i>
+          Nueva Marca de Aceite
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <form action="/admin/oil-brands" method="POST" class="row g-3">
+
+          <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}">
+
+          <div class="col-md-12">
+
+            <label class="form-label">
+              Nombre
+            </label>
+
+            <input
+              type="text"
+              name="name"
+              class="form-control"
+              maxlength="100"
+              required>
+
+          </div>
+
+          <div class="col-md-12">
+
+            <label class="form-label">
+              Descripción
+            </label>
+
+            <textarea
+              name="description"
+              class="form-control"
+              rows="3"
+              placeholder="Descripción de la marca de aceite..."></textarea>
+
+          </div>
+
+          <div class="col-12 mt-4">
+
+            <button
+              type="submit"
+              class="btn btn-success">
+
+              <i class="fa fa-save me-2"></i>
+              Guardar
+
+            </button>
+
+            <a
+              href="/admin/oil-brands"
+              class="btn btn-warning ms-2">
+
+              <i class="fa fa-times me-2"></i>
+              Cancelar
+
+            </a>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+{% endblock %}

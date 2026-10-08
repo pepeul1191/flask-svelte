@@ -49,6 +49,10 @@ Este es un proyecto base que integra un backend en **Flask** con un frontend en 
     #### FILES SERVICE
     URL_FILES_SERVICE=http://localhost:4000
     X_AUTH_FILES_SERVICE=dXNlci1zdGlja3lfc2VjcmV0XzEyMzQ1Njc
+    #### SCRAPING SERVICE
+    URL_SCRAPING_SERVICE=http://localhost:5020
+    X_AUTH_SCRAPING_SERVICE=dXNlci1zdGlja3lfc2VjcmV0XzEyMzQ1Njc
+    SCRAPING_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoicGVwZSIsImlkIjoxfSwiaWF0IjoxNzgyNTIxMTI0LCJleHAiOjE3ODI1MjQ3MjR9.h4zsVEOJi4sBSZJDt6XbLadjJ0oldCW932d1wSAQ6T0
     #### GOOGLE OAUTH
     GOOGLE_CLIENT_ID=your_google_client_id
     GOOGLE_CLIENT_SECRET=your_google_client_secret

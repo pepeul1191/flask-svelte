@@ -32,7 +32,6 @@ def login():
     session['user'] = {
       "id": user_data["user"]["id"],
       "username": user_data["user"]["username"],
-      "name": user_data["user"].get("name", user_data["user"]["username"]),
       "email": user_data["user"]["email"],
       "oauth": False
     }
@@ -40,28 +39,12 @@ def login():
     session['tokens'] = user_data.get("tokens", {})
     session['roles'] = user_data.get("roles", [])
 
-    """
-    # =========================
-    # LOGIN LOG (equivalente Rails model)
-    # =========================
-    try:
-      from main.models.login_log import LoginLog
-
-      log = LoginLog(
-        user_id=user_data["user"]["id"],
-        success=True,
-        ip_address=request.remote_addr,
-        created_at=datetime.utcnow()
-      )
-      log.save()
-
-    except Exception as e:
-      print("LoginLog error:", e)
-    """
     # en función al rol el redirect
     roles = user_data.get("roles", [])
 
-    if "admin" in roles:
+    # print(roles)
+
+    if any(role["name"] == "terpel-admin" for role in roles):
       return redirect("/admin")
 
     return redirect('/')

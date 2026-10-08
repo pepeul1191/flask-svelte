@@ -1,0 +1,15 @@
+-- migrate:up
+
+CREATE TABLE oil_brands (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL,
+  description TEXT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_oil_brands_name (name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- migrate:down
+
+DROP TABLE oil_brands;
