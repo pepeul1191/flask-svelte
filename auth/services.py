@@ -49,24 +49,25 @@ class AuthService(ApplicationService):
         "username and password are required"
       )
 
+    # api de accesos
     access_api = AuthService._make_auth_access_request(username, password)
     if not access_api["success"]:
       return access_api
 
-    files_api = AuthService._make_auth_files_request()
+    access_data = access_api["data"]
+    # api de archivos
+    files_api = AuthService._make_auth_files_request(access_data)
     
     if not files_api.get("success", False):
       error = files_api.get("error")
-
-      # Estos errores no bloquean el flujo
-      if error in ("USER_REQUIRED", "ROLES_NOT_FOUND"):
+      if error in ("USER_REQUIRED", "ROLE_NOT_FOUND"):
         files_data = None
       else:
         return files_api
     else:
       files_data = files_api.get("data")
 
-    access_data = access_api["data"]
+    # response final
 
     login_response = {
       "user": {
@@ -149,7 +150,7 @@ class AuthService(ApplicationService):
   # =====================================================
 
   @staticmethod
-  def _make_auth_files_request():
+  def _make_auth_files_request(access_data):
 
     url = os.getenv("URL_FILES_SERVICE")
     x_auth = os.getenv("X_AUTH_FILES_SERVICE")
@@ -163,19 +164,16 @@ class AuthService(ApplicationService):
       resp = requests.post(
         f"{url}/api/v1/sign-in",
         json={
-
+          "user": access_data["user"]["username"],
+          "roles": access_data["roles"]
         },
         headers={
           "X-Auth-Trigger": x_auth
         },
         timeout=30
       )
-
-      if resp.status_code < 400:
-        return AuthService.build_response(
-          data=resp.json(),
-          message="Files authentication successful"
-        )
+      print("staus code")
+      print(resp.json())
 
       return resp.json()
 
