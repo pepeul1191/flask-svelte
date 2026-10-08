@@ -13,7 +13,7 @@ skinparam arrow {
   Color #A80036
   FontColor #A80036
 }
-
+ 
 entity "clients" as clients {
   * id : bigint <<PK>>
   --
@@ -98,13 +98,22 @@ entity "oil_brands" as oil_brands {
   updated_at : datetime
 }
 
+entity "oil_types" as oil_types {
+  * id : bigint <<PK>>
+  --
+  name : string <<unique>>
+  description : text
+  created_at : datetime
+  updated_at : datetime
+}
+
 entity "oils" as oils {
   * id : bigint <<PK>>
   --
   oil_brand_id : bigint <<FK>>
+  oil_type_id : bigint <<FK>>
   name : string
   viscosity_grade : string
-  type : string
   description : text
   created_at : datetime
   updated_at : datetime
@@ -188,6 +197,7 @@ brands ||--o{ models : "1:N"
 models ||--o{ machines : "1:N"
 
 oil_brands ||--o{ oils : "1:N"
+oil_types ||--o{ oils : "1:N"
 
 machines ||--o{ machine_oils : "1:N"
 oils ||--o{ machine_oils : "1:N"

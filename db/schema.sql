@@ -27,6 +27,23 @@ CREATE TABLE `oil_brands` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `oil_types`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `oil_types` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `description` text,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_oil_types_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `schema_migrations`
 --
 
@@ -60,5 +77,7 @@ CREATE TABLE `schema_migrations` (
 LOCK TABLES `schema_migrations` WRITE;
 INSERT INTO `schema_migrations` (version) VALUES
   ('20261008185818'),
-  ('20261008190048');
+  ('20261008190048'),
+  ('20261008191251'),
+  ('20261008191258');
 UNLOCK TABLES;
