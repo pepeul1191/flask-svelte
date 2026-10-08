@@ -4,6 +4,7 @@ from flask import Blueprint, flash, render_template, request, redirect
 
 from admin.configs.middlewares import only_logged
 from admin.services.brand_service import BrandService
+from admin.services.brand_model_service import BrandModelService
 
 views = Blueprint(
   "admin-brands-views",
@@ -105,22 +106,56 @@ def create():
 @views.route("/admin/brands/<int:brand_id>/edit", methods=["GET"])
 @only_logged
 def edit(brand_id):
+  # 1. Obtener la marca
+  brand_response = BrandService.fetch_one(brand_id)
 
-  response = BrandService.fetch_one(brand_id)
-
-  if not response["success"]:
-    flash(response["message"], "danger")
+  if not brand_response["success"]:
+    flash(brand_response["message"], "danger")
     return redirect("/admin/brands")
+
+  # 2. Obtener parámetros de paginación y búsqueda para los modelos de esta marca
+  page = request.args.get("page", default=1, type=int)
+  per_page = request.args.get("per_page", default=10, type=int)
+  search_query = request.args.get("model_name", default='')
+
+  if page < 1:
+    page = 1
+  if per_page < 1:
+    per_page = 10
+
+  # 3. Obtener los modelos de la marca usando BrandModelService
+  models_response = BrandModelService.fetch_by_brand(
+    brand_id=brand_id,
+    page=page,
+    per_page=per_page,
+    search_query=search_query
+  )
+
+  brand_models = []
+  pagination = {
+    "page": page,
+    "per_page": per_page,
+    "total_models": 0,
+    "total_pages": 0,
+    "start_record": 0,
+    "end_record": 0
+  }
+
+  if models_response["success"]:
+    brand_models = models_response["data"]["brand_models"]
+    pagination = models_response["data"]["pagination"]
 
   return render_template(
     "brands/edit.html",
     locals={
-      "title": "Editar Marca",
+      "title": "Editar Marca y Modelos",
       "nav_link": "master-data",
-      "brand": response["data"]
+      "brand": brand_response["data"],
+      "brand_models": brand_models,
+      "pagination": pagination,
+      "model_search_query": search_query
     }
   )
-
 
 # =====================
 # UPDATE

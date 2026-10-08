@@ -10,6 +10,25 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `brand_models`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `brand_models` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `brand_id` bigint unsigned NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` text,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_brand_models_brand_id` (`brand_id`),
+  CONSTRAINT `fk_brand_models_brand_id` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `brands`
 --
 
@@ -122,5 +141,7 @@ INSERT INTO `schema_migrations` (version) VALUES
   ('20261008193046'),
   ('20261008193049'),
   ('20261008195317'),
-  ('20261008195550');
+  ('20261008195550'),
+  ('20261008200925'),
+  ('20261008201047');
 UNLOCK TABLES;
