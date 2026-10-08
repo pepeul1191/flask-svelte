@@ -10,7 +10,7 @@
     "svelte": "rollup -c -w",
     "dev:access": "npx dotenv-cli -e .env -- bash -c 'cd \"$ACCESS_PATH\" && npm run dev'",
     "dev:files": "npx dotenv-cli -e .env -- bash -c 'cd \"$FILES_PATH\" && npm run dev'",
-    "dev-all": "concurrently -p \"[{name}]\" -n \"CLASSROOM,ACCESS,FILES\" -c \"bgRed.bold,bgGreen.bold,bgBlue.bold,bgOrange.bold\" \"npm run dev\" \"npm run dev:access\" \"npm run dev:files\"",
+    "dev-all": "concurrently -p \"[{name}]\" -n \"OILS,ACCESS,FILES\" -c \"bgRed.bold,bgGreen.bold,bgBlue.bold,bgOrange.bold\" \"npm run dev\" \"npm run dev:access\" \"npm run dev:files\"",
     "db:new": "npx dbmate -d \"db/migrations\" -e \"DATABASE_URL\" new ",
     "db:up": "npx dbmate -d \"db/migrations\" -e \"DATABASE_URL\" up",
     "db:rollback": "npx dbmate -d \"db/migrations\" -e \"DATABASE_URL\" rollback",

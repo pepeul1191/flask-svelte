@@ -1,0 +1,182 @@
+@startuml
+' Base de datos - Notación Rails
+' users: solo datos propios de identidad/auth
+' roles: catálogo independiente
+' client_operators / provider_operators: datos propios de cada tipo (pueden repetirse)
+
+hide circle
+skinparam linetype ortho
+skinparam entity {
+  BackgroundColor #FEFECE
+  BorderColor #A80036
+}
+skinparam arrow {
+  Color #A80036
+  FontColor #A80036
+}
+
+entity "roles" as roles {
+  * id : bigint <<PK>>
+  --
+  name : string <<unique>>
+  code : string <<unique>>
+  description : string
+  created_at : datetime
+  updated_at : datetime
+  ..
+  code: client_operator
+  code: provider_operator
+  code: admin
+}
+
+entity "users" as users {
+  * id : bigint <<PK>>
+  --
+  role_id : bigint <<FK>>
+  email : string <<unique>>
+  encrypted_password : string
+  active : boolean
+  created_at : datetime
+  updated_at : datetime
+  ..
+  Solo identidad / autenticación.
+  Los datos personales y de perfil
+  viven en cada tabla de operador.
+}
+
+entity "clients" as clients {
+  * id : bigint <<PK>>
+  --
+  name : string
+  tax_id : string <<unique>>
+  contact_name : string
+  email : string
+  phone : string
+  address : text
+  notes : text
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "client_operators" as client_operators {
+  * id : bigint <<PK>>
+  --
+  user_id : bigint <<FK>> <<unique>>
+  client_id : bigint <<FK>>
+  name : string
+  document_id : string
+  phone : string
+  position : string
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "provider_operators" as provider_operators {
+  * id : bigint <<PK>>
+  --
+  user_id : bigint <<FK>> <<unique>>
+  name : string
+  document_id : string
+  phone : string
+  certification : string
+  position : string
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "machines" as machines {
+  * id : bigint <<PK>>
+  --
+  client_id : bigint <<FK>>
+  name : string
+  code : string
+  brand : string
+  model : string
+  serial_number : string
+  machine_type : string
+  location : string
+  criticality : integer
+  status : integer
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "machine_documents" as machine_documents {
+  * id : bigint <<PK>>
+  --
+  machine_id : bigint <<FK>>
+  name : string
+  description : text
+  url : string
+  document_type : string
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "samples" as samples {
+  * id : bigint <<PK>>
+  --
+  machine_id : bigint <<FK>>
+  client_operator_id : bigint <<FK>> <<nullable>>
+  provider_operator_id : bigint <<FK>> <<nullable>>
+  sampled_at : datetime
+  sample_type : integer
+  compartment : string
+  sample_point : string
+  oil_hours : decimal
+  oil_km : decimal
+  container_code : string <<unique>>
+  viscosity_grade : string
+  status : integer
+  notes : text
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "analyses" as analyses {
+  * id : bigint <<PK>>
+  --
+  sample_id : bigint <<FK>>
+  provider_operator_id : bigint <<FK>>
+  lab_name : string
+  report_number : string
+  received_at : datetime
+  analyzed_at : datetime
+  viscosity_40c : decimal
+  viscosity_100c : decimal
+  water_ppm : decimal
+  fuel_percent : decimal
+  glycol : boolean
+  iron_ppm : decimal
+  copper_ppm : decimal
+  lead_ppm : decimal
+  silicon_ppm : decimal
+  tbn : decimal
+  tan : decimal
+  iso_code : string
+  wear_severity : integer
+  recommendation : text
+  status : integer
+  created_at : datetime
+  updated_at : datetime
+}
+
+' ---------- Relaciones ----------
+roles ||--o{ users : "1:N"
+
+users ||--o| client_operators : "1:1 (perfil)"
+users ||--o| provider_operators : "1:1 (perfil)"
+
+clients ||--o{ client_operators : "1:N"
+clients ||--o{ machines : "1:N"
+
+machines ||--o{ machine_documents : "1:N"
+machines ||--o{ samples : "1:N"
+
+client_operators ||--o{ samples : "1:N (client_operator_id)"
+provider_operators ||--o{ samples : "1:N (provider_operator_id)"
+provider_operators ||--o{ analyses : "1:N (provider_operator_id)"
+
+samples ||--o| analyses : "1:0..1"
+
+@enduml

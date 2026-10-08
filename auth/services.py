@@ -1,7 +1,11 @@
 # auth/services.py
 import os
 import requests
+import traceback
+import logging
 from main.services import ApplicationService
+
+logger = logging.getLogger(__name__)
 
 class AuthService(ApplicationService):
 
@@ -50,18 +54,30 @@ class AuthService(ApplicationService):
       return access_api
 
     files_api = AuthService._make_auth_files_request()
-    if not files_api["success"]:
-      return files_api
+    
+    if not files_api.get("success", False):
+      error = files_api.get("error")
+
+      # Estos errores no bloquean el flujo
+      if error in ("USER_REQUIRED", "ROLES_NOT_FOUND"):
+        files_data = None
+      else:
+        return files_api
+    else:
+      files_data = files_api.get("data")
 
     access_data = access_api["data"]
-    files_data = files_api["data"]
 
     login_response = {
-      "user": access_data["data"]["user"],
-      "roles": access_data["data"]["roles"],
+      "user": {
+        "id": access_data["user"]["id"],
+        "username": access_data["user"]["username"],
+        "email": access_data["user"]["email"],
+      },
+      "roles": access_data["roles"],
       "tokens": {
-        "access": access_data["data"]["token"],
-        "file": files_data["data"]["token"]
+        "access": access_data["jwt"],
+        "files": files_data
       }
     }
 
@@ -146,7 +162,9 @@ class AuthService(ApplicationService):
     try:
       resp = requests.post(
         f"{url}/api/v1/sign-in",
-        json={},
+        json={
+
+        },
         headers={
           "X-Auth-Trigger": x_auth
         },
@@ -159,10 +177,7 @@ class AuthService(ApplicationService):
           message="Files authentication successful"
         )
 
-      return AuthService.handle_error(
-        resp.json().get("message", "Error in files service"),
-        resp.text
-      )
+      return resp.json()
 
     except Exception as e:
       return AuthService.handle_error(
@@ -199,10 +214,7 @@ class AuthService(ApplicationService):
       )
 
       if resp.status_code < 400:
-        return AuthService.build_response(
-          data=resp.json(),
-          message="Authentication successful"
-        )
+        return resp.json()
 
       return AuthService.handle_error(
         resp.json().get("message", "Error in authentication service"),
@@ -210,6 +222,7 @@ class AuthService(ApplicationService):
       )
 
     except Exception as e:
+      traceback.print_exc()
       return AuthService.handle_error(
         "could not connect to the authentication service",
         str(e)

@@ -222,11 +222,11 @@ def province_create():
 
   if response["success"]:
     flash(response["message"], "success")
-    return redirect(f"/admin/locations?department_id={request.form.get("department_id")}")
+    return redirect(f"/admin/locations?department_id={request.form.get('department_id')}")
 
   flash(response["message"], "danger")
 
-  return redirect(f"/admin/provinces/new?department_id={request.form.get("department_id")}")
+  return redirect(f"/admin/provinces/new?department_id={request.form.get('department_id')}")
 
 @views.route("/admin/departments/<int:department_id>/provinces/<int:province_id>/edit", methods=["GET"])
 @only_logged

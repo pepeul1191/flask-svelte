@@ -18,10 +18,8 @@ def login():
   username = request.form.get('username')
   password = request.form.get('password')
 
-  # result = AuthService.login_by_username(username, password)
-  result = AuthService.simple_login(username, password)
-
-  print(result)
+  result = AuthService.login_by_username(username, password)
+  #result = AuthService.simple_login(username, password)
 
   if result.get("success"):
 
