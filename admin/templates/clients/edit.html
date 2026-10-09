@@ -11,12 +11,8 @@
   <div class="container-fluid">
 
     <h3 class="mb-4">
-      <a href="/admin">
-        <i class="fa fa-cc-mastercard me-2"></i>
-        Datos Maestros
-      </a>
-      /
       <a href="/admin/clients">
+        <i class="fa fa-tint me-2"></i>
         Gestión de Clientes
       </a>
       /
@@ -140,6 +136,24 @@
             </button>
 
             <a
+              href="/admin/clients/{{ locals.client.id }}/workers"
+              class="btn btn-secondary ms-2">
+
+              <i class="fa fa-users me-2"></i>
+              Trabajadores
+
+            </a>
+
+            <a
+              href="/admin/clients/{{ locals.client.id }}/machines"
+              class="btn btn-secondary ms-2">
+
+              <i class="fa fa-cogs me-2"></i>
+              Maquinarias
+
+            </a>
+
+            <a
               href="/admin/clients"
               class="btn btn-warning ms-2">
 
@@ -150,35 +164,6 @@
 
           </div>
 
-        </div>
-
-      </div>
-
-
-      <!-- CARD 2: NOTAS Y OBSERVACIONES -->
-      <div class="card mb-4">
-
-        <div class="card-header">
-          <h6 class="mb-0">
-            <i class="fa fa-sticky-note me-2"></i>
-            Notas Adicionales
-          </h6>
-        </div>
-
-        <div class="card-body">
-          <div class="row g-3">
-            <div class="col-md-12">
-              <label class="form-label">
-                Notas Internas del Cliente
-              </label>
-
-              <textarea
-                name="notes"
-                class="form-control"
-                rows="4"
-                placeholder="Comentarios u observaciones internas...">{{ locals.client.notes or '' }}</textarea>
-            </div>
-          </div>
         </div>
 
       </div>

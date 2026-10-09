@@ -46,6 +46,33 @@ CREATE TABLE `brands` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `client_workers`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `client_workers` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `client_id` bigint unsigned NOT NULL,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `names` varchar(150) NOT NULL,
+  `last_names` varchar(150) NOT NULL,
+  `email` varchar(150) NOT NULL,
+  `document` varchar(50) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `certification` varchar(255) DEFAULT NULL,
+  `position` varchar(100) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `user_id` (`user_id`),
+  KEY `fk_client_workers_client` (`client_id`),
+  CONSTRAINT `fk_client_workers_client` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `clients`
 --
 
@@ -191,5 +218,7 @@ INSERT INTO `schema_migrations` (version) VALUES
   ('20261008204846'),
   ('20261008204853'),
   ('20261008213032'),
-  ('20261008213038');
+  ('20261008213038'),
+  ('20261009020635'),
+  ('20261009020742');
 UNLOCK TABLES;

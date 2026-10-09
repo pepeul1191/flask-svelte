@@ -7,3 +7,4 @@ from admin.models.brand import Brand
 from admin.models.brand_model import BrandModel
 from admin.models.worker import Worker
 from admin.models.client import Client
+from admin.models.client_worker import ClientWorker

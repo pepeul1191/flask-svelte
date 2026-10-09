@@ -31,6 +31,7 @@ entity "client_workers" as client_workers {
   * id : int <<PK>>
   --
   user_id : int <<unique>> <<nullable>>
+  client_id_id : int <<FK>>
   names : string
   last_names : string
   email: string

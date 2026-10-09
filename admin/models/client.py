@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from sqlalchemy import Column, BigInteger, String, Text, DateTime
+from sqlalchemy.orm import relationship
 from main.databases import Base, ToString
 
 
@@ -55,6 +56,13 @@ class Client(Base, ToString):
     default=datetime.utcnow,
     onupdate=datetime.utcnow,
     nullable=False
+  )
+
+  # Relación con ClientWorker (asociación jerárquica)
+  client_workers = relationship(
+    "ClientWorker",
+    back_populates="client",
+    cascade="all, delete-orphan"
   )
 
   def __init__(self, name, contact_name, email=None, phone=None, address=None, notes=None):
