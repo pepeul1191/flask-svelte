@@ -93,6 +93,31 @@ CREATE TABLE `clients` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `machines`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `machines` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `client_id` bigint unsigned NOT NULL,
+  `model_id` bigint unsigned NOT NULL,
+  `name` varchar(150) NOT NULL,
+  `code` varchar(100) NOT NULL,
+  `serial_number` varchar(100) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `code` (`code`),
+  UNIQUE KEY `serial_number` (`serial_number`),
+  KEY `fk_machines_client` (`client_id`),
+  KEY `fk_machines_brand_model` (`model_id`),
+  CONSTRAINT `fk_machines_brand_model` FOREIGN KEY (`model_id`) REFERENCES `brand_models` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_machines_client` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `oil_brands`
 --
 
@@ -220,5 +245,7 @@ INSERT INTO `schema_migrations` (version) VALUES
   ('20261008213032'),
   ('20261008213038'),
   ('20261009020635'),
-  ('20261009020742');
+  ('20261009020742'),
+  ('20261009024954'),
+  ('20261009025000');
 UNLOCK TABLES;

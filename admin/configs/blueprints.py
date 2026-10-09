@@ -9,6 +9,7 @@ from admin.views.brand_model_view import views as brand_model_view
 from admin.views.worker_view import views as worker_view
 from admin.views.client_view import views as client_view
 from admin.views.client_worker_view import views as client_worker_view
+from admin.views.machine_view import views as machine_view
 # apis
 
 blueprints = [
@@ -22,5 +23,6 @@ blueprints = [
   worker_view,
   client_view,
   client_worker_view,
+  machine_view,
   # apis
 ]

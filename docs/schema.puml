@@ -85,10 +85,6 @@ entity "machines" as machines {
   name : string
   code : string
   serial_number : string
-  machine_type : string
-  location : string
-  criticality : integer
-  status : integer
   created_at : datetime
   updated_at : datetime
 }

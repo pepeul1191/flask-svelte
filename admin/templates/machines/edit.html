@@ -1,0 +1,165 @@
+{# admin/templates/machines/edit.html #}
+
+{% extends './layouts/admin_dashboard.html' %}
+
+{% block extra_css %}{% endblock %}
+{% block extra_js %}{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin">
+        <i class="fa fa-cc-mastercard me-2"></i>
+        Datos Maestros
+      </a>
+      /
+      <a href="/admin/clients">
+        Gestión de Clientes
+      </a>
+      /
+      <a href="/admin/clients/{{ locals.client.id }}/machines">
+        Gestión de Máquinas
+      </a>
+      /
+      Editar Máquina
+    </h3>
+
+    {% include 'partials/flash_messages.html' %}
+
+    <form
+      action="/admin/clients/{{ locals.client.id }}/machines/{{ locals.machine.id }}/update"
+      method="POST"
+      class="row g-4">
+
+      <input
+        type="hidden"
+        name="csrf_token"
+        value="{{ csrf_token() }}">
+
+      <!-- CARD 1: INFORMACIÓN PRINCIPAL DE LA MÁQUINA -->
+      <div class="col-md-12">
+        <div class="card mb-2">
+
+          <div class="card-header">
+            <h6 class="mb-0">
+              <i class="fa fa-cogs me-2"></i>
+              Editar Equipo: {{ locals.machine.name }}
+            </h6>
+          </div>
+
+          <div class="card-body">
+            <div class="row g-3">
+
+              <!-- Nombre de la Máquina -->
+              <div class="col-md-6">
+                <label class="form-label">
+                  Nombre del Equipo <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  class="form-control"
+                  maxlength="150"
+                  placeholder="Ej. Compresor de Tornillo Principal"
+                  value="{{ locals.machine.name }}"
+                  required>
+              </div>
+
+              <!-- Código de Inventario / Identificador -->
+              <div class="col-md-6">
+                <label class="form-label">
+                  Código de Inventario <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="code"
+                  class="form-control"
+                  maxlength="100"
+                  placeholder="Ej. COMP-001-IND"
+                  value="{{ locals.machine.code }}"
+                  required>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- CARD 2: MODELO Y NUMERO DE SERIE -->
+      <div class="col-md-12">
+        <div class="card mb-4">
+
+          <div class="card-header">
+            <h6 class="mb-0">
+              <i class="fa fa-barcode me-2"></i>
+              Especificaciones Técnicas y Marca
+            </h6>
+          </div>
+
+          <div class="card-body">
+            <div class="row g-3">
+
+              <!-- Modelo de Marca -->
+              <div class="col-md-6">
+                <label class="form-label">
+                  Marca / Modelo <span class="text-danger">*</span>
+                </label>
+                <select name="model_id" id="model_id" class="form-select" required>
+                  <option value="">-- Seleccione una Marca y Modelo --</option>
+                  {% for bm in locals.brand_models %}
+                  <option value="{{ bm.id }}" {% if locals.machine.model_id == bm.id %}selected{% endif %}>
+                    {{ bm.brand_name }} - {{ bm.name }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Número de Serie -->
+              <div class="col-md-6">
+                <label class="form-label">
+                  Número de Serie
+                </label>
+                <input
+                  type="text"
+                  name="serial_number"
+                  class="form-control"
+                  maxlength="100"
+                  placeholder="Ej. SN-CMP-987123"
+                  value="{{ locals.machine.serial_number or '' }}">
+              </div>
+
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="col-12 mt-4">
+              <button
+                type="submit"
+                class="btn btn-success">
+                <i class="fa fa-save me-2"></i>
+                Actualizar
+              </button>
+
+              <a
+                href="/admin/clients/{{ locals.client.id }}/machines"
+                class="btn btn-warning ms-2">
+                <i class="fa fa-times me-2"></i>
+                Cancelar
+              </a>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </form>
+
+  </div>
+</main>
+
+{% endblock %}
